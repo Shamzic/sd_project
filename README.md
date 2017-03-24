@@ -4,6 +4,8 @@ Corrigé des TPs + sujet projet : https://dpt-info.u-strasbg.fr/~g.frey/SD/
 
 Diagramme UML draw.io : https://drive.google.com/file/d/0B0OIKQIdHBm8Qi16NDBucFFaakE/view?usp=sharing
 
+# Petites infos précisées en TP :
+
 Pour rappel c'est de la prog distribuée donc il faut faire des processus indépendants.
 Si un agent demande un accès aux ressources d'un producteur, c'est la méthode du producteur qui est appelée.
 
@@ -44,7 +46,7 @@ File d'attente pour les producteurs car accès exclusif, cela peut être géré 
 
 Exemple pour gagner partie : 100 ressource de la ressources 1 et 50 de la ressource 2.
 
-#initialisation
+# initialisation
 
 Pour lancer une partie, on peut le faire ne ligne de commande, on stocke tout dans un fichier qu'on peut utiliser pour l'interface graphique.
 
@@ -53,13 +55,13 @@ Definir les objectifs des joueurs. Les ressources épuisables ou non.
 On peut faire un fichier init pour stocker tous les paramètres dedans.
 
 
-#Deroulement de la partie
+# Deroulement de la partie
 
 Le coordinateur permet aux joueurs d'accéder aux ressources des producteurs. 
 Il faut enregistrer CHAQUE opération dans un fichier texte par exemple dès qu'un joueur a finit son action.
 Dans un premier temps on peut l'afficher dans le terminal pour commencer sans interface graphique.
 
-#Fin de la partie
+# Fin de la partie
 
 La visualisation de l'interface se fait à posteriori une fois que la partie est terminée on affiche les noeuds des joueurs.
 Il existe des libraires de représentation des graphes (on fait simplement dix noeuds par exemple et ça les dispose automatiquement).

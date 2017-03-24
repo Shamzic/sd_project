@@ -22,3 +22,7 @@ On peut avoir plusieurs règles de fin, si un agent a fini, on regarde l'état d
 
 Accès exclusif aux producteurs de ressources.
 
+Production possible pour un agent : la moitié des ressources +1 toutes les 50 ms.
+
+Plusieurs personnalités pour les joueurs : individualiste ou coopératif (en binôme, il serait bien d'en faire d'autres)
+

@@ -46,6 +46,16 @@ File d'attente pour les producteurs car accès exclusif, cela peut être géré 
 
 Exemple pour gagner partie : 100 ressource de la ressources 1 et 50 de la ressource 2.
 
+# Rôles
+
+-Coopératif
+-Coopératif stratège
+-Individualiste
+-Individualiste voleur
+-Voleur
+-Traître
+-Rancunier
+
 # initialisation
 
 Pour lancer une partie, on peut le faire ne ligne de commande, on stocke tout dans un fichier qu'on peut utiliser pour l'interface graphique.

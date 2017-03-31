@@ -5,9 +5,19 @@ public class Agent
 	{
 		this.id = id;
 	}
+    Agent()
+    {
+    }
 	
+    void setId(int id)
+	{
+        this.id = id;
+    }
 	
-	
+    int getId()
+    {
+        return id;
+    }
 
 
 

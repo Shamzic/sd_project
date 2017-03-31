@@ -1,5 +1,9 @@
 import java.util.ArrayList;
+import java.lang.Runtime;
 
+import java.net.* ;
+import java.rmi.* ;
+import java.io.* ;
 
 /* Arguments du Controlleur
  * port rmiregistry du controlleur
@@ -12,55 +16,44 @@ import java.util.ArrayList;
  * ressources initiales
  * nb de ressources différentes
  * nb de ressources nécessaires pour gagner
+ * nb de ressourcse pour gagner
  * mode jeu
  * ( en fonction du mode ) temps de jeu
  * 
 */
 public class Controller
 {
-	
-	
+	int nbJoueurs, nbProducteurs;
+    int nbRessourcesInitiales;
+    int nbRessourcesDifferentes;
+    
 	Controller (String args[])
 	{
-		ArrayList<Joueur> Joueurs;
-		ArrayList<Producteur> Producteurs;
-		int nbJoueurs, nbProducteurs;
 		int i ;
-		Joueur tmp;
-		Producteur tmp2;
-		
-		if (args.length != 2)
-		{
-			System.out.println("Controller : <nbJoueurs> <nbProducteurs>");
-			System.exit(1);
-		}
 		nbJoueurs = Integer.parseInt( args[0] );
-		nbProducteurs = Integer.parseInt( args[1] );
+        nbProducteurs = Integer.parseInt( args[1] );
+        nbRessourcesInitiales = 5;
+        nbRessourcesDifferentes = 3;
+
+        // fait autant de messages de contrôles que spécifiés dans les arguements
+        // doit d'abord attendre que les joueurs envoient un message de confirmation 
+        // d'initialisation au controlleur pour qu'il puisse se connecter aux agents
+	//	ArrayList<MessageControleImpl> Joueurs = new ArrayList<MessageControleImpl>( nbJoueurs );
+		//ArrayList<MessageControleImpl>  Producteurs = new ArrayList<MessageControleImpl>( nbProducteurs );
+        
+        
 		
-		//try
-		//{
-			// fait autant de joueurs et producteurs spécifiés dans les arguments
-			Joueurs = new ArrayList<Joueur>( nbJoueurs );
-			Producteurs = new ArrayList<Producteur>( nbProducteurs );
-			for( i = 0 ; i < nbJoueurs ; i++)
-			{
-				tmp = new Joueur(i);
-				Joueurs.add(i,tmp);
-			}
-			for( i = 0 ; i < nbProducteurs ; i++)
-			{
-				tmp2 = new Producteur(i);
-				Producteurs.add(i,tmp2);
-			}
+		try
+		{
+            
+			// Commence par faire l'objet grâce auquel le Controlleur communique avec les agents
+            MessageControleImpl MC = new MessageControleImpl(5,3);
+            Naming.rebind( "rmi://localhost:"+5000 + "/MessageControleGlobal", MC);
+            
 			
-			// Commence par faire le corba serveur
-			
-			
-			
-			// Maintenant il faut faire un corba avec tous les agents
-			// puis il faut transmettre tous les corba a tous les agents
-		//}
-		
+		}
+        catch (RemoteException re) { System.out.println(re) ; }
+        catch (MalformedURLException e) { System.out.println(e) ; }
 	}
 	
 	

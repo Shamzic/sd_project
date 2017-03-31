@@ -1,10 +1,26 @@
 import java.util.ArrayList;
 
+
+/* Arguments du Controlleur
+ * port rmiregistry du controlleur
+ * fichier d'enregistrement d'évènements
+ * nom de machine
+ * nb de joueurs 
+ * [] liste de port rmiregistry pour joueurs
+ * nb de producteurs
+ * [] liste de port rmiregistry pour producteurs
+ * ressources initiales
+ * nb de ressources différentes
+ * nb de ressources nécessaires pour gagner
+ * mode jeu
+ * ( en fonction du mode ) temps de jeu
+ * 
+*/
 public class Controller
 {
 	
 	
-	public static void main (String args[])
+	Controller (String args[])
 	{
 		ArrayList<Joueur> Joueurs;
 		ArrayList<Producteur> Producteurs;

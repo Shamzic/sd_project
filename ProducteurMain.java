@@ -24,7 +24,7 @@ public class ProducteurMain
             
             // initialise le serveur producteur
             P = new ProducteurImpl ( T.x, T.y, T.z);
-            Naming.rebind( "rmi://localhost:"+args[3] + "/Producteur"+ P.id, P);
+            Naming.rebind( "rmi://localhost:"+args[3] + "/Producteur", P);
             
             // initialise le serveur connexion pour que le controlleur puisse lui envoyer les nouveaux connectés
             C = new ConnexionImpl();

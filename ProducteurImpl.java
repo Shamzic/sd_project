@@ -18,5 +18,11 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
         
 	}
 	
+    public void salut()
+    throws RemoteException
+    {
+        System.out.println("Salut on vient de t'ajouter");
+    }
+    
 }
 

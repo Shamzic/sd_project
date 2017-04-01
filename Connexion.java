@@ -9,4 +9,7 @@ public interface Connexion extends Remote
     
     public void addConnexion(String MachineName, int port)
         throws RemoteException ;
+        
+    public void setProducteur ( int nbRessourcesDifferentes , String MachineName, int port)
+        throws RemoteException ;
 }

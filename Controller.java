@@ -29,6 +29,7 @@ public class Controller
     
 	Controller (String args[])
 	{
+        
 		int i ;
 		nbJoueurs = Integer.parseInt( args[0] );
         nbProducteurs = Integer.parseInt( args[1] );
@@ -47,7 +48,7 @@ public class Controller
 		{
             
 			// Commence par faire l'objet grâce auquel le Controlleur communique avec les agents
-            MessageControleImpl MC = new MessageControleImpl(5,3, nbProducteurs);
+            MessageControleImpl MC = new MessageControleImpl(5,3, nbProducteurs,"localhost", 5000);
             Naming.rebind( "rmi://localhost:"+5000 + "/MessageControleGlobal", MC);
             
 		}

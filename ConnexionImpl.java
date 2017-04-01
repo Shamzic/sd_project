@@ -9,7 +9,10 @@ import java.net.MalformedURLException ;
 class ConnexionImpl extends UnicastRemoteObject implements Connexion
 {
     public SerializableList L ;
-    public ArrayList<Joueur> PList = new ArrayList<Joueur>();
+    public ArrayList<Joueur> JList = new ArrayList<Joueur>();
+    
+    public ArrayList<Producteur> PList = new ArrayList<Producteur>();
+
     
     public ConnexionImpl()
     throws RemoteException
@@ -19,17 +22,34 @@ class ConnexionImpl extends UnicastRemoteObject implements Connexion
     public void initialSetPlayer( SerializableList L)
     throws RemoteException
     {
-        this.L = L;
         int i;
-        
+        this.L = L;
         try
         {
             for( i = 0 ; i< L.size() ; i++)
             {
                 System.out.println("Machine :" + L.get(i).MN + " :" + L.get(i).port);
                 Joueur P = (Joueur) Naming.lookup("rmi://" +  L.get(i).MN + ":" + L.get(i).port + "/Joueur") ;
-                PList.add( P );
+                JList.add( P );
                 P.salut();
+            }
+            
+        }
+        catch (NotBoundException re) { System.out.println(re) ; }
+        catch (MalformedURLException e) { System.out.println(e) ; }
+    }
+    
+    public void setProducteur ( int nbProducteurs , String MachineName, int port)
+    throws RemoteException
+    {
+        int i;
+        try
+        {
+            for(i=0; i < nbProducteurs ; i++)
+            {
+                System.out.println("Ajoute le producteur " + i + " au port " + port + " nom de machine : " + MachineName);
+                Producteur P = (Producteur) Naming.lookup("rmi://" + MachineName + ":"+port+"/Producteur"+i);
+                PList.add(P);
             }
         }
         catch (NotBoundException re) { System.out.println(re) ; }
@@ -44,7 +64,7 @@ class ConnexionImpl extends UnicastRemoteObject implements Connexion
         try
         {
             Joueur P = (Joueur) Naming.lookup("rmi://" + MachineName + ":" + port + "/Joueur") ;
-            PList.add( P );
+            JList.add( P );
             P.salut();
         }
         catch (NotBoundException re) { System.out.println(re) ; }

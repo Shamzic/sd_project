@@ -8,17 +8,21 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
 {
 	public int IdProducteur = 0, IdJoueur = 0;
     public int nbRessourcesInitiales, nbRessourcesDifferentes;
+    public String Name;
+    public int port;
     public SerializableList SList = new SerializableList();
     public ArrayList<Connexion> CList = new ArrayList<Connexion>();
     public ArrayList<ProducteurImpl> PList = new ArrayList<ProducteurImpl>();
     public ArrayList<Joueur> JList = new ArrayList<Joueur>();
     
-    public MessageControleImpl(int nbRessourcesInitiales, int nbRessourcesDifferentes, int nbProducteurs)
+    public MessageControleImpl(int nbRessourcesInitiales, int nbRessourcesDifferentes, int nbProducteurs, String Name, int port)
     throws RemoteException
     {
         int i;
         this.nbRessourcesInitiales = nbRessourcesInitiales;
         this.nbRessourcesDifferentes = nbRessourcesDifferentes;
+        this.Name = Name;
+        this.port = port;
         
         
         try
@@ -30,6 +34,7 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
                 PList.add(P);
                 String s ="rmi://localhost:" + 5000 + "/Producteur" + i;
                 Naming.rebind( s , P); // Pour se connecter au producteur i, on contact le producteur i 
+                System.out.println("Créé le producteur " + i);
             }
          }
         catch (MalformedURLException e) { System.out.println(e) ; }
@@ -52,7 +57,8 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
         try
         {
             Connexion CNew = (Connexion) Naming.lookup("rmi://" + MachineName + ":" + port + "/Connexion");
-            CNew.initialSetPlayer(SList); // envoie à l'agent qui s'est connecté les coordonnées des autres agents
+            CNew.initialSetPlayer(SList); // envoie au joueur qui s'est connecté les coordonnées des autres joueurs
+            CNew.setProducteur(PList.size(),Name,this.port); // envoie au joueur le nécessaire pour qu'il puisse se connecter aux producteurs
             
             // Maintenant envoie les coordonnées du nouveau connecté à tous les agents
             for( i = 0 ; i < CList.size() ; i ++)

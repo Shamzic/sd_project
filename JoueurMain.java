@@ -9,6 +9,7 @@ public class JoueurMain
     
     public static void main (String [] args)
     {
+        int i;
         if ( args.length != 4)
         {
             System.err.println( "usage : <ControllerMachineName> <ControllerPort> <JoueurMachineName> <ProducterPort>");
@@ -35,7 +36,6 @@ public class JoueurMain
             // Maintenant envoie ses "coordonnées" au Coordinateur
             M.addMachine( args[2], Integer.parseInt(args[3]) );
             
-            // Reste à faire la connexion entre les ressources et les joueurs 
 			
 		}
         catch (RemoteException re) { System.out.println(re) ; }

@@ -1,17 +1,17 @@
 import java.rmi.* ; 
 import java.net.MalformedURLException ; 
 
-public class ProducteurMain
+public class JoueurMain
 {
     static MessageControle M;
-    static ProducteurImpl P;
+    static JoueurImpl J;
     static ConnexionImpl C;
     
     public static void main (String [] args)
     {
         if ( args.length != 4)
         {
-            System.err.println( "usage : <ControllerMachineName> <ControllerPort> <ProducterMachineName> <ProducterPort>");
+            System.err.println( "usage : <ControllerMachineName> <ControllerPort> <JoueurMachineName> <ProducterPort>");
             System.exit(1);
         }
         try
@@ -19,12 +19,13 @@ public class ProducteurMain
             
             // débute la communication avec le controller
             M = (MessageControle) Naming.lookup("rmi://" + args[0] + ":" + args[1] + "/MessageControleGlobal");
-            TripleImpl T =M.getProdInitialInfo();
+            
+            TripleImpl T =M.getPlayerInitialInfo();
             System.out.println("Le Producteur reçoit l'id : " + T.x + ", RI : " + T.y + ", RD : " + T.z);
             
-            // initialise le serveur producteur
-            P = new ProducteurImpl ( T.x, T.y, T.z);
-            Naming.rebind( "rmi://localhost:"+args[3] + "/Producteur", P);
+            // initialise le serveur joueur
+            J = new JoueurImpl (T.x, T.y, T.z);
+            Naming.rebind( "rmi://localhost:"+args[3] + "/Joueur", J);
             
             // initialise le serveur connexion pour que le controlleur puisse lui envoyer les nouveaux connectés
             C = new ConnexionImpl();

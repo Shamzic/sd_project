@@ -4,7 +4,7 @@ import java.rmi.RemoteException ;
 
 public interface Connexion extends Remote
 {
-    public void initialSet( SerializableList L)
+    public void initialSetPlayer( SerializableList L)
         throws RemoteException ;
     
     public void addConnexion(String MachineName, int port)

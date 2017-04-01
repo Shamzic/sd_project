@@ -18,7 +18,7 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
         this.nbRessourcesDifferentes = nbRessourcesDifferentes;
     }
     
-    public TripleImpl getProdInitialInfo()
+    public TripleImpl getPlayerInitialInfo()
     throws RemoteException
     {
         TripleImpl T = new TripleImpl(IdProducteur++, nbRessourcesInitiales, nbRessourcesDifferentes);
@@ -34,7 +34,7 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
         try
         {
             Connexion CNew = (Connexion) Naming.lookup("rmi://" + MachineName + ":" + port + "/Connexion");
-            CNew.initialSet(SList); // envoie à l'agent qui s'est connecté les coordonnées des autres agents
+            CNew.initialSetPlayer(SList); // envoie à l'agent qui s'est connecté les coordonnées des autres agents
             
             // Maintenant envoie les coordonnées du nouveau connecté à tous les agents
             for( i = 0 ; i < CList.size() ; i ++)

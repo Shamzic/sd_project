@@ -1,10 +1,11 @@
-class Joueur 
+
+import java.util.ArrayList;
+import java.rmi.Remote ; 
+import java.rmi.RemoteException ; 
+
+public interface Joueur extends Remote
 {
-    int id;
-	Joueur(int id)
-	{
-		this.id = id;
-	}
-	
-	
+    public void salut()
+        throws RemoteException ;
+    
 }

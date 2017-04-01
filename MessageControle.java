@@ -6,7 +6,7 @@ public interface MessageControle extends Remote
 {
     public int getIdProducteur()
         throws RemoteException ;
-    public TripleImpl getProdInitialInfo()
+    public TripleImpl getPlayerInitialInfo()
         throws RemoteException;
         
     public void addMachine( String MachineName, int port)

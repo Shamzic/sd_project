@@ -9,14 +9,14 @@ import java.net.MalformedURLException ;
 class ConnexionImpl extends UnicastRemoteObject implements Connexion
 {
     public SerializableList L ;
-    public ArrayList<Producteur> PList = new ArrayList<Producteur>();
+    public ArrayList<Joueur> PList = new ArrayList<Joueur>();
     
     public ConnexionImpl()
     throws RemoteException
     {
     }
     
-    public void initialSet( SerializableList L)
+    public void initialSetPlayer( SerializableList L)
     throws RemoteException
     {
         this.L = L;
@@ -27,7 +27,7 @@ class ConnexionImpl extends UnicastRemoteObject implements Connexion
             for( i = 0 ; i< L.size() ; i++)
             {
                 System.out.println("Machine :" + L.get(i).MN + " :" + L.get(i).port);
-                Producteur P = (Producteur) Naming.lookup("rmi://" +  L.get(i).MN + ":" + L.get(i).port + "/Producteur") ;
+                Joueur P = (Joueur) Naming.lookup("rmi://" +  L.get(i).MN + ":" + L.get(i).port + "/Producteur") ;
                 PList.add( P );
                 P.salut();
             }
@@ -43,7 +43,7 @@ class ConnexionImpl extends UnicastRemoteObject implements Connexion
         System.out.println("J'ai ajouté la machine " + MachineName + ":"+ port);
         try
         {
-            Producteur P = (Producteur) Naming.lookup("rmi://" + MachineName + ":" + port + "/Producteur") ;
+            Joueur P = (Joueur) Naming.lookup("rmi://" + MachineName + ":" + port + "/Producteur") ;
             PList.add( P );
             P.salut();
         }

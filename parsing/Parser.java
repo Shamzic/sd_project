@@ -4,15 +4,23 @@ import java.io.FileInputStream;
 public class Parser {
 
 	String nom;
-	String nbjoueurs;
-	String nbproducteurs;
+	static String nbjoueurs;
+	static String nbproducteurs;
 
 	public Parser(String nom){
 		this.nom=nom;
 	}
 
-	public int getNbProd(){
+	public int getNbProducteurs(){
 		return Integer.parseInt(this.nbproducteurs);
+	}
+
+	public int getNbJoueurs(){
+		return Integer.parseInt(this.nbjoueurs);
+	}
+
+	public void concat2string(String a,String b){
+		a=a+b;
 	}
 
 	// Lecture d'un fichier octet par octet
@@ -34,11 +42,12 @@ public class Parser {
 		    		// On cherche les champs situé avant ':'
 		    		if(((char)lu!=':')&&((char)lu!='\n')&&(lecture_variable==false))
 						nomvariable+=(char)lu;
-
 					if(((char)lu!=':')&&((char)lu!='\n')&&(lecture_variable==true)&&(nomvariable=="nbjoueurs"))
-						this.nbjoueurs+=(char)lu;
+						nbjoueurs+=(char)lu;
+						//concat2string(nbjoueurs,(char)lu);
 					if(((char)lu!=':')&&((char)lu!='\n')&&(lecture_variable==true)&&(nomvariable=="nbproducteurs"))
-						this.nbproducteurs+=(char)lu;
+						nbproducteurs+=(char)lu;
+						//concat2string(nbproducteurs,(char)lu);
 					if((char)lu==':')
 					{
 						lecture_variable=true;

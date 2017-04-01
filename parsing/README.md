@@ -5,7 +5,7 @@ Fichiers pour l'initalisation du jeu.
 ### Utilisation du fichier "configuration" :
  Il est nécessaire de rentrer un nombre de joueurs et de producteurs.
 
-`nbjoueurs=< nombre de joueurs >`
+`nbjoueurs=<nombre de joueurs>`
 
 `nbproducteurs= <nombre de producteurs>`
 

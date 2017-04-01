@@ -8,5 +8,9 @@ public interface MessageControle extends Remote
         throws RemoteException ;
     public TripleImpl getProdInitialInfo()
         throws RemoteException;
+        
+    public void addMachine( String MachineName, int port)
+        throws RemoteException;
+
     
 }

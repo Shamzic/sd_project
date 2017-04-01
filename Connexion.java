@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.rmi.Remote ; 
 import java.rmi.RemoteException ; 
 
-public interface Producteur extends Remote
+public interface Connexion extends Remote
 {
     
 }

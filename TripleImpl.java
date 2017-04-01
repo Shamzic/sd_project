@@ -1,5 +1,3 @@
-import java.rmi.server.UnicastRemoteObject ;
-import java.rmi.RemoteException ;
 import java.io.Serializable;
 
 public class TripleImpl  implements Serializable

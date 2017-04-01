@@ -1,8 +1,9 @@
-class Joueur extends Agent
+class Joueur 
 {
+    int id;
 	Joueur(int id)
 	{
-		super(id);
+		this.id = id;
 	}
 	
 	

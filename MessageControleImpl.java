@@ -3,8 +3,9 @@ import java.rmi.RemoteException ;
 
 public class MessageControleImpl extends UnicastRemoteObject implements MessageControle
 {
-	int IdProducteur = 0, IdJoueur = 0;
-    int nbRessourcesInitiales, nbRessourcesDifferentes;
+	public int IdProducteur = 0, IdJoueur = 0;
+    public int nbRessourcesInitiales, nbRessourcesDifferentes;
+    public SerializableList SList = new SerializableList();
     
     public MessageControleImpl(int nbRessourcesInitiales, int nbRessourcesDifferentes)
     throws RemoteException
@@ -20,6 +21,20 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
         System.out.println("je donne les infos initiales");
         return new TripleImpl(IdProducteur++, nbRessourcesInitiales, nbRessourcesDifferentes);
     }
+    
+    public void addMachine( String MachineName, int port)
+    throws RemoteException
+    {
+        SList.add(MachineName,port);
+        System.out.println("J'ai ajouté le producteur " + MachineName + " port : " + port);
+    }
+    
+    
+    
+    
+    
+    
+    
     
     public int getIdProducteur()
     throws RemoteException

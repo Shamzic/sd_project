@@ -34,11 +34,8 @@ public class JoueurMain
             
             // Maintenant envoie ses "coordonnées" au Coordinateur
             M.addMachine( args[2], Integer.parseInt(args[3]) );
-            //~ 
-            //~ je fais un objet dans lequel je mets toutes les connexions avec les Joueurs/Producteurs
-            //~ quand j ajoute un joueur/producteur j envoie un message au Controlleur depuis MessController
-            //~ et le controlleur envoie un message à tous les agents
-            //~ 
+            
+            // Reste à faire la connexion entre les ressources et les joueurs 
 			
 		}
         catch (RemoteException re) { System.out.println(re) ; }

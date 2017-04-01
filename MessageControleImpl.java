@@ -10,12 +10,30 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
     public int nbRessourcesInitiales, nbRessourcesDifferentes;
     public SerializableList SList = new SerializableList();
     public ArrayList<Connexion> CList = new ArrayList<Connexion>();
+    public ArrayList<ProducteurImpl> PList = new ArrayList<ProducteurImpl>();
+    public ArrayList<Joueur> JList = new ArrayList<Joueur>();
     
-    public MessageControleImpl(int nbRessourcesInitiales, int nbRessourcesDifferentes)
+    public MessageControleImpl(int nbRessourcesInitiales, int nbRessourcesDifferentes, int nbProducteurs)
     throws RemoteException
     {
+        int i;
         this.nbRessourcesInitiales = nbRessourcesInitiales;
         this.nbRessourcesDifferentes = nbRessourcesDifferentes;
+        
+        
+        try
+        {            
+            // Créé maintenant tous les producteurs
+            for (i=0 ; i < nbProducteurs ; i++)
+            {
+                ProducteurImpl P = new ProducteurImpl(i,nbRessourcesInitiales,nbRessourcesDifferentes);
+                PList.add(P);
+                String s ="rmi://localhost:" + 5000 + "/Producteur" + i;
+                Naming.rebind( s , P); // Pour se connecter au producteur i, on contact le producteur i 
+            }
+         }
+        catch (MalformedURLException e) { System.out.println(e) ; }
+        
     }
     
     public TripleImpl getPlayerInitialInfo()
@@ -42,7 +60,11 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
             
             CList.add(CNew); // l'ajoute à la list de connexions
             SList.add(MachineName,port); // l'ajoute à la liste de tuples (MachineName,port) servant à l'interconnexion des différents hôtes
-            System.out.println("J'ai ajouté le producteur " + MachineName + " port : " + port);
+            
+            Joueur J = (Joueur) Naming.lookup("rmi://" + MachineName + ":" + port + "/Joueur"); // établi une connexion avec le joueur
+            JList.add(J);
+            
+            System.out.println("J'ai ajouté le joueur " + MachineName + " port : " + port);
         }
         catch (NotBoundException re) { System.out.println(re) ; }
         catch (MalformedURLException e) { System.out.println(e) ; }

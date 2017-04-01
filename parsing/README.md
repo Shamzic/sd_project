@@ -2,6 +2,10 @@
 
 Fichiers de configuration pourl'initialisation du jeu.
 
-# Execution de test :
+* Compilation
 
-`javac *.java`
+`./javac *.java`
+
+* Execution
+
+`./java Test`

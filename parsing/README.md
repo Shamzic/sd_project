@@ -1,11 +1,7 @@
 #PARSEUR
 
-Fichiers de configuration pourl'initialisation du jeu.
+Fichiers pour l'initalisation du jeu. Il est nécessaire de rentrer un nombre de joueurs et de producteurs.
+Dans le fichier configuration :
+`nbjoueurs=< nombre de joueurs >`
 
-* Compilation
-
-`./javac *.java`
-
-* Execution
-
-`./java Test`
+`nbproducteurs= <nombre de producteurs>`

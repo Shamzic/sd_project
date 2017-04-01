@@ -14,5 +14,15 @@ public class SerializableList  implements Serializable
         L.add(new Tuple(MachineName,port));
     }
     
+    public Tuple get (int index)
+    {
+        return L.get(index);
+    }
+    
+    public int size()
+    {
+        return L.size();
+    }
+    
 } 
 

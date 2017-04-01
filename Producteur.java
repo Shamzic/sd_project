@@ -4,5 +4,6 @@ import java.rmi.RemoteException ;
 
 public interface Producteur extends Remote
 {
-    
+    public void salut()
+        throws RemoteException ;
 }

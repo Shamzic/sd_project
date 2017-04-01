@@ -27,7 +27,7 @@ class ConnexionImpl extends UnicastRemoteObject implements Connexion
             for( i = 0 ; i< L.size() ; i++)
             {
                 System.out.println("Machine :" + L.get(i).MN + " :" + L.get(i).port);
-                Joueur P = (Joueur) Naming.lookup("rmi://" +  L.get(i).MN + ":" + L.get(i).port + "/Producteur") ;
+                Joueur P = (Joueur) Naming.lookup("rmi://" +  L.get(i).MN + ":" + L.get(i).port + "/Joueur") ;
                 PList.add( P );
                 P.salut();
             }
@@ -43,7 +43,7 @@ class ConnexionImpl extends UnicastRemoteObject implements Connexion
         System.out.println("J'ai ajouté la machine " + MachineName + ":"+ port);
         try
         {
-            Joueur P = (Joueur) Naming.lookup("rmi://" + MachineName + ":" + port + "/Producteur") ;
+            Joueur P = (Joueur) Naming.lookup("rmi://" + MachineName + ":" + port + "/Joueur") ;
             PList.add( P );
             P.salut();
         }

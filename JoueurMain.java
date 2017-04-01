@@ -21,7 +21,7 @@ public class JoueurMain
             M = (MessageControle) Naming.lookup("rmi://" + args[0] + ":" + args[1] + "/MessageControleGlobal");
             
             TripleImpl T =M.getPlayerInitialInfo();
-            System.out.println("Le Producteur reçoit l'id : " + T.x + ", RI : " + T.y + ", RD : " + T.z);
+            System.out.println("Le joueur reçoit l'id : " + T.x + ", RI : " + T.y + ", RD : " + T.z);
             
             // initialise le serveur joueur
             J = new JoueurImpl (T.x, T.y, T.z);

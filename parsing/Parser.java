@@ -1,22 +1,31 @@
 import java.io.IOException;
 import java.io.FileInputStream;
+/*
+	Cette classe sert à parser le fichier configuration
+	Les nombres de joueurs et de producteurs sont à indiquer 
+	dans le fichier configuration après le signe "="
+*/
 
 public class Parser {
 
-	String nom;
-	static String nbjoueurs;
-	static String nbproducteurs;
+	private String nom;
+	static String nbjoueurs="";
+	static String nbproducteurs="";
 
-	public Parser(String nom){
-		this.nom=nom;
+	public Parser(){
+		;
 	}
 
-	public int getNbProducteurs(){
-		return Integer.parseInt(this.nbproducteurs);
+	public String getNom(){
+		return this.nom;
+	}
+	
+	public String getNbProducteurs(){
+		return nbproducteurs;
 	}
 
-	public int getNbJoueurs(){
-		return Integer.parseInt(this.nbjoueurs);
+	public String getNbJoueurs(){
+		return nbjoueurs;
 	}
 
 	public void concat2string(String a,String b){
@@ -24,39 +33,47 @@ public class Parser {
 	}
 
 	// Lecture d'un fichier octet par octet
-	 public static void lecture_fichier(String nom){
+	 public void lecture_fichier(String nom){
 	   	int lu = 0; // octet lu dans le fichier
-	   	int i = 0;
-	   	int j = 0;
 	 	try {
 			FileInputStream fis = new FileInputStream(nom);
 			String nomvariable="";
-			String valeurvariable;
+			//String valeurvariable;
 			Boolean lecture_variable = false;
+			String nbjoueurs1="";
+			String nbproducteurs1="";
 	    	while (lu != -1){
 		    	lu = fis.read();
 		    	if (lu != -1) 
 		    	{
-		    		System.out.print((char)lu);
+		    		//System.out.print((char)lu);
 
-		    		// On cherche les champs situé avant ':'
-		    		if(((char)lu!=':')&&((char)lu!='\n')&&(lecture_variable==false))
+		    		if(((char)lu!='=')&&(lecture_variable==false)&&(char)lu!='\n')
 						nomvariable+=(char)lu;
-					if(((char)lu!=':')&&((char)lu!='\n')&&(lecture_variable==true)&&(nomvariable=="nbjoueurs"))
+					if(((char)lu!='=')&&(lecture_variable==true)&&(nomvariable.equals("nbjoueurs"))&&(char)lu!='\n')
+					{
 						nbjoueurs+=(char)lu;
-						//concat2string(nbjoueurs,(char)lu);
-					if(((char)lu!=':')&&((char)lu!='\n')&&(lecture_variable==true)&&(nomvariable=="nbproducteurs"))
+					}
+
+					if(((char)lu!='=')&&(lecture_variable==true)&&(nomvariable.equals("nbproducteurs"))&&(char)lu!='\n')
+					{
+						nbproducteurs1+=(char)lu;
 						nbproducteurs+=(char)lu;
-						//concat2string(nbproducteurs,(char)lu);
-					if((char)lu==':')
+					}
+
+					if((char)lu=='=')
 					{
 						lecture_variable=true;
 					}
 					if((char)lu=='\n')
 					{
 						nomvariable="";
-						valeurvariable="";
+						lecture_variable=false;
 					}
+					
+					//System.out.println(" nomvariable : "+nomvariable);
+					//System.out.println("nbjoueurs : "+nbjoueurs1);
+					//System.out.println("nbproducteurs : "+nbproducteurs1);
 				}
 			}
 		    fis.close();

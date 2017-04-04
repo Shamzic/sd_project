@@ -19,6 +19,13 @@ class ConnexionImpl extends UnicastRemoteObject implements Connexion
     {
     }
     
+    public int getRessourceAmount( int producteurNb, int ressourceNb)
+    throws RemoteException
+    {
+        return PList.get(producteurNb).askRessourceAmount(ressourceNb);
+    }
+    
+    
     public void initialSetPlayer( SerializableList L)
     throws RemoteException
     {

@@ -28,6 +28,7 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
         try
         {            
             // Créé maintenant tous les producteurs
+            System.out.println("il y a "+ nbRessourcesInitiales + " ressources au début ");
             for (i=0 ; i < nbProducteurs ; i++)
             {
                 ProducteurImpl P = new ProducteurImpl(i,nbRessourcesInitiales,nbRessourcesDifferentes);

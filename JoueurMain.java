@@ -35,7 +35,7 @@ public class JoueurMain
             
             // Maintenant envoie ses "coordonnées" au Coordinateur
             M.addMachine( args[2], Integer.parseInt(args[3]) );
-            
+            System.out.println("La ressource du producteur 0 et ressource 0 : " + C.getRessourceAmount(0,0));
 			
 		}
         catch (RemoteException re) { System.out.println(re) ; }

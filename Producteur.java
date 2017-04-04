@@ -6,4 +6,7 @@ public interface Producteur extends Remote
 {
     public void salut()
         throws RemoteException ;
+        
+    public int askRessourceAmount( int ressource)
+        throws RemoteException ;
 }

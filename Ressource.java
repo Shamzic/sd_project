@@ -12,5 +12,10 @@ public class Ressource
         nombre = nombreInit;
     }
     
+    int getRessource()
+    {
+        return nombre;
+    }
+    
     
 }

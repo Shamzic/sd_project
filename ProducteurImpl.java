@@ -24,5 +24,10 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
         System.out.println("Salut on vient de t'ajouter");
     }
     
+    public int askRessourceAmount( int ressource)
+        throws RemoteException 
+    {
+        return RList.get(ressource).getRessource();
+    }
 }
 

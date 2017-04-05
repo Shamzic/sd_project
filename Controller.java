@@ -31,25 +31,17 @@ public class Controller
 	{
         
 		int i ;
-		nbJoueurs = Integer.parseInt( args[0] );
-        nbProducteurs = Integer.parseInt( args[1] );
-        nbRessourcesInitiales = 5;
-        nbRessourcesDifferentes = 3;
+		nbJoueurs = Integer.parseInt( args[0] ); // nombre de joueur qu'on veut pour lancer la partie
+        nbProducteurs = Integer.parseInt( args[1] ); // nombre de producteurs qu'on veut
+        nbRessourcesInitiales = 5; // amount de chaque ressource à l'état initial
+        nbRessourcesDifferentes = 3; // nombre de ressources différentes de chaque producteur
 
-        // fait autant de messages de contrôles que spécifiés dans les arguements
-        // doit d'abord attendre que les joueurs envoient un message de confirmation 
-        // d'initialisation au controlleur pour qu'il puisse se connecter aux agents
-	//	ArrayList<MessageControleImpl> Joueurs = new ArrayList<MessageControleImpl>( nbJoueurs );
-		//ArrayList<MessageControleImpl>  Producteurs = new ArrayList<MessageControleImpl>( nbProducteurs );
-        
-        
-		
 		try
 		{
             
 			// Commence par faire l'objet grâce auquel le Controlleur communique avec les agents
             MessageControleImpl MC = new MessageControleImpl(5,3, nbProducteurs,"localhost", 5000);
-            Naming.rebind( "rmi://localhost:"+5000 + "/MessageControleGlobal", MC);
+            Naming.rebind( "rmi://localhost:"+5000 + "/MessageControleGlobal", MC); 
             
 		}
         catch (RemoteException re) { System.out.println(re) ; }

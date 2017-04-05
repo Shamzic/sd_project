@@ -1,5 +1,7 @@
 import java.io.Serializable;
 
+
+// Juste une classe qui permet d'envoyer 3 int dans un return
 public class TripleImpl  implements Serializable
 { 
     public final int x; 

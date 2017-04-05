@@ -7,9 +7,9 @@ public interface Connexion extends Remote
     public void initialSetPlayer( SerializableList L)
         throws RemoteException ;
     
-    public void addConnexion(String MachineName, int port)
+    public void addConnexionPlayer(String MachineName, int port)
         throws RemoteException ;
         
-    public void setProducteur ( int nbRessourcesDifferentes , String MachineName, int port)
+    public void setProducteur ( SerializableList PList)
         throws RemoteException ;
 }

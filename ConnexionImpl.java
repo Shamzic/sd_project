@@ -46,16 +46,17 @@ class ConnexionImpl extends UnicastRemoteObject implements Connexion
         catch (MalformedURLException e) { System.out.println(e) ; }
     }
     
-    public void setProducteur ( int nbProducteurs , String MachineName, int port)
+    public void setProducteur ( SerializableList PCoordList)
     throws RemoteException
     {
         int i;
+        int size = PCoordList.size();
         try
         {
-            for(i=0; i < nbProducteurs ; i++)
+            for(i=0; i < size ; i++)
             {
-                System.out.println("Ajoute le producteur " + i + " au port " + port + " nom de machine : " + MachineName);
-                Producteur P = (Producteur) Naming.lookup("rmi://" + MachineName + ":"+port+"/Producteur"+i);
+                System.out.println("Ajoute le producteur " + i + " au port " + PCoordList.get(i).port + " nom de machine : " + PCoordList.get(i).MN);
+                Producteur P = (Producteur) Naming.lookup("rmi://" +  PCoordList.get(i).MN + ":"+PCoordList.get(i).port+"/Producteur");
                 PList.add(P);
             }
         }
@@ -63,7 +64,7 @@ class ConnexionImpl extends UnicastRemoteObject implements Connexion
         catch (MalformedURLException e) { System.out.println(e) ; }
     }
     
-    public void addConnexion(String MachineName, int port)
+    public void addConnexionPlayer(String MachineName, int port)
     throws RemoteException
     {
         L.add(MachineName,port);

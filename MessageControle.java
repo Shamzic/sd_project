@@ -9,8 +9,14 @@ public interface MessageControle extends Remote
     public TripleImpl getPlayerInitialInfo()
         throws RemoteException;
         
+    
+    public TripleImpl getProducteurInitialInfo()
+        throws RemoteException;
+        
     public void addMachine( String MachineName, int port)
         throws RemoteException;
 
+    public void addProducteur( String MachineName, int port)
+        throws RemoteException;
     
 }

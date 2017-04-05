@@ -12,4 +12,7 @@ public interface Connexion extends Remote
         
     public void setProducteur ( SerializableList PList)
         throws RemoteException ;
+        
+    public int getRessourceAmount( int producteurNb, int ressourceNb)
+        throws RemoteException;
 }

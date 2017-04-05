@@ -1,3 +1,18 @@
+D'abord aller dans le dossier où sont les programmes et lancer : 
+rmiregistry 5000 &
+rmiregistry 5001 &
+rmiregistry 5002 &
+
+ensuite lancer dans des terminaux différents :
+java Mainexemple
+
+java ProducteurMain localhost 5000 lalhost 5001
+
+java JoueurMain localhost 5000 localst 5002
+
+
+
+
 # sd_project
 
 Corrigé des TPs + sujet projet : https://dpt-info.u-strasbg.fr/~g.frey/SD/

@@ -6,15 +6,15 @@ import java.net.MalformedURLException ;
 
 public class MessageControleImpl extends UnicastRemoteObject implements MessageControle
 {
-	public int IdProducteur = 0, IdJoueur = 0;
-    public int nbRessourcesInitiales, nbRessourcesDifferentes;
-    public String Name;
-    public int port;
-    public SerializableList SList = new SerializableList();
-    public SerializableList prodCoordList = new SerializableList();
-    public ArrayList<Connexion> CList = new ArrayList<Connexion>();
-    public ArrayList<Producteur> PList = new ArrayList<Producteur>();
-    public ArrayList<Joueur> JList = new ArrayList<Joueur>();
+	public int IdProducteur = 0, IdJoueur = 0; // id des producteurs et des joueurs
+    public int nbRessourcesInitiales, nbRessourcesDifferentes; 
+    public String Name; // nom de la machine du contrôleur
+    public int port; // port du rmiregistry du contrôleur
+    public SerializableList SList = new SerializableList(); // Liste avec les coordonnées des joueurs ( NomDeMachine , port)
+    public SerializableList prodCoordList = new SerializableList(); // liste avec les coordonnées des producteurs ( NomDeMachine , port)
+    public ArrayList<Connexion> CList = new ArrayList<Connexion>(); // Liste contenant les objets connexion avec lesquels on communique des infos du contrôleur aux joueurs ( ex un nouveau joueur / producteur s'est ajouté
+    public ArrayList<Producteur> PList = new ArrayList<Producteur>(); // Liste de objets producteur avec lesquels on communique avec les producteurs
+    public ArrayList<Joueur> JList = new ArrayList<Joueur>(); // Liste d'objet joueurs avec lesquels on communique avec les joueurs
     
     public MessageControleImpl(int nbRessourcesInitiales, int nbRessourcesDifferentes, int nbProducteurs, String Name, int port)
     throws RemoteException
@@ -43,6 +43,7 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
         
     }
     
+    // Envoie les infos initiales au joueur
     public TripleImpl getPlayerInitialInfo()
     throws RemoteException
     {
@@ -52,7 +53,7 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
     }
     
     
-    
+    // Envoie les infos initiales au producteur
     public TripleImpl getProducteurInitialInfo()
         throws RemoteException
     {
@@ -61,6 +62,7 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
         return T;
     }
     
+    // Add le joueur de la machine MachineName et du port port
     public void addMachine( String MachineName, int port)
     throws RemoteException
     {
@@ -90,15 +92,15 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
         
     }
     
-    
+    // Add le producteur de la machine MachineName et du port port
     public void addProducteur( String MachineName, int port)
     throws RemoteException
     {
         try
         {
-            prodCoordList.add(MachineName,port);
+            prodCoordList.add(MachineName,port); // l'ajoute à la liste contenant les coordonnées du joueur
             Producteur P = (Producteur) Naming .lookup("rmi://" + MachineName + ":" + port + "/Producteur"); // établi une connexion avec le producteur
-            PList.add(P);
+            PList.add(P); // Ajoute le producteur à la liste des producteurs
             
             System.out.println("J'ai ajouté le producteur " + MachineName + " port : " + port);
         }

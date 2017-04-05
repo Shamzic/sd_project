@@ -19,13 +19,14 @@ class ConnexionImpl extends UnicastRemoteObject implements Connexion
     {
     }
     
+    // Renvoie la quantité de la ressource ressourceNb du producteur producteurNb
     public int getRessourceAmount( int producteurNb, int ressourceNb)
     throws RemoteException
     {
         return PList.get(producteurNb).askRessourceAmount(ressourceNb);
     }
     
-    
+    // Établi la connexion avec les autres joueurs contenus dans la lsite L envoyée par le coordinateur
     public void initialSetPlayer( SerializableList L)
     throws RemoteException
     {
@@ -46,6 +47,8 @@ class ConnexionImpl extends UnicastRemoteObject implements Connexion
         catch (MalformedURLException e) { System.out.println(e) ; }
     }
     
+    
+    // Établi la connexion avec les autres producteurs contenus dans la lsite L envoyée par le coordinateurs
     public void setProducteur ( SerializableList PCoordList)
     throws RemoteException
     {
@@ -64,6 +67,7 @@ class ConnexionImpl extends UnicastRemoteObject implements Connexion
         catch (MalformedURLException e) { System.out.println(e) ; }
     }
     
+    // Lorsqu'un joueur est ajouté on appel cette méthode pour le dire à tous les joueurs
     public void addConnexionPlayer(String MachineName, int port)
     throws RemoteException
     {

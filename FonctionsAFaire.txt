@@ -47,3 +47,9 @@ Faire des coûts différents pour atteindre des ressources -> une ressource est 
 
 Pour lancer les Producteurs / Joueurs le controlleur lancera les fonctions starts des producteurs et joueurs ou alors lance un signal
 
+
+ON peut faire des joueurs avec des caractéristiques
+
+On peut faire des capacités max d'entrepôt
+
+Mettre un coefficient différent en fonction de la ressource qu'on fait

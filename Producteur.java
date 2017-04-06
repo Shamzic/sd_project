@@ -15,5 +15,8 @@ public interface Producteur extends Remote
     
     public TYPE getRessourceType( int rNumber)
         throws RemoteException ;
+        
+    public void fonctionThread ( int ms, int quantity)
+        throws RemoteException ;
     
 }

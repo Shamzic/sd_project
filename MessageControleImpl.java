@@ -111,6 +111,7 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
             ListProducteurRTypes.add(LISTE); // ajoute la liste des types de ressources produites par ce producteur
             for ( i = 0 ; i< LISTE.size() ; i++)
                 System.out.println( "Ressource "  +i +" : "+ LISTE.get(i) );
+            P.fonctionThread(1000, 5);
         }
         catch (NotBoundException re) { System.out.println(re) ; }
         catch (MalformedURLException e) { System.out.println(e) ; }
@@ -121,7 +122,7 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
     // Dans chaque entrée i de la liste se trouve une liste contenant les types de ressources du producteur i
     public SerializableList<SerializableList<TYPE>> getRessourceTypesAllProducteurs()
     {
-        return ListProducteurRTypes;        
+        return ListProducteurRTypes;
     }
     
     

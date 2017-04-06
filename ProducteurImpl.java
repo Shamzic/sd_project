@@ -1,10 +1,10 @@
+
+//package com.jmdoudoux.dej.thread;
 import java.util.ArrayList;
 import java.rmi.server.UnicastRemoteObject ;
 import java.rmi.RemoteException ;
-
-
     
-class ProducteurImpl extends UnicastRemoteObject implements Producteur, Runnable
+class ProducteurImpl extends UnicastRemoteObject implements Producteur
 {
     public ArrayList<Ressource> RList;
     int id;
@@ -50,6 +50,75 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur, Runnable
         for(i=0 ; i < RList.size() ; i++)
             L.add( RList.get(i).getRessourceType() );
         return L;
+    }
+    
+    public void fonctionThread ( int ms, int quantity)
+    {
+        Thread t = new Thread()
+        {
+            public void run()
+            {
+                int i;
+                while(true)
+                {
+                    System.out.println("j'ajoute des ressources");
+                    for(i = 0 ; i< RList.size() ; i++)
+                    {
+                        RList.get(i).addRessource( quantity );
+                        System.out.println("ressource " + RList.get(i).getRessourceType() + " : " + RList.get(i).getRessource());
+                    }
+                    try { Thread.sleep(ms); }catch (InterruptedException re) { System.out.println(re) ; };
+                }
+            }
+        };
+        t.start()
+    }
+    
+    public int getRessource(int quantity, TYPE T)
+    {
+        // Commence par compter le nombre de ressources de ce type chez ce producteur 
+        int nType = 0, total = 0, takenRessources = 0 , i;
+        int RNonDivisibles;
+        ArrayList<Ressource> RL = new ArrayList<Ressource>(); // y met les ressources de ce type
+
+        for (i = 0 ; i < RList.size() ; i++)
+        {
+            if(RList.get(i).getRessourceType() == T)
+            {
+                nType++;
+                RL.add(RList.get(i));
+                total +=RList.get(i).getRessourceAmount();
+            }
+        }
+
+        // on prend des ressources en proportionnelle arrondi a la partie entière
+        for( i=0 ; i < nType ; i++)
+        {
+            takenRessources += RL.get(i).takeRessource( (RL.getRessource(i) / total) * quantity);
+        }
+        
+        System.out.println("on a " + takenRessources + " et il faut : " + quantity);
+        
+        return takenRessources;
+        // nombre de ressource qu'on peut pas partager équitablement entre les producteurs
+        //~ // exemple : 2 prod et besoin de 5 ressources : 5 % 2 = 1 ressource non divisible équitablement
+        //~ RNonDivisibles = quantity % nType; 
+        //~ 
+        //~ // On regarde la parité nbRessourcesProduites et parité du besoin de ressources
+        //~ // Si la parité est bonne -> rien à faire en plus
+        //~ // Si elle est pas bonne -> on fait un modulo du nombre de producteurs et on enlève 
+        //~ // ça AUX PRODUCTEURS QUI ONT LE PLUS (commence par le premier, si pas assez va au deuxième, etc...)
+        //~ 
+        //~ 
+        //~ if( total > quantity) // il y a assez de ressources
+        //~ {
+            //~ 
+        //~ }
+        //~ else // il y en a pas assez -> prend toutes les ressources de chaque
+        //~ {
+            //~ 
+        //~ }
+        //~ 
     }
     
 }

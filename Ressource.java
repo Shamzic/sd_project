@@ -48,5 +48,14 @@ public class Ressource
         return T;
     }
     
+    void addRessource(int quantity)
+    {
+        nombre+=quantity;
+    }
     
+    int takeRessource(int quantity)
+    {
+        nombre -= quantity;
+        return nombre;
+    }
 }

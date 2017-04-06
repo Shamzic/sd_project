@@ -14,6 +14,7 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
     public int port; // port du rmiregistry du contrôleur
     public SerializableList<Tuple> SList = new SerializableList<Tuple>(); // Liste avec les coordonnées des joueurs ( NomDeMachine , port)
     public SerializableList<Tuple> prodCoordList = new SerializableList<Tuple>(); // liste avec les coordonnées des producteurs ( NomDeMachine , port)
+    public SerializableList<SerializableList<TYPE>> ListProducteurRTypes = new SerializableList<SerializableList<TYPE>>();
     public ArrayList<Connexion> CList = new ArrayList<Connexion>(); // Liste contenant les objets connexion avec lesquels on communique des infos du contrôleur aux joueurs ( ex un nouveau joueur / producteur s'est ajouté
     public ArrayList<Producteur> PList = new ArrayList<Producteur>(); // Liste de objets producteur avec lesquels on communique avec les producteurs
     public ArrayList<Joueur> JList = new ArrayList<Joueur>(); // Liste d'objet joueurs avec lesquels on communique avec les joueurs
@@ -107,15 +108,21 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
             
             System.out.println("J'ai ajouté le producteur " + MachineName + " port : " + port);
             SerializableList<TYPE> LISTE = P.getRessourceTypes();
+            ListProducteurRTypes.add(LISTE); // ajoute la liste des types de ressources produites par ce producteur
             for ( i = 0 ; i< LISTE.size() ; i++)
-                System.out.println( LISTE.get(i) );
+                System.out.println( "Ressource "  +i +" : "+ LISTE.get(i) );
         }
         catch (NotBoundException re) { System.out.println(re) ; }
         catch (MalformedURLException e) { System.out.println(e) ; }
         
     }
     
-    
+    // Envoie la liste des types de tous les producteurs au joueur qui la demande
+    // Dans chaque entrée i de la liste se trouve une liste contenant les types de ressources du producteur i
+    public SerializableList<SerializableList<TYPE>> getRessourceTypesAllProducteurs()
+    {
+        return ListProducteurRTypes;        
+    }
     
     
     

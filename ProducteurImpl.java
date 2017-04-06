@@ -4,7 +4,7 @@ import java.rmi.RemoteException ;
 
 
     
-class ProducteurImpl extends UnicastRemoteObject implements Producteur
+class ProducteurImpl extends UnicastRemoteObject implements Producteur, Runnable
 {
     public ArrayList<Ressource> RList;
     int id;

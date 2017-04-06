@@ -30,8 +30,16 @@ public class Ressource
         }
         System.out.println("J'ai créé la ressource " + T);
     }
-    
-    // Retourne la quantité de la ressource
+
+    // Constructeur utile pour init la liste de ressouces
+    // D'un joueur
+    Ressource (int nombreInit, TYPE T )
+    {
+        this.nombre = 0;
+        this.T =T;
+    }
+
+   	 // Retourne la quantité de la ressource
     int getRessource()
     {
         return nombre;

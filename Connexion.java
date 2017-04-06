@@ -18,4 +18,9 @@ public interface Connexion extends Remote
         
     public int getRessourceAmount( int producteurNb, int ressourceNb)
         throws RemoteException;
+
+    // Soustrait un nombre de ressource à un producteur
+    // et l'ajoute à un joueur
+    public void takeRessourceAmount( int producteurNb, int ressourceNb, int quantite)
+    throws RemoteException;
 }

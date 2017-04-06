@@ -21,28 +21,28 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
         {
             System.out.println("getRType " + getRessourceType(i));
         }
-        
 	}
-	
-    public void salut() // sert à rien 
+	 // sert à rien 
+    public void salut()
     throws RemoteException
     {
         System.out.println("Salut on vient de t'ajouter");
     }
     
-    // demande le montant de la ressource <ressource> 
+    // renvoie la quantité de la ressource N°ressource 
     public int askRessourceAmount( int ressource)
         throws RemoteException 
     {
         return RList.get(ressource).getRessource();
     }
     
-    
+    // Renvoie le type de la ressource n°rNumber du tableau du producteur
     public TYPE getRessourceType( int rNumber)
     {
         return RList.get(rNumber).getRessourceType();
     }
 
+    // Renvoie une liste contenant tous les types du producteur
     public SerializableList<TYPE> getRessourceTypes()
     {
         int i;
@@ -50,6 +50,12 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
         for(i=0 ; i < RList.size() ; i++)
             L.add( RList.get(i).getRessourceType() );
         return L;
+    }
+
+    public void decreaseRessourceAmount(int ressource, int x)
+        throws RemoteException 
+    {
+        RList.get(ressource).decreaseRessource(x);
     }
     
     public void fonctionThread ( int ms, int quantity)

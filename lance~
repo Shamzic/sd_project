@@ -1,0 +1,15 @@
+#!/bin/bash
+set -v
+echo "Lancement du jeu ..."
+rmiregistry 5000 &
+rmiregistry 5001 &
+rmiregistry 5002 &
+sleep 2
+echo "Lancement du coordinateur ..."
+xterm -e "java Mainexemple; $SHELL" &
+sleep 2
+echo "Lancement du producteur ..."
+xterm -e "java ProducteurMain localhost 5000 localhost 5001; $SHELL" &
+sleep 2
+echo "Lancement du joueur ..."
+xterm -e "java JoueurMain localhost 5000 localhost 5002; $SHELL" &

@@ -98,10 +98,19 @@ class ConnexionImpl extends UnicastRemoteObject implements Connexion
         
     }
 
-    public int takeRessourceAmount( int producteurNb, int ressourceNb)
+    // Soustrait un nombre de ressource à un producteur
+    // et l'ajoute à un joueur
+    public void takeRessourceAmount( int producteurNb, int ressourceNb, int quantite)
     throws RemoteException
     {
-        return PList.get(producteurNb).askRessourceAmount(ressourceNb);
+        int quantite_stock = PList.get(producteurNb).askRessourceAmount(ressourceNb);
+        if (quantite<=quantite_stock)
+        {	
+        	// décrémente de <quantite> la ressource N°ressourceNb du prod N°producteurNb
+        	PList.get(producteurNb).decreaseRessourceAmount(ressourceNb,quantite);
+       		//JList.get(producteurNb).increaseRessourceAmount(quantite);
+       	}
+
     }
 	
 }

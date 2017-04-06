@@ -32,11 +32,16 @@ public class Ressource
     }
 
     // Constructeur utile pour init la liste de ressouces
-    // D'un joueur
+    // d'un joueur
     Ressource (int nombreInit, TYPE T )
     {
         this.nombre = 0;
         this.T =T;
+    }
+
+    void setRessource(int quantite)
+    {
+        this.nombre=quantite;
     }
 
    	 // Retourne la quantité de la ressource
@@ -50,6 +55,15 @@ public class Ressource
     {
         return T;
     }
-    
-    
+
+    void increaseRessource(int x){
+    	setRessource(getRessource()+x);
+    }
+
+    void decreaseRessource(int x){
+    	int i = getRessource()-x;
+    	if(i<0)
+    		i=0;
+    	setRessource(i);
+    }
 }

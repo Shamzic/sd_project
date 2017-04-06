@@ -36,8 +36,15 @@ public class JoueurMain
             // Maintenant envoie ses "coordonnées" au Coordinateur
             M.addMachine( args[2], Integer.parseInt(args[3]) );
             System.out.println("La ressource du producteur 0 et ressource 0 : " + C.getRessourceAmount(0,0));
-            System.out.println("Le joueur a pris 2 ressources N°0 au producteur N°0 : " + C.takeRessourceAmount(0,0));
-		
+            
+
+            // ------- TESTER ---------
+            System.out.println("TEST : Le joueur prend DEUX ressources N°0 au producteur N°0 : ");
+         	C.takeRessourceAmount(0,0,2);
+			// On réaffiche pour tester si la ressource a bien diminuée de 2 : 
+			System.out.println("TEST : La ressource du producteur 0 et ressource 0 : " + C.getRessourceAmount(0,0));
+			// ---- FIN TESTER --------- 
+
 		}
         catch (RemoteException re) { System.out.println(re) ; }
         catch (MalformedURLException e) { System.out.println(e) ; }

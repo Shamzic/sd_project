@@ -18,14 +18,19 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
 
         // Boucle pour init la liste des ressources du joueur
         // Ayant des quantité nulles pour chaque type
-
+        for (TYPE t : TYPE.values())
+        {
+        	RList.add(new Ressource(0,t));
+        }
 	}
 	
 	// Incrémente de x la quantité de la ressource de type t
 	public void increaseRessourceAmout(TYPE t, int x)
     throws RemoteException
     {
-    	;
+    	for(int i=0 ; i < RList.size() ; i++)
+           if(RList.get(i).getRessourceType()==t)
+           		RList.get(i).increaseRessource(x);
     }
 
 	

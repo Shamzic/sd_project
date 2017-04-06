@@ -8,13 +8,16 @@ public interface Producteur extends Remote
         throws RemoteException ;
         
     // Renvoie la quantité    
-    public int askRessourceAmount( int ressource)
+    public int askRessourceAmount(int ressource)
         throws RemoteException ;
         
     public SerializableList<TYPE> getRessourceTypes()
         throws RemoteException ;
     
-    public TYPE getRessourceType( int rNumber)
+    public TYPE getRessourceType(int rNumber)
+        throws RemoteException ;
+
+    public void decreaseRessourceAmount( int ressource, int x)
         throws RemoteException ;
     
 }

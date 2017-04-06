@@ -4,7 +4,7 @@ import java.rmi.RemoteException ;
 
 
     
-class ProducteurImpl extends UnicastRemoteObject implements Producteur, Runnable
+class ProducteurImpl extends UnicastRemoteObject implements Producteur
 {
     public ArrayList<Ressource> RList;
     int id;
@@ -21,7 +21,6 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur, Runnable
         {
             System.out.println("getRType " + getRessourceType(i));
         }
-        
 	}
 	 // sert à rien 
     public void salut()
@@ -51,6 +50,12 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur, Runnable
         for(i=0 ; i < RList.size() ; i++)
             L.add( RList.get(i).getRessourceType() );
         return L;
+    }
+
+    public void decreaseRessourceAmount(int ressource, int x)
+        throws RemoteException 
+    {
+        RList.get(ressource).decreaseRessource(x);
     }
     
 }

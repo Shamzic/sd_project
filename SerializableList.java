@@ -2,20 +2,20 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 // Juste une Arraylist qui étend Serializable pour pouvoir l'envoyer dans un retour de méthode RMI
-public class SerializableList  implements Serializable
+public class SerializableList <T> implements Serializable
 { 
-    ArrayList<Tuple> L;
+    ArrayList<T> L;
     SerializableList()
     {
-        L = new ArrayList<Tuple>();
+        L = new ArrayList<T>();
     }
     
-    public void add (String MachineName, int port)
+    public void add (T ajout)
     {
-        L.add(new Tuple(MachineName,port));
+        L.add(ajout);
     }
     
-    public Tuple get (int index)
+    public T get (int index)
     {
         return L.get(index);
     }

@@ -8,7 +8,7 @@ import java.net.MalformedURLException ;
 // Une méthode de cette classe est appelée à chaque fois que le controlleur ajoute une machine
 class ConnexionImpl extends UnicastRemoteObject implements Connexion
 {
-    public SerializableList L ;
+    
     public ArrayList<Joueur> JList = new ArrayList<Joueur>();
     
     public ArrayList<Producteur> PList = new ArrayList<Producteur>();
@@ -27,11 +27,10 @@ class ConnexionImpl extends UnicastRemoteObject implements Connexion
     }
     
     // Établi la connexion avec les autres joueurs contenus dans la lsite L envoyée par le coordinateur
-    public void initialSetPlayer( SerializableList L)
+    public void initialSetPlayer( SerializableList<Tuple> L)
     throws RemoteException
     {
         int i;
-        this.L = L;
         try
         {
             for( i = 0 ; i< L.size() ; i++)
@@ -49,7 +48,7 @@ class ConnexionImpl extends UnicastRemoteObject implements Connexion
     
     
     // Établi la connexion avec les autres producteurs contenus dans la lsite L envoyée par le coordinateurs
-    public void setProducteur ( SerializableList PCoordList)
+    public void setProducteur ( SerializableList<Tuple> PCoordList)
     throws RemoteException
     {
         int i;
@@ -71,12 +70,27 @@ class ConnexionImpl extends UnicastRemoteObject implements Connexion
     public void addConnexionPlayer(String MachineName, int port)
     throws RemoteException
     {
-        L.add(MachineName,port);
         System.out.println("J'ai ajouté la machine " + MachineName + ":"+ port);
         try
         {
-            Joueur P = (Joueur) Naming.lookup("rmi://" + MachineName + ":" + port + "/Joueur") ;
-            JList.add( P );
+            Joueur J = (Joueur) Naming.lookup("rmi://" + MachineName + ":" + port + "/Joueur") ;
+            JList.add( J );
+            J.salut();
+        }
+        catch (NotBoundException re) { System.out.println(re) ; }
+        catch (MalformedURLException e) { System.out.println(e) ; }
+        
+    }
+
+    // Lorsqu'un joueur est ajouté on appel cette méthode pour le dire à tous les joueurs
+    public void addConnexionProducteur(String MachineName, int port)
+    throws RemoteException
+    {
+        System.out.println("J'ai ajouté la machine " + MachineName + ":"+ port);
+        try
+        {
+            Producteur P = (Producteur) Naming.lookup("rmi://" + MachineName + ":" + port + "/Producteur") ;
+            PList.add( P );
             P.salut();
         }
         catch (NotBoundException re) { System.out.println(re) ; }

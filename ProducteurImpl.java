@@ -2,6 +2,8 @@ import java.util.ArrayList;
 import java.rmi.server.UnicastRemoteObject ;
 import java.rmi.RemoteException ;
 
+
+    
 class ProducteurImpl extends UnicastRemoteObject implements Producteur
 {
     public ArrayList<Ressource> RList;
@@ -15,6 +17,10 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
         for (i=0; i< RD; i++) // initialise toutes les ressources du producteur
             RList.add(i, new Ressource(RI));
         
+        for (i=0; i< RD ; i++)
+        {
+            System.out.println("getRType " + getRessourceType(i));
+        }
         
 	}
 	
@@ -30,5 +36,20 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
     {
         return RList.get(ressource).getRessource();
     }
+    
+    public TYPE getRessourceType( int rNumber)
+    {
+        return RList.get(rNumber).getRessourceType();
+    }
+
+    public ArrayList<TYPE> getRessourceTypes()
+    {
+        int i;
+        ArrayList<TYPE> L = new ArrayList<TYPE>();;
+        for(i=0 ; i < RList.size() ; i++)
+            L.add( RList.get(i).getRessourceType() );
+        return L;
+    }
+    
 }
 

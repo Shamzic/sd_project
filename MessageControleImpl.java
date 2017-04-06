@@ -4,14 +4,16 @@ import java.util.ArrayList;
 import java.rmi.* ; 
 import java.net.MalformedURLException ; 
 
+
+
 public class MessageControleImpl extends UnicastRemoteObject implements MessageControle
 {
 	public int IdProducteur = 0, IdJoueur = 0; // id des producteurs et des joueurs
     public int nbRessourcesInitiales, nbRessourcesDifferentes; 
     public String Name; // nom de la machine du contrôleur
     public int port; // port du rmiregistry du contrôleur
-    public SerializableList SList = new SerializableList(); // Liste avec les coordonnées des joueurs ( NomDeMachine , port)
-    public SerializableList prodCoordList = new SerializableList(); // liste avec les coordonnées des producteurs ( NomDeMachine , port)
+    public SerializableList<Tuple> SList = new SerializableList<Tuple>(); // Liste avec les coordonnées des joueurs ( NomDeMachine , port)
+    public SerializableList<Tuple> prodCoordList = new SerializableList<Tuple>(); // liste avec les coordonnées des producteurs ( NomDeMachine , port)
     public ArrayList<Connexion> CList = new ArrayList<Connexion>(); // Liste contenant les objets connexion avec lesquels on communique des infos du contrôleur aux joueurs ( ex un nouveau joueur / producteur s'est ajouté
     public ArrayList<Producteur> PList = new ArrayList<Producteur>(); // Liste de objets producteur avec lesquels on communique avec les producteurs
     public ArrayList<Joueur> JList = new ArrayList<Joueur>(); // Liste d'objet joueurs avec lesquels on communique avec les joueurs
@@ -79,7 +81,7 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
                 CList.get(i).addConnexionPlayer(MachineName,port);
             
             CList.add(CNew); // l'ajoute à la list de connexions
-            SList.add(MachineName,port); // l'ajoute à la liste de tuples (MachineName,port) servant à l'interconnexion des différents hôtes
+            SList.add(new Tuple(MachineName,port)); // l'ajoute à la liste de tuples (MachineName,port) servant à l'interconnexion des différents hôtes
             
             Joueur J = (Joueur) Naming.lookup("rmi://" + MachineName + ":" + port + "/Joueur"); // établi une connexion avec le joueur
             JList.add(J);
@@ -98,7 +100,7 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
     {
         try
         {
-            prodCoordList.add(MachineName,port); // l'ajoute à la liste contenant les coordonnées du joueur
+            prodCoordList.add(new Tuple(MachineName,port)); // l'ajoute à la liste contenant les coordonnées du joueur
             Producteur P = (Producteur) Naming .lookup("rmi://" + MachineName + ":" + port + "/Producteur"); // établi une connexion avec le producteur
             PList.add(P); // Ajoute le producteur à la liste des producteurs
             

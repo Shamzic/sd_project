@@ -97,5 +97,11 @@ class ConnexionImpl extends UnicastRemoteObject implements Connexion
         catch (MalformedURLException e) { System.out.println(e) ; }
         
     }
+
+    public int takeRessourceAmount( int producteurNb, int ressourceNb)
+    throws RemoteException
+    {
+        return PList.get(producteurNb).askRessourceAmount(ressourceNb);
+    }
 	
 }

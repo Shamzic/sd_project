@@ -31,11 +31,13 @@ public class Ressource
         System.out.println("J'ai créé la ressource " + T);
     }
     
+    // Retourne la quantité de la ressource
     int getRessource()
     {
         return nombre;
     }
     
+    // Retourne le type de la ressource
     TYPE getRessourceType()
     {
         return T;

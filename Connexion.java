@@ -18,4 +18,7 @@ public interface Connexion extends Remote
         
     public int getRessourceAmount( int producteurNb, int ressourceNb)
         throws RemoteException;
+
+    public int takeRessourceAmount( int producteurNb, int ressourceNb)
+    throws RemoteException;
 }

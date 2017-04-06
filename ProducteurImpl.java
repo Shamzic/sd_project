@@ -37,15 +37,16 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
         return RList.get(ressource).getRessource();
     }
     
+    
     public TYPE getRessourceType( int rNumber)
     {
         return RList.get(rNumber).getRessourceType();
     }
 
-    public ArrayList<TYPE> getRessourceTypes()
+    public SerializableList<TYPE> getRessourceTypes()
     {
         int i;
-        ArrayList<TYPE> L = new ArrayList<TYPE>();;
+        SerializableList<TYPE> L = new SerializableList<TYPE>();;
         for(i=0 ; i < RList.size() ; i++)
             L.add( RList.get(i).getRessourceType() );
         return L;

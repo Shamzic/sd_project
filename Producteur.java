@@ -9,4 +9,11 @@ public interface Producteur extends Remote
         
     public int askRessourceAmount( int ressource)
         throws RemoteException ;
+        
+    public SerializableList<TYPE> getRessourceTypes()
+        throws RemoteException ;
+    
+    public TYPE getRessourceType( int rNumber)
+        throws RemoteException ;
+    
 }

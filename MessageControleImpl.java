@@ -98,6 +98,7 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
     public void addProducteur( String MachineName, int port)
     throws RemoteException
     {
+        int i;
         try
         {
             prodCoordList.add(new Tuple(MachineName,port)); // l'ajoute à la liste contenant les coordonnées du joueur
@@ -105,6 +106,9 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
             PList.add(P); // Ajoute le producteur à la liste des producteurs
             
             System.out.println("J'ai ajouté le producteur " + MachineName + " port : " + port);
+            SerializableList<TYPE> LISTE = P.getRessourceTypes();
+            for ( i = 0 ; i< LISTE.size() ; i++)
+                System.out.println( LISTE.get(i) );
         }
         catch (NotBoundException re) { System.out.println(re) ; }
         catch (MalformedURLException e) { System.out.println(e) ; }

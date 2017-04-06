@@ -31,6 +31,13 @@ public class Ressource
         System.out.println("J'ai créé la ressource " + T);
     }
     
+    Ressource (int nombreInit, TYPE T )
+    {
+        this.nombre = 0;
+        this.T =T;
+    }
+    
+    
     int getRessource()
     {
         return nombre;

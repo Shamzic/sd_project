@@ -19,6 +19,6 @@ public interface MessageControle extends Remote
     public void addProducteur( String MachineName, int port)
         throws RemoteException;
     
-    public SerializableList<SerializableList<TYPE>> getRessourceTypesAllProducteurs()
+    public SerializableList<SerializableList<TYPE>> getStocksTypesAllProducteurs()
         throws RemoteException;
 }

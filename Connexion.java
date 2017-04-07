@@ -16,7 +16,7 @@ public interface Connexion extends Remote
     public void setProducteur ( SerializableList<Tuple> PCoordList)
         throws RemoteException ;
         
-    public int getRessourceAmount( int producteurNb, int ressourceNb)
+    public int getStockAmount( int producteurNb, int ressourceNb)
         throws RemoteException;
 
     // Soustrait un nombre de ressource à un producteur

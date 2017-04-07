@@ -5,7 +5,6 @@ public class JoueurMain
 {
     static MessageControle M;
     static JoueurImpl J;
-    static ConnexionImpl C;
     
     public static void main (String [] args)
     {
@@ -25,26 +24,23 @@ public class JoueurMain
             System.out.println("Le joueur reçoit l'id : " + T.x + ", RI : " + T.y + ", RD : " + T.z);
             
             // initialise le serveur joueur
-            J = new JoueurImpl (T.x, T.y, T.z);
+            J = new JoueurImpl (T.x, T.y, T.z, args[3]);
             Naming.rebind( "rmi://localhost:"+args[3] + "/Joueur", J);
             
-            // initialise le serveur connexion pour que le controlleur puisse lui envoyer les nouveaux connectés
-            C = new ConnexionImpl();
-            Naming.rebind( "rmi://localhost:"+args[3] + "/Connexion", C);
+            
             
             
             // Maintenant envoie ses "coordonnées" au Coordinateur
             M.addMachine( args[2], Integer.parseInt(args[3]) );
-            System.out.println("La ressource du producteur 0 et ressource 0 : " + C.getRessourceAmount(0,0));
             
 
-            // ------- TESTER ---------
-            System.out.println("TEST : Le joueur prend DEUX ressources N°0 au producteur N°0 : ");
-         	C.takeRessourceAmount(0,0,2);
-			// On réaffiche pour tester si la ressource a bien diminuée de 2 : 
-			System.out.println("TEST : La ressource du producteur 0 et ressource 0 : " + C.getRessourceAmount(0,0));
-			// ---- FIN TESTER --------- 
-
+            //~ // ------- TESTER ---------
+            //~ System.out.println("TEST : Le joueur prend DEUX ressources N°0 au producteur N°0 : ");
+         	//~ C.takeRessourceAmount(0,0,2);
+			//~ // On réaffiche pour tester si la ressource a bien diminuée de 2 : 
+			//~ System.out.println("TEST : La ressource du producteur 0 et ressource 0 : " + C.getStockAmount(0,0));
+			//~ // ---- FIN TESTER --------- 
+            
 		}
         catch (RemoteException re) { System.out.println(re) ; }
         catch (MalformedURLException e) { System.out.println(e) ; }

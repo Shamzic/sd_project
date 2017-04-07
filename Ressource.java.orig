@@ -45,13 +45,13 @@ public class Ressource
     }
 
    	 // Retourne la quantité de la ressource
-    int getRessource()
+    int getStock()
     {
         return nombre;
     }
     
     // Retourne le type de la ressource
-    TYPE getRessourceType()
+    TYPE getStockType()
     {
         return T;
     }
@@ -69,11 +69,11 @@ public class Ressource
 =======
 
     void increaseRessource(int x){
-    	setRessource(getRessource()+x);
+    	setRessource(getStock()+x);
     }
 
     void decreaseRessource(int x){
-    	int i = getRessource()-x;
+    	int i = getStock()-x;
     	if(i<0)
     		i=0;
     	setRessource(i);

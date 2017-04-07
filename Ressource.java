@@ -6,10 +6,10 @@ public class Ressource
     
     TYPE T = TYPE.ARGENT;
     
-    int nombre;
-    Ressource (int nombreInit)
+    int stock;
+    Ressource (int stockInit)
     {
-        nombre = nombreInit;
+        stock = stockInit;
         Random rn = new Random();
         switch(rn.nextInt(3))
         {
@@ -33,38 +33,50 @@ public class Ressource
 
     // Constructeur utile pour init la liste de ressouces
     // d'un joueur
-    Ressource (int nombreInit, TYPE T )
+    Ressource (int stockInit, TYPE T )
     {
-        this.nombre = 0;
+        this.stock = 0;
         this.T =T;
     }
 
     void setRessource(int quantite)
     {
-        this.nombre=quantite;
+        this.stock=quantite;
     }
 
    	 // Retourne la quantité de la ressource
-    int getRessource()
+    int getStock()
     {
-        return nombre;
+        return stock;
     }
     
     // Retourne le type de la ressource
-    TYPE getRessourceType()
+    TYPE getStockType()
     {
         return T;
     }
 
 
     void increaseRessource(int x){
-    	setRessource(getRessource()+x);
+    	setRessource(getStock()+x);
     }
 
     void decreaseRessource(int x){
-    	int i = getRessource()-x;
+    	int i = getStock()-x;
     	if(i<0)
     		i=0;
     	setRessource(i);
+    }
+    
+    int takeRessource(int quantity)
+    {
+        int r = stock;
+        if (r > quantity)
+            r = quantity;
+            
+        stock -= r;
+        
+        return r;
+        
     }
 }

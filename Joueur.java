@@ -9,6 +9,13 @@ public interface Joueur extends Remote
         throws RemoteException ;
         
     public void increaseRessourceAmout(TYPE t, int x)
-    throws RemoteException ;
+        throws RemoteException ;
+    
+    
+    public void receiveToken()
+        throws RemoteException ;
+
+    public void start()
+        throws RemoteException ;
     
 }

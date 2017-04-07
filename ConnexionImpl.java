@@ -20,7 +20,7 @@ class ConnexionImpl extends UnicastRemoteObject implements Connexion
     }
     
     // Renvoie la quantité de la ressource ressourceNb du producteur producteurNb
-    public int getRessourceAmount( int producteurNb, int ressourceNb)
+    public int getStockAmount( int producteurNb, int ressourceNb)
     throws RemoteException
     {
         return PList.get(producteurNb).askRessourceAmount(ressourceNb);
@@ -112,5 +112,8 @@ class ConnexionImpl extends UnicastRemoteObject implements Connexion
        	}
 
     }
+    
+    
+    
 	
 }

@@ -19,7 +19,7 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
         
         for (i=0; i< RD ; i++)
         {
-            System.out.println("getRType " + getRessourceType(i));
+            System.out.println("getRType " + getStockType(i));
         }
 	}
 	 // sert à rien 
@@ -33,22 +33,22 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
     public int askRessourceAmount( int ressource)
         throws RemoteException 
     {
-        return RList.get(ressource).getRessource();
+        return RList.get(ressource).getStock();
     }
     
     // Renvoie le type de la ressource n°rNumber du tableau du producteur
-    public TYPE getRessourceType( int rNumber)
+    public TYPE getStockType( int rNumber)
     {
-        return RList.get(rNumber).getRessourceType();
+        return RList.get(rNumber).getStockType();
     }
 
     // Renvoie une liste contenant tous les types du producteur
-    public SerializableList<TYPE> getRessourceTypes()
+    public SerializableList<TYPE> getStockTypes()
     {
         int i;
         SerializableList<TYPE> L = new SerializableList<TYPE>();;
         for(i=0 ; i < RList.size() ; i++)
-            L.add( RList.get(i).getRessourceType() );
+            L.add( RList.get(i).getStockType() );
         return L;
     }
 
@@ -70,17 +70,17 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
                     System.out.println("j'ajoute des ressources");
                     for(i = 0 ; i< RList.size() ; i++)
                     {
-                        RList.get(i).addRessource( quantity );
-                        System.out.println("ressource " + RList.get(i).getRessourceType() + " : " + RList.get(i).getRessource());
+                        RList.get(i).increaseRessource( quantity );
+                        System.out.println("ressource " + RList.get(i).getStockType() + " : " + RList.get(i).getStock());
                     }
                     try { Thread.sleep(ms); }catch (InterruptedException re) { System.out.println(re) ; };
                 }
             }
         };
-        t.start()
+        t.start();
     }
     
-    public int getRessource(int quantity, TYPE T)
+    public int getStock(int quantity, TYPE T)
     {
         // Commence par compter le nombre de ressources de ce type chez ce producteur 
         int nType = 0, total = 0, takenRessources = 0 , i;
@@ -89,42 +89,41 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
 
         for (i = 0 ; i < RList.size() ; i++)
         {
-            if(RList.get(i).getRessourceType() == T)
+            if(RList.get(i).getStockType() == T)
             {
                 nType++;
                 RL.add(RList.get(i));
-                total +=RList.get(i).getRessourceAmount();
+                total +=RList.get(i).getStock();
             }
         }
 
         // on prend des ressources en proportionnelle arrondi a la partie entière
         for( i=0 ; i < nType ; i++)
         {
-            takenRessources += RL.get(i).takeRessource( (RL.getRessource(i) / total) * quantity);
+            takenRessources += RL.get(i).takeRessource( (RL.get(i).getStock() / total) * quantity);
         }
         
         System.out.println("on a " + takenRessources + " et il faut : " + quantity);
         
+        // Maintenant il faut chercher le restant des ressources 
+        i=0;
+        while(takenRessources != quantity)
+        {
+            takenRessources += RL.get(i).takeRessource( quantity - takenRessources );
+        }
+        
+        // Maintenant qu'on a toutes les ressources (ou qu'on a prit ce qu'on pouvait)
+        // On met à jour les ressources
+        for(i=0 ; i < RList.size() ; i++)
+        {
+            if( RList.get(i).getStockType() == T)
+            {
+                RList.get(i).setRessource( RL.get(0).getStock() );
+                RL.remove( 0 );
+            }
+        }
+        
         return takenRessources;
-        // nombre de ressource qu'on peut pas partager équitablement entre les producteurs
-        //~ // exemple : 2 prod et besoin de 5 ressources : 5 % 2 = 1 ressource non divisible équitablement
-        //~ RNonDivisibles = quantity % nType; 
-        //~ 
-        //~ // On regarde la parité nbRessourcesProduites et parité du besoin de ressources
-        //~ // Si la parité est bonne -> rien à faire en plus
-        //~ // Si elle est pas bonne -> on fait un modulo du nombre de producteurs et on enlève 
-        //~ // ça AUX PRODUCTEURS QUI ONT LE PLUS (commence par le premier, si pas assez va au deuxième, etc...)
-        //~ 
-        //~ 
-        //~ if( total > quantity) // il y a assez de ressources
-        //~ {
-            //~ 
-        //~ }
-        //~ else // il y en a pas assez -> prend toutes les ressources de chaque
-        //~ {
-            //~ 
-        //~ }
-        //~ 
     }
     
 }

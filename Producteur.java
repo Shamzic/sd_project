@@ -11,10 +11,10 @@ public interface Producteur extends Remote
     public int askRessourceAmount(int ressource)
         throws RemoteException ;
         
-    public SerializableList<TYPE> getRessourceTypes()
+    public SerializableList<TYPE> getStockTypes()
         throws RemoteException ;
     
-    public TYPE getRessourceType(int rNumber)
+    public TYPE getStockType(int rNumber)
         throws RemoteException ;
 
     public void decreaseRessourceAmount( int ressource, int x)

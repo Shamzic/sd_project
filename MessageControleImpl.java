@@ -107,7 +107,7 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
             PList.add(P); // Ajoute le producteur à la liste des producteurs
             
             System.out.println("J'ai ajouté le producteur " + MachineName + " port : " + port);
-            SerializableList<TYPE> LISTE = P.getRessourceTypes();
+            SerializableList<TYPE> LISTE = P.getStockTypes();
             ListProducteurRTypes.add(LISTE); // ajoute la liste des types de ressources produites par ce producteur
             for ( i = 0 ; i< LISTE.size() ; i++)
                 System.out.println( "Ressource "  +i +" : "+ LISTE.get(i) );
@@ -120,7 +120,7 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
     
     // Envoie la liste des types de tous les producteurs au joueur qui la demande
     // Dans chaque entrée i de la liste se trouve une liste contenant les types de ressources du producteur i
-    public SerializableList<SerializableList<TYPE>> getRessourceTypesAllProducteurs()
+    public SerializableList<SerializableList<TYPE>> getStocksTypesAllProducteurs()
     {
         return ListProducteurRTypes;
     }

@@ -79,7 +79,7 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
         catch (NotBoundException re) { System.out.println(re) ; }
         catch (MalformedURLException e) { System.out.println(e) ; }
         
-        if( (IdJoueur  == nbJoueurs) &&( IdProducteur  == nbProducteurs))
+        if( (IdJoueur  == nbJoueurs) &&  ( IdProducteur  == nbProducteurs))
             JList.get(0).receiveToken();
         else
             System.out.println("Il manque " + (nbJoueurs - IdJoueur) + " Joueurs et " + (nbProducteurs - IdProducteur) + " Producteurs ");

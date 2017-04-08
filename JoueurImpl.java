@@ -66,7 +66,6 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
         try
         {
             Naming.rebind( "rmi://localhost:"+ portSelf + "/Connexion", C);
-            System.out.println("pas ici");
         }
         catch (RemoteException re) { System.out.println(re) ; }
         catch (MalformedURLException e) { System.out.println(e) ; }
@@ -94,8 +93,8 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                             monitor.wait();
                         }
                         System.out.println("À mon tour.");
-                        TimeUnit.SECONDS.sleep(1);
-                        C.JList.get(id +1).receiveToken();
+                        TimeUnit.SECONDS.sleep(3);
+                        C.JList.get((id +1) %C.JList.size()).receiveToken();
                     }
                     catch (InterruptedException re) { System.out.println(re) ; }
                     catch (RemoteException re) { System.out.println(re) ; }
@@ -135,7 +134,6 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
     public void receiveToken()
     throws RemoteException
     {
-        System.out.println("Mon tour =)");
         synchronized(monitor)
         {monitor.notify();}
     }

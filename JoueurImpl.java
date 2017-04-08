@@ -33,20 +33,21 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
             System.out.println("Le joueur reçoit l'id : " + T.x + ", RI : " + T.y + ", RD : " + T.z);
             
             // initialise le serveur joueur
-            System.out.println("je rentre dans joueurimpl");
-            J = new JoueurImpl (T.x, T.y, T.z, args[0], args[1], args[3]);
+            J = new JoueurImpl (T.x, T.y, T.z, args[3]);
             Naming.rebind( "rmi://localhost:"+args[3] + "/Joueur", J);
-            System.out.println("potr " + args[3]);
-            start();
             
-		}
+            // Maintenant envoie ses "coordonnées" au Coordinateur
+            M.addMachine( args[2], Integer.parseInt(args[3]) );
+        }
         catch (RemoteException re) { System.out.println(re) ; }
         catch (MalformedURLException e) { System.out.println(e) ; }
         catch (NotBoundException re) { System.out.println(re) ; }
+        
+        start();
     }
     
     
-	JoueurImpl(int id, int RI, int RD, String CoordinateurCoord, String portCoord, String portSelf)
+	JoueurImpl(int id, int RI, int RD, String portSelf)
     throws RemoteException
 	{
 		this.id = id;
@@ -69,15 +70,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
         }
         catch (RemoteException re) { System.out.println(re) ; }
         catch (MalformedURLException e) { System.out.println(e) ; }
-        
-        
-        // Maintenant envoie ses "coordonnées" au Coordinateur
-        System.out.println("Avant appel addmachine");
-        M.addMachine( CoordinateurCoord, Integer.parseInt(portSelf) );
-        System.out.println("pas ici");
-        
-        
-        
+                
     }
 	
 	// Incrémente de x la quantité de la ressource de type t

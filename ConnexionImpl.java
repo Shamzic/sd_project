@@ -44,7 +44,6 @@ class ConnexionImpl extends UnicastRemoteObject implements Connexion
         }
         catch (NotBoundException re) { System.out.println(re) ; }
         catch (MalformedURLException e) { System.out.println(e) ; }
-        System.out.println("j'ai fini");
     }
     
     
@@ -71,7 +70,6 @@ class ConnexionImpl extends UnicastRemoteObject implements Connexion
     public void addConnexionPlayer(String MachineName, int port)
     throws RemoteException
     {
-        System.out.println("J'ai ajouté le joueur " + MachineName + ":"+ port);
         try
         {
             Joueur J = (Joueur) Naming.lookup("rmi://" + MachineName + ":" + port + "/Joueur") ;
@@ -80,6 +78,7 @@ class ConnexionImpl extends UnicastRemoteObject implements Connexion
         }
         catch (NotBoundException re) { System.out.println(re) ; }
         catch (MalformedURLException e) { System.out.println(e) ; }
+        System.out.println("J'ai ajouté le joueur " + MachineName + ":"+ port);
         
     }
 

@@ -57,31 +57,28 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
     throws RemoteException
     {
         int i;
-        System.out.println("salut");
         // Créé d'abord la nouvelle connexion
         try
         {
             Connexion CNew = (Connexion) Naming.lookup("rmi://" + MachineName + ":" + port + "/Connexion");
             CNew.initialSetPlayer(SList); // envoie au joueur qui s'est connecté les coordonnées des autres joueurs
             CNew.setProducteur(prodCoordList); // envoie au joueur le nécessaire pour qu'il puisse se connecter aux producteurs
-            
             // Maintenant envoie les coordonnées du nouveau connecté à tous les agents
             for( i = 0 ; i < CList.size() ; i ++)
                 CList.get(i).addConnexionPlayer(MachineName,port);
+
             
             CList.add(CNew); // l'ajoute à la list de connexions
             SList.add(new Tuple(MachineName,port)); // l'ajoute à la liste de tuples (MachineName,port) servant à l'interconnexion des différents hôtes
             
-            Joueur J = (Joueur) Naming.lookup("rmi://" + MachineName + ":" + port + "/Joueur"); // établi une connexion avec le joueur
-            JList.add(J);
-        System.out.println("la taille liste de joueurs " + JList.size());
             
+            Joueur J = (Joueur) Naming.lookup("rmi://" + MachineName + ":" + port + "/Joueur"); // établi une connexion avec le joueur
+            JList.add(J);            
             System.out.println("J'ai ajouté le joueur " + MachineName + " port : " + port);
         }
         catch (NotBoundException re) { System.out.println(re) ; }
         catch (MalformedURLException e) { System.out.println(e) ; }
         
-        System.out.println(" calc1 : " + (IdJoueur + 1) + " nbJoueur = " + nbJoueurs);
         if( (IdJoueur  == nbJoueurs) &&( IdProducteur  == nbProducteurs))
             JList.get(0).receiveToken();
         else
@@ -92,7 +89,6 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
     public void addProducteur( String MachineName, int port)
     throws RemoteException
     {
-        System.out.println("la taille liste de joueurs " + JList.size());
         int i;
         try
         {

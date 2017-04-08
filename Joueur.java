@@ -14,8 +14,8 @@ public interface Joueur extends Remote
     
     public void receiveToken()
         throws RemoteException ;
-
-    public void start()
-        throws RemoteException ;
+//~ 
+    //~ public void start()
+        //~ throws RemoteException ;
     
 }

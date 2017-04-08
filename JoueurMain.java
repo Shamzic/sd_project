@@ -24,14 +24,12 @@ public class JoueurMain
             System.out.println("Le joueur reçoit l'id : " + T.x + ", RI : " + T.y + ", RD : " + T.z);
             
             // initialise le serveur joueur
-            J = new JoueurImpl (T.x, T.y, T.z, args[3]);
+            J = new JoueurImpl (T.x, T.y, T.z, args[2],args[3]);
             Naming.rebind( "rmi://localhost:"+args[3] + "/Joueur", J);
             
             
             
             
-            // Maintenant envoie ses "coordonnées" au Coordinateur
-            M.addMachine( args[2], Integer.parseInt(args[3]) );
             
 
             //~ // ------- TESTER ---------

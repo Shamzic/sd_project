@@ -40,7 +40,7 @@ public class Controller
 		{
             
 			// Commence par faire l'objet grâce auquel le Controlleur communique avec les agents
-            MessageControleImpl MC = new MessageControleImpl(5,3, nbProducteurs,"localhost", 5000);
+            MessageControleImpl MC = new MessageControleImpl(5,3, nbProducteurs,nbJoueurs,"localhost", 5000);
             Naming.rebind( "rmi://localhost:"+5000 + "/MessageControleGlobal", MC); 
             
 		}

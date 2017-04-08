@@ -3,14 +3,50 @@ import java.rmi.server.UnicastRemoteObject ;
 import java.rmi.RemoteException ;
 import java.rmi.* ; 
 import java.net.MalformedURLException ; 
+import java.util.concurrent.TimeUnit;
 
 class JoueurImpl extends UnicastRemoteObject implements Joueur
 {
-    public int id, RD, RI;
+    public static int id, RD, RI;
     public ArrayList<Ressource> RList;
     static ConnexionImpl C;
+    static MessageControle M;
+    Thread T ;
+    final static Object monitor = new Object();
+    static JoueurImpl J;
     
-	JoueurImpl(int id, int RI, int RD, String CoordinateurCoord)
+    public static void main (String [] args)
+    {
+        int i;
+        if ( args.length != 4)
+        {
+            System.err.println( "usage : <ControllerMachineName> <ControllerPort> <JoueurMachineName> <ProducterPort>");
+            System.exit(1);
+        }
+        try
+		{
+            
+            // débute la communication avec le controller
+            M = (MessageControle) Naming.lookup("rmi://" + args[0] + ":" + args[1] + "/MessageControleGlobal");
+            
+            TripleImpl T =M.getPlayerInitialInfo();
+            System.out.println("Le joueur reçoit l'id : " + T.x + ", RI : " + T.y + ", RD : " + T.z);
+            
+            // initialise le serveur joueur
+            System.out.println("je rentre dans joueurimpl");
+            J = new JoueurImpl (T.x, T.y, T.z, args[0], args[1], args[3]);
+            Naming.rebind( "rmi://localhost:"+args[3] + "/Joueur", J);
+            System.out.println("potr " + args[3]);
+            start();
+            
+		}
+        catch (RemoteException re) { System.out.println(re) ; }
+        catch (MalformedURLException e) { System.out.println(e) ; }
+        catch (NotBoundException re) { System.out.println(re) ; }
+    }
+    
+    
+	JoueurImpl(int id, int RI, int RD, String CoordinateurCoord, String portCoord, String portSelf)
     throws RemoteException
 	{
 		this.id = id;
@@ -28,11 +64,20 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
         C = new ConnexionImpl();
         try
         {
-            Naming.rebind( "rmi://localhost:"+ CoordinateurCoord + "/Connexion", C);
+            Naming.rebind( "rmi://localhost:"+ portSelf + "/Connexion", C);
+            System.out.println("pas ici");
         }
         catch (RemoteException re) { System.out.println(re) ; }
         catch (MalformedURLException e) { System.out.println(e) ; }
-        start();
+        
+        
+        // Maintenant envoie ses "coordonnées" au Coordinateur
+        System.out.println("Avant appel addmachine");
+        M.addMachine( CoordinateurCoord, Integer.parseInt(portSelf) );
+        System.out.println("pas ici");
+        
+        
+        
     }
 	
 	// Incrémente de x la quantité de la ressource de type t
@@ -44,25 +89,62 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
            		RList.get(i).increaseRessource(x);
     }
 
-	
-    public void start()
+    public static void start()
     {
         while(true)
-        {
-            try
-            {
-                wait();
-                System.out.println("À mon tour.");
-                Thread.sleep(1000);
-                C.JList.get(id +1).receiveToken();
-            }
-            catch (InterruptedException re) { System.out.println(re) ; }
-        }
+                {
+                    try
+                    {
+                        synchronized (monitor)
+                        {
+                            System.out.println("j'attends");
+                            monitor.wait();
+                        }
+                        System.out.println("À mon tour.");
+                        TimeUnit.SECONDS.sleep(1);
+                        C.JList.get(id +1).receiveToken();
+                    }
+                    catch (InterruptedException re) { System.out.println(re) ; }
+                    catch (RemoteException re) { System.out.println(re) ; }
+                }
     }
+	
+    //~ public void start()
+    //~ throws RemoteException
+    //~ {
+        //~ T = new Thread()
+        //~ {
+            //~ public void run()
+            //~ {
+                //~ while(true)
+                //~ {
+                    //~ try
+                    //~ {
+                        //~ synchronized (monitor)
+                        //~ {
+                            //~ System.out.println("j'attends");
+                            //~ monitor.wait();
+                        //~ }
+                        //~ System.out.println("À mon tour.");
+                        //~ TimeUnit.SECONDS.sleep(1);
+                        //~ C.JList.get(id +1).receiveToken();
+                    //~ }
+                    //~ catch (InterruptedException re) { System.out.println(re) ; }
+                    //~ catch (RemoteException re) { System.out.println(re) ; }
+                //~ }
+            //~ }
+            //~ 
+            //~ 
+        //~ };
+        //~ T.run();
+    //~ }
     
     public void receiveToken()
+    throws RemoteException
     {
-        notify();
+        System.out.println("Mon tour =)");
+        synchronized(monitor)
+        {monitor.notify();}
     }
     
     public void salut()

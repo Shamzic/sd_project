@@ -9,6 +9,8 @@ import java.net.MalformedURLException ;
 public class MessageControleImpl extends UnicastRemoteObject implements MessageControle
 {
 	public int IdProducteur = 0, IdJoueur = 0; // id des producteurs et des joueurs
+    public int nbProducteurs, nbJoueurs; // nombre de joueurs et producteurs qu'on veut 
+    
     public int nbRessourcesInitiales, nbRessourcesDifferentes; 
     public String Name; // nom de la machine du contrôleur
     public int port; // port du rmiregistry du contrôleur
@@ -19,7 +21,7 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
     public ArrayList<Producteur> PList = new ArrayList<Producteur>(); // Liste de objets producteur avec lesquels on communique avec les producteurs
     public ArrayList<Joueur> JList = new ArrayList<Joueur>(); // Liste d'objet joueurs avec lesquels on communique avec les joueurs
     
-    public MessageControleImpl(int nbRessourcesInitiales, int nbRessourcesDifferentes, int nbProducteurs, String Name, int port)
+    public MessageControleImpl(int nbRessourcesInitiales, int nbRessourcesDifferentes, int nbProducteurs, int nbJoueurs, String Name, int port)
     throws RemoteException
     {
         int i;
@@ -27,30 +29,15 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
         this.nbRessourcesDifferentes = nbRessourcesDifferentes;
         this.Name = Name;
         this.port = port;
-        
-        //~ 
-        //~ try
-        //~ {            
-            //~ // Créé maintenant tous les producteurs
-            //~ System.out.println("il y a "+ nbRessourcesInitiales + " ressources au début ");
-            //~ for (i=0 ; i < nbProducteurs ; i++)
-            //~ {
-                //~ ProducteurImpl P = new ProducteurImpl(i,nbRessourcesInitiales,nbRessourcesDifferentes);
-                //~ PList.add(P);
-                //~ String s ="rmi://localhost:" + 5000 + "/Producteur" + i;
-                //~ Naming.rebind( s , P); // Pour se connecter au producteur i, on contact le producteur i 
-                //~ System.out.println("Créé le producteur " + i);
-            //~ }
-         //~ }
-        //~ catch (MalformedURLException e) { System.out.println(e) ; }
-        
+        this.nbProducteurs = nbProducteurs;
+        this.nbJoueurs = nbJoueurs;        
     }
     
     // Envoie les infos initiales au joueur
     public TripleImpl getPlayerInitialInfo()
     throws RemoteException
     {
-        TripleImpl T = new TripleImpl(IdProducteur++, nbRessourcesInitiales, nbRessourcesDifferentes);
+        TripleImpl T = new TripleImpl(IdJoueur++, nbRessourcesInitiales, nbRessourcesDifferentes);
         System.out.println("je donne les infos initiales pour joueur");
         return new TripleImpl(IdProducteur, nbRessourcesInitiales, nbRessourcesDifferentes);
     }
@@ -70,6 +57,7 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
     throws RemoteException
     {
         int i;
+        System.out.println("salut");
         // Créé d'abord la nouvelle connexion
         try
         {
@@ -86,19 +74,25 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
             
             Joueur J = (Joueur) Naming.lookup("rmi://" + MachineName + ":" + port + "/Joueur"); // établi une connexion avec le joueur
             JList.add(J);
+        System.out.println("la taille liste de joueurs " + JList.size());
             
             System.out.println("J'ai ajouté le joueur " + MachineName + " port : " + port);
         }
         catch (NotBoundException re) { System.out.println(re) ; }
         catch (MalformedURLException e) { System.out.println(e) ; }
         
-        
+        System.out.println(" calc1 : " + (IdJoueur + 1) + " nbJoueur = " + nbJoueurs);
+        if( (IdJoueur  == nbJoueurs) &&( IdProducteur  == nbProducteurs))
+            JList.get(0).receiveToken();
+        else
+            System.out.println("Il manque " + (nbJoueurs - IdJoueur) + " Joueurs et " + (nbProducteurs - IdProducteur) + " Producteurs ");
     }
     
     // Add le producteur de la machine MachineName et du port port
     public void addProducteur( String MachineName, int port)
     throws RemoteException
     {
+        System.out.println("la taille liste de joueurs " + JList.size());
         int i;
         try
         {
@@ -115,6 +109,12 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
         }
         catch (NotBoundException re) { System.out.println(re) ; }
         catch (MalformedURLException e) { System.out.println(e) ; }
+        
+
+        if( (IdJoueur  == nbJoueurs) &&( IdProducteur == nbProducteurs))
+            JList.get(0).receiveToken();
+        else
+            System.out.println("Il manque " + (nbJoueurs - IdJoueur) + " Joueurs et " + (nbProducteurs - IdProducteur) + " Producteurs ");
         
     }
     

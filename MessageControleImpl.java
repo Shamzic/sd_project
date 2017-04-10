@@ -61,16 +61,17 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
         try
         {
             Connexion CNew = (Connexion) Naming.lookup("rmi://" + MachineName + ":" + port + "/Connexion");
+            ///////////////// j'ai changé ça de place après le for pour que les joueurs senregistres aussi :::::::::::::::::::::::::::::::::::::
+            CList.add(CNew); // l'ajoute à la list de connexions
+            SList.add(new Tuple(MachineName,port)); // l'ajoute à la liste de tuples (MachineName,port) servant à l'interconnexion des différents hôtes
+            
+            
             CNew.initialSetPlayer(SList); // envoie au joueur qui s'est connecté les coordonnées des autres joueurs
             CNew.setProducteur(prodCoordList); // envoie au joueur le nécessaire pour qu'il puisse se connecter aux producteurs
             // Maintenant envoie les coordonnées du nouveau connecté à tous les agents
             for( i = 0 ; i < CList.size() ; i ++)
                 CList.get(i).addConnexionPlayer(MachineName,port);
 
-            
-            CList.add(CNew); // l'ajoute à la list de connexions
-            SList.add(new Tuple(MachineName,port)); // l'ajoute à la liste de tuples (MachineName,port) servant à l'interconnexion des différents hôtes
-            
             
             Joueur J = (Joueur) Naming.lookup("rmi://" + MachineName + ":" + port + "/Joueur"); // établi une connexion avec le joueur
             JList.add(J);            
@@ -103,7 +104,7 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
             ListProducteurRTypes.add(LISTE); // ajoute la liste des types de ressources produites par ce producteur
             for ( i = 0 ; i< LISTE.size() ; i++)
                 System.out.println( "Ressource "  +i +" : "+ LISTE.get(i) );
-            P.fonctionThread(1000, 5);
+            P.fonctionThread(3000, 5);
         }
         catch (NotBoundException re) { System.out.println(re) ; }
         catch (MalformedURLException e) { System.out.println(e) ; }

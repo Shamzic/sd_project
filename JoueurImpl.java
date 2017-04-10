@@ -84,21 +84,27 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
     // fonction qui exécute les tâches du joueur chaque tour 
     public static void start()
     {
+        boolean debut = true;
         while(true)
                 {
                     try
                     {
                         synchronized (monitor)
                         {
-                            System.out.println("j'attends");
-                            monitor.wait();
+                            if ( C.JList.size() != 0 && debut) // besoin car sinon division par 0 et ça fait tout planter
+                            {
+                                System.out.println("Je vais attendre");
+                                monitor.wait();
+                                debut = false;
+                            }
                         }
                         System.out.println("À mon tour.");
                         System.out.println("je prend des ressources " + C.PList.get(0).getStock( 10 , TYPE.OR));
                         System.out.println("je prend des ressources " + C.PList.get(0).getStock( 10 , TYPE.BOIS));
                         System.out.println("je prend des ressources " + C.PList.get(0).getStock( 10 , TYPE.ARGENT));
                         TimeUnit.SECONDS.sleep(3);
-                        C.JList.get((id +1) %C.JList.size()).receiveToken();
+                        if(C.JList.size() != 0) // besoin car sinon division par 0 et ça fait tout planter
+                            C.JList.get((id +1) %C.JList.size()).receiveToken();
                     }
                     catch (InterruptedException re) { System.out.println(re) ; }
                     catch (RemoteException re) { System.out.println(re) ; }

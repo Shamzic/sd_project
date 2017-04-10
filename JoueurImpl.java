@@ -5,8 +5,10 @@ import java.rmi.* ;
 import java.net.MalformedURLException ; 
 import java.util.concurrent.TimeUnit;
 
+
 class JoueurImpl extends UnicastRemoteObject implements Joueur
 {
+	public static final long serialVersionUID = 1L; // Utilie uniquement pour régler les warning de serial
     public static int id, RD, RI;
     public static ArrayList<Ressource> RList;
     static ConnexionImpl C;
@@ -17,7 +19,6 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
     
     public static void main (String [] args)
     {
-        int i;
         if ( args.length != 4)
         {
             System.err.println( "usage : <ControllerMachineName> <ControllerPort> <JoueurMachineName> <ProducterPort>");
@@ -38,21 +39,23 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
             
             // Maintenant envoie ses "coordonnées" au Coordinateur
             M.addMachine( args[2], Integer.parseInt(args[3]) );
+
+            J.start();
         }
         catch (RemoteException re) { System.out.println(re) ; }
         catch (MalformedURLException e) { System.out.println(e) ; }
         catch (NotBoundException re) { System.out.println(re) ; }
         
-        start();
+        
     }
     
     
 	JoueurImpl(int id, int RI, int RD, String portSelf)
     throws RemoteException
 	{
-		this.id = id;
-        this.RD = RD; // Ressources différentes ??
-        this.RI = RI; // Ressources initiales du joueur, inutile ???
+		JoueurImpl.id = id;
+        JoueurImpl.RD = RD; // Ressources différentes ??
+        JoueurImpl.RI = RI; // Ressources initiales du joueur, inutile ???
         RList = new ArrayList<Ressource> (RD);
 
         // Boucle pour init la liste des ressources du joueur
@@ -82,7 +85,8 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
     }
 
     // fonction qui exécute les tâches du joueur chaque tour 
-    public static void start()
+    public  void start()
+    throws RemoteException
     {
         boolean debut = true;
         while(true)
@@ -101,10 +105,21 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                         System.out.println("À mon tour.");
                         //System.out.println("je prend des ressources " + C.PList.get(0).getStock( 10 , TYPE.OR));
                         //System.out.println("je prend des ressources " + C.PList.get(0).getStock( 10 , TYPE.BOIS));
-                        System.out.println("je prend des ressources " + C.PList.get(0).getStock( 9 , TYPE.OR));
+                        int ressources_prises = C.PList.get(0).getStock( 9 , TYPE.OR);
+                        System.out.println("je prend "+ressources_prises+" ressources d'or !");
+                       	increaseRessourceAmout(TYPE.OR,ressources_prises);
                         TimeUnit.SECONDS.sleep(3);
                         if(C.JList.size() != 0) // besoin car sinon division par 0 et ça fait tout planter
                             C.JList.get((id +1) %C.JList.size()).receiveToken();
+
+                        /* Affichage des ressources du joueur */
+                        System.out.println("********** ETAT DES RESSOURCES **********");
+                        for(int i=0;i<RList.size();i++)
+                        	System.out.println(RList.get(i).toString());	
+						System.out.println("******************************************");
+
+
+
                     }
                     catch (InterruptedException re) { System.out.println(re) ; }
                     catch (RemoteException re) { System.out.println(re) ; }

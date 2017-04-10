@@ -2,15 +2,22 @@
 set -v
 echo "Lancement du jeu ..."
 pkill rmiregistry
+sleep 2
 rmiregistry 5000 &
 rmiregistry 5001 &
 rmiregistry 5002 &
+rmiregistry 5003 &
 sleep 2
 echo "Lancement du coordinateur ..."
 xterm -T "Controlleur" -e "java Mainexemple; $SHELL" &
 sleep 2
-echo "Lancement du producteur ..."
+echo "Lancement du producteur 1 ..."
 xterm -T "Producteur n°1" -e "java ProducteurImpl localhost 5000 localhost 5001; $SHELL" &
 sleep 2
-echo "Lancement du joueur ..."
+echo "Lancement du joueur 1 ..."
 xterm -T "Joueur n°1" -e "java JoueurImpl localhost 5000 localhost 5002; $SHELL" &
+# sleep 2
+# echo "Lancement du joueur 2 ..."
+# xterm -T "Joueur n°2" -e "java JoueurImpl localhost 5000 localhost 5003; $SHELL" &
+
+

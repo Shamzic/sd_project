@@ -17,5 +17,8 @@ public interface Joueur extends Remote
 //~ 
     //~ public void start()
         //~ throws RemoteException ;
+
+    public  void start()
+    throws RemoteException;
     
 }

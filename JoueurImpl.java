@@ -84,7 +84,10 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
            		RList.get(i).increaseRessource(x);
     }
 
-    // fonction qui exécute les tâches du joueur chaque tour 
+        /**
+         * Exécute les tâches du joueur chaque tour 
+         *
+         */
     public  void start()
     throws RemoteException
     {
@@ -109,22 +112,53 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                         System.out.println("je prend "+ressources_prises+" ressources d'or !");
                        	increaseRessourceAmout(TYPE.OR,ressources_prises);
                         TimeUnit.SECONDS.sleep(3);
+
                         if(C.JList.size() != 0) // besoin car sinon division par 0 et ça fait tout planter
                             C.JList.get((id +1) %C.JList.size()).receiveToken();
 
                         /* Affichage des ressources du joueur */
-                        System.out.println("********** ETAT DES RESSOURCES **********");
-                        for(int i=0;i<RList.size();i++)
-                        	System.out.println(RList.get(i).toString());	
-						System.out.println("******************************************");
-
-
-
+                        displayRessourceList();
                     }
                     catch (InterruptedException re) { System.out.println(re) ; }
                     catch (RemoteException re) { System.out.println(re) ; }
                 }
     }
+
+    /**
+         * Demande une quantitée de ressource d'un certains type à un producteur
+         * 
+         * @param productorNumber
+         *            Le numero du producteur.
+         * @param t
+         *            Le type de la ressource.
+         * @param quantity
+         *            La quantité de ressource à prendre.
+         */
+    public void askProdForRessource(int productorNumber, TYPE t, int quantity)
+    throws RemoteException
+    {
+    	 int ressources_prises = C.PList.get(productorNumber).getStock(quantity,t);
+    	 if(ressources_prises>0)
+    	 	System.out.println(""+ressources_prises+" ressources d'or prises au producteur "+productorNumber);
+    	 else
+    	 	System.out.println("Le producteur"+productorNumber+" n'as pas pu fournir  de ressources "+t);
+    }
+    
+    /**
+         * Affichage les ressources possédées par le joueur
+         * avec leur types et leur quantités.
+         *
+         */
+    public void displayRessourceList()
+    throws RemoteException
+    {
+    	System.out.println("******* ETAT DES RESSOURCES JOUEUR *******");
+        for(int i=0;i<RList.size();i++)
+            System.out.println(RList.get(i).toString());	
+		System.out.println("******************************************");
+	}
+
+
 	
     public void receiveToken()
     throws RemoteException

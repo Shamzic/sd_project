@@ -97,6 +97,8 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
     
     public void fonctionThread ( int ms, int quantity)
     {
+        final int time = ms;
+        final int q = quantity;
         Thread t = new Thread()
         {
             public void run()
@@ -107,10 +109,10 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
                     System.out.println("j'ajoute des ressources");
                     for(i = 0 ; i< RList.size() ; i++)
                     {
-                        RList.get(i).increaseRessource( quantity );
+                        RList.get(i).increaseRessource( q );
                         System.out.println("ressource " + RList.get(i).getStockType() + " : " + RList.get(i).getStock());
                     }
-                    try { Thread.sleep(ms); }catch (InterruptedException re) { System.out.println(re) ; };
+                    try { Thread.sleep(time); }catch (InterruptedException re) { System.out.println(re) ; };
                 }
             }
         };
@@ -120,6 +122,7 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
     public int getStock(int quantity, TYPE T)
         throws RemoteException 
     {
+        System.out.println("On me demande de " + T );
         // Commence par compter le nombre de ressources de ce type chez ce producteur 
         int nType = 0, total = 0, takenRessources = 0 , i;
         int RNonDivisibles;

@@ -99,9 +99,9 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                             }
                         }
                         System.out.println("À mon tour.");
-                        System.out.println("je prend des ressources " + C.PList.get(0).getStock( 10 , TYPE.OR));
-                        System.out.println("je prend des ressources " + C.PList.get(0).getStock( 10 , TYPE.BOIS));
-                        System.out.println("je prend des ressources " + C.PList.get(0).getStock( 10 , TYPE.ARGENT));
+                        //System.out.println("je prend des ressources " + C.PList.get(0).getStock( 10 , TYPE.OR));
+                        //System.out.println("je prend des ressources " + C.PList.get(0).getStock( 10 , TYPE.BOIS));
+                        System.out.println("je prend des ressources " + C.PList.get(0).getStock( 9 , TYPE.OR));
                         TimeUnit.SECONDS.sleep(3);
                         if(C.JList.size() != 0) // besoin car sinon division par 0 et ça fait tout planter
                             C.JList.get((id +1) %C.JList.size()).receiveToken();

@@ -52,12 +52,9 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
         this.id = id;
         RList = new ArrayList<Ressource> (RD);
         for (i=0; i< RD; i++) // initialise toutes les ressources du producteur
+            //RList.add(i, new Ressource(RI));
             RList.add(i, new Ressource(RI));
         
-        for (i=0; i< RD ; i++)
-        {
-            System.out.println("getRType " + getStockType(i));
-        }
 	}
 	 // sert à rien 
     public void salut()
@@ -122,11 +119,12 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
     public int getStock(int quantity, TYPE T)
         throws RemoteException 
     {
-        System.out.println("On me demande de " + T );
         // Commence par compter le nombre de ressources de ce type chez ce producteur 
         int nType = 0, total = 0, takenRessources = 0 , i;
         int RNonDivisibles;
         ArrayList<Ressource> RL = new ArrayList<Ressource>(); // y met les ressources de ce type
+
+        System.out.println("On me demande de " + T );
 
         for (i = 0 ; i < RList.size() ; i++)
         {
@@ -143,20 +141,33 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
             return 0;
         }
         // on prend des ressources en proportionnelle arrondi a la partie entière
-        for( i=0 ; i < nType ; i++)
+        
+        if( total < quantity )  // on a pas assez de ressources -> on transmet ce qu'on a
         {
-            takenRessources += RL.get(i).takeRessource( (RL.get(i).getStock() / total) * quantity);
+            for( i=0 ; i < nType ; i ++)
+            {
+                System.out.println("\t\t\tJe prends " + RL.get(i).getStock() + " du prod " + i);
+                takenRessources += RL.get(i).takeRessource( RL.get(i).getStock() );
+            }
+        }
+        else
+        {
+            for( i=0 ; i < nType ; i++)
+            {
+                System.out.println("\t\t\tJe prends " + ( (RL.get(i).getStock()  * quantity) / total) + " du prod " + i);
+                takenRessources += RL.get(i).takeRessource( (RL.get(i).getStock()  * quantity) / total);
+            }
+            i=0;
+
+            // Maintenant il faut chercher le restant des ressources 
+            while(takenRessources != quantity)
+            {
+                takenRessources += RL.get(i).takeRessource( quantity - takenRessources );
+                i++;
+            }
         }
         
         System.out.println("on a " + takenRessources + " et il faut : " + quantity);
-        
-        // Maintenant il faut chercher le restant des ressources 
-        i=0;
-        while(takenRessources != quantity)
-        {
-            takenRessources += RL.get(i).takeRessource( quantity - takenRessources );
-        }
-        
         // Maintenant qu'on a toutes les ressources (ou qu'on a prit ce qu'on pouvait)
         // On met à jour les ressources
         for(i=0 ; i < RList.size() ; i++)
@@ -167,7 +178,7 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
                 RL.remove( 0 );
             }
         }
-        
+
         return takenRessources;
     }
     

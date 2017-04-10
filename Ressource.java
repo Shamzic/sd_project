@@ -31,6 +31,16 @@ public class Ressource
         System.out.println("J'ai créé la ressource " + T);
     }
 
+    Ressource (int stockInit, int type)
+    {
+        System.out.println(type);
+        if(type == 0)
+            T = TYPE.ARGENT;
+        else
+            T = TYPE.OR;
+        System.out.println("J'ai créé la ressource " + T);
+    }
+
     // Constructeur utile pour init la liste de ressouces
     // d'un joueur
     Ressource (int stockInit, TYPE T )

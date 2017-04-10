@@ -95,7 +95,9 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
             prodCoordList.add(new Tuple(MachineName,port)); // l'ajoute à la liste contenant les coordonnées du joueur
             Producteur P = (Producteur) Naming .lookup("rmi://" + MachineName + ":" + port + "/Producteur"); // établi une connexion avec le producteur
             PList.add(P); // Ajoute le producteur à la liste des producteurs
-            
+            for( i = 0 ; i < CList.size() ; i ++)
+                CList.get(i).addConnexionProducteur(MachineName,port);
+
             System.out.println("J'ai ajouté le producteur " + MachineName + " port : " + port);
             SerializableList<TYPE> LISTE = P.getStockTypes();
             ListProducteurRTypes.add(LISTE); // ajoute la liste des types de ressources produites par ce producteur

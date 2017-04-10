@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 class JoueurImpl extends UnicastRemoteObject implements Joueur
 {
     public static int id, RD, RI;
-    public ArrayList<Ressource> RList;
+    public static ArrayList<Ressource> RList;
     static ConnexionImpl C;
     static MessageControle M;
     Thread T ;
@@ -81,6 +81,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
            		RList.get(i).increaseRessource(x);
     }
 
+    // fonction qui exécute les tâches du joueur chaque tour 
     public static void start()
     {
         while(true)
@@ -93,6 +94,9 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                             monitor.wait();
                         }
                         System.out.println("À mon tour.");
+                        System.out.println("je prend des ressources " + C.PList.get(0).getStock( 10 , TYPE.OR));
+                        System.out.println("je prend des ressources " + C.PList.get(0).getStock( 10 , TYPE.BOIS));
+                        System.out.println("je prend des ressources " + C.PList.get(0).getStock( 10 , TYPE.ARGENT));
                         TimeUnit.SECONDS.sleep(3);
                         C.JList.get((id +1) %C.JList.size()).receiveToken();
                     }
@@ -101,36 +105,6 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                 }
     }
 	
-    //~ public void start()
-    //~ throws RemoteException
-    //~ {
-        //~ T = new Thread()
-        //~ {
-            //~ public void run()
-            //~ {
-                //~ while(true)
-                //~ {
-                    //~ try
-                    //~ {
-                        //~ synchronized (monitor)
-                        //~ {
-                            //~ System.out.println("j'attends");
-                            //~ monitor.wait();
-                        //~ }
-                        //~ System.out.println("À mon tour.");
-                        //~ TimeUnit.SECONDS.sleep(1);
-                        //~ C.JList.get(id +1).receiveToken();
-                    //~ }
-                    //~ catch (InterruptedException re) { System.out.println(re) ; }
-                    //~ catch (RemoteException re) { System.out.println(re) ; }
-                //~ }
-            //~ }
-            //~ 
-            //~ 
-        //~ };
-        //~ T.run();
-    //~ }
-    
     public void receiveToken()
     throws RemoteException
     {

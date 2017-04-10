@@ -3,11 +3,48 @@
 import java.util.ArrayList;
 import java.rmi.server.UnicastRemoteObject ;
 import java.rmi.RemoteException ;
+import java.rmi.* ; 
+import java.net.MalformedURLException ; 
+
     
 class ProducteurImpl extends UnicastRemoteObject implements Producteur
 {
     public ArrayList<Ressource> RList;
     int id;
+    
+    
+    static MessageControle M; // Objet grâce auquel le producteur communique avec le contrôleur
+    
+    
+    
+    public static void main (String [] args)
+    {
+        ProducteurImpl P; // Objet qui instancie le producteur
+        int i;
+        if ( args.length != 4)
+        {
+            System.err.println( "usage : <ControllerMachineName> <ControllerPort> <JoueurMachineName> <ProducteurPort>");
+            System.exit(1);
+        }
+        try
+		{
+            // débute la communication avec le controller
+            M = (MessageControle) Naming.lookup("rmi://" + args[0] + ":" + args[1] + "/MessageControleGlobal");
+            TripleImpl  T = M.getProducteurInitialInfo(); // demande les informations initiales au contrôleur
+            
+            
+            // initialise le serveur producteur
+            P = new ProducteurImpl(T.x,T.y, T.z); // Fait le producteur
+            Naming.rebind( "rmi://localhost:"+args[3] + "/Producteur", P);
+            M.addProducteur( args[2], Integer.parseInt(args[3]) ); // Maintenant envoie ses "coordonnées" au Coordinateur
+            System.out.println("Le producteur a été ajouté");
+		}
+        catch (RemoteException re) { System.out.println(re) ; }
+        catch (MalformedURLException e) { System.out.println(e) ; }
+        catch (NotBoundException re) { System.out.println(re) ; }
+        
+    }
+    
 	ProducteurImpl (int id, int RI, int RD)
     throws RemoteException
 	{
@@ -81,6 +118,7 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
     }
     
     public int getStock(int quantity, TYPE T)
+        throws RemoteException 
     {
         // Commence par compter le nombre de ressources de ce type chez ce producteur 
         int nType = 0, total = 0, takenRessources = 0 , i;
@@ -96,7 +134,11 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
                 total +=RList.get(i).getStock();
             }
         }
-
+        if(nType == 0)
+        {
+            System.out.println("On me demande des ressources que j'ai pas ");
+            return 0;
+        }
         // on prend des ressources en proportionnelle arrondi a la partie entière
         for( i=0 ; i < nType ; i++)
         {

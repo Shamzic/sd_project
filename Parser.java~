@@ -9,8 +9,8 @@ import java.io.FileInputStream;
 public class Parser {
 
 	private String nom;
-	static String nbjoueurs;
-	static String nbproducteurs;
+	static String nbjoueurs="";
+	static String nbproducteurs="";
 
 	public Parser(){
 		;
@@ -40,6 +40,8 @@ public class Parser {
 			String nomvariable="";
 			//String valeurvariable;
 			Boolean lecture_variable = false;
+			String nbjoueurs1="";
+			String nbproducteurs1="";
 	    	while (lu != -1){
 		    	lu = fis.read();
 		    	if (lu != -1) 
@@ -55,6 +57,7 @@ public class Parser {
 
 					if(((char)lu!='=')&&(lecture_variable==true)&&(nomvariable.equals("nbproducteurs"))&&(char)lu!='\n')
 					{
+						nbproducteurs1+=(char)lu;
 						nbproducteurs+=(char)lu;
 					}
 

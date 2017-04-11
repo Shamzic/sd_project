@@ -17,6 +17,8 @@ sleep 2
 echo "Lancement du producteur 1 ..."
 xterm -T "Producteur n°1" -e "java ProducteurImpl localhost 5000 localhost 5001; $SHELL" &
 
+
+
 # sleep 2
 # echo "Lancement du joueur 2 ..."
 # xterm -T "Joueur n°2" -e "java JoueurImpl localhost 5000 localhost 5003; $SHELL" &

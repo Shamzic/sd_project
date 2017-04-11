@@ -9,8 +9,8 @@ import java.io.FileInputStream;
 public class Parser {
 
 	private String nom;
-	static String nbjoueurs;
-	static String nbproducteurs;
+	static String nbjoueurs="";
+	static String nbproducteurs="";
 
 	public Parser(){
 		;

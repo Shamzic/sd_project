@@ -19,6 +19,20 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
     static boolean have_token = false;
     public COMPORTEMENT comportement= COMPORTEMENT.VOLEUR;
 
+    /**
+	 *
+	 * Méthode principale qui lance un joueur lié à un producteur
+	 * par leurs numéros de ports.
+	 *
+	 * @arg0 
+	 *		Nom de machine du controleur
+	 * @arg1 
+	 *		Numéro de port du controleur
+	 * @arg2 
+	 *		Nom de machine du joueur
+	 * @arg3 
+	 *		Numéro de port du producteur
+     */
     public static void main (String [] args)
     {
         if ( args.length != 4)
@@ -51,7 +65,18 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
         
     }
     
-    
+    /**
+     * Constructeur de la classe JoueurImpl
+     *
+     * @param id
+     * 			  Le numéro de port du joueur
+     * @param RI
+     *            Les ressources initiales. // inutile
+     * @param RD
+     *            Le nombre de ressources différentes possibles
+     * @param portSelf
+     *            Le numéro de port du joueur
+     */
 	JoueurImpl(int id, int RI, int RD, String portSelf)
     throws RemoteException
 	{
@@ -76,7 +101,14 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                 
     }
 	
-	// Incrémente de x la quantité de la ressource de type t
+	/**
+     * Incrémente de x la quantité de la ressource de type t
+     * 
+     * @param t
+     * 			  Le type de la ressource.
+     * @param x
+     *            La quantité de ressource à augmenter.
+     */
 	public void increaseRessourceAmout(TYPE t, int x)
     throws RemoteException
     {
@@ -85,10 +117,11 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
            		RList.get(i).increaseRessource(x);
     }
 
-        /**
-         * Exécute les tâches du joueur chaque tour 
-         *
-         */
+    /**
+     * Exécute les tâches du joueur chaque tour
+     * Celui ci prend chaque tour des ressources d'or
+     *
+     */
     public  void start()
     throws RemoteException
     {
@@ -133,15 +166,15 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
     }
 
     /**
-         * Demande une quantité de ressource d'un certains type à un producteur
-         * 
-         * @param productorNumber
-         *            Le numero du producteur.
-         * @param t
-         *            Le type de la ressource.
-         * @param quantity
-         *            La quantité de ressource à prendre.
-         */
+     * Demande une quantité de ressource d'un certains type à un producteur
+     * 
+     * @param productorNumber
+     *            Le numero du producteur.
+     * @param t
+     *            Le type de la ressource.
+     * @param quantity
+     *            La quantité de ressource à prendre.
+     */
     public void askProdForRessource(int productorNumber, TYPE t, int quantity)
     throws RemoteException
     {
@@ -153,10 +186,10 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
     }
     
     /**
-         * Affichage les ressources possédées par le joueur
-         * avec leur types et leur quantités.
-         *
-         */
+     * Affichage les ressources possédées par le joueur
+     * avec leur types et leur quantités.
+     *
+     */
     public void displayRessourceList()
     throws RemoteException
     {
@@ -167,7 +200,13 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
 	}
 
 
-	
+	/**
+     * Confirmation de la réception du jeton.
+     *
+     * Met à jour le booléen et notifie le monitor
+     * pour lancer le tour du joueur.
+     *
+     */
     public void receiveToken()
     throws RemoteException
     {
@@ -177,10 +216,14 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
         {monitor.notify();}
     }
     
+    /**
+     * Confirmation de l'ajout du joueur
+     *
+     */
     public void salut()
     throws RemoteException
     {
-        System.out.println("Salut on vient de t'ajouter");
+        System.out.println("Salut joueur"+id+", on vient de t'ajouter");
     }
     
 }

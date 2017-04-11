@@ -9,20 +9,15 @@ public interface Joueur extends Remote
     public void increaseRessourceAmout(TYPE t, int x)
         throws RemoteException ;
     
-    
     public void receiveToken()
         throws RemoteException ;
-//~ 
-    //~ public void start()
-        //~ throws RemoteException ;
 
     public  void start()
-    throws RemoteException;
+    	throws RemoteException;
 
     public void askProdForRessource(int productorNumber, TYPE t, int quantity)
-    throws RemoteException;
+    	throws RemoteException;
 
     public void displayRessourceList()
-    throws RemoteException;
-    
+   		throws RemoteException;
 }

@@ -39,7 +39,7 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
     {
         TripleImpl T = new TripleImpl(IdJoueur++, nbRessourcesInitiales, nbRessourcesDifferentes);
         System.out.println("je donne les infos initiales pour joueur");
-        return new TripleImpl(IdProducteur, nbRessourcesInitiales, nbRessourcesDifferentes);
+        return T;
     }
     
     
@@ -69,7 +69,7 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
             CNew.initialSetPlayer(SList); // envoie au joueur qui s'est connecté les coordonnées des autres joueurs
             CNew.setProducteur(prodCoordList); // envoie au joueur le nécessaire pour qu'il puisse se connecter aux producteurs
             // Maintenant envoie les coordonnées du nouveau connecté à tous les agents
-            for( i = 0 ; i < CList.size() ; i ++)
+            for( i = 0 ; i < CList.size() -1 ; i ++) // l'envoie à tout le monde sauf au joueur qui vient de se connecter
                 CList.get(i).addConnexionPlayer(MachineName,port);
 
             
@@ -81,7 +81,10 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
         catch (MalformedURLException e) { System.out.println(e) ; }
         
         if( (IdJoueur  == nbJoueurs) &&  ( IdProducteur  == nbProducteurs))
+        {
+            System.out.println("Le jeu va commencer");
             JList.get(0).receiveToken();
+        }
         else
             System.out.println("Il manque " + (nbJoueurs - IdJoueur) + " Joueurs et " + (nbProducteurs - IdProducteur) + " Producteurs ");
     }

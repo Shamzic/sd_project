@@ -91,7 +91,6 @@ class ConnexionImpl extends UnicastRemoteObject implements Connexion
         {
             Producteur P = (Producteur) Naming.lookup("rmi://" + MachineName + ":" + port + "/Producteur") ;
             PList.add( P );
-            P.salut();
         }
         catch (NotBoundException re) { System.out.println(re) ; }
         catch (MalformedURLException e) { System.out.println(e) ; }

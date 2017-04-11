@@ -14,6 +14,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
     Thread T ;
     final static Object monitor = new Object();
     static JoueurImpl J;
+    static boolean have_token = false;
     
     public static void main (String [] args)
     {
@@ -54,7 +55,6 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
         this.RD = RD; // Ressources différentes ??
         this.RI = RI; // Ressources initiales du joueur, inutile ???
         RList = new ArrayList<Ressource> (RD);
-
         // Boucle pour init la liste des ressources du joueur
         // Ayant des quantité nulles pour chaque type
         for (TYPE t : TYPE.values())
@@ -84,27 +84,33 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
     // fonction qui exécute les tâches du joueur chaque tour 
     public static void start()
     {
-        boolean debut = true;
+//        boolean debut = true;
         while(true)
                 {
                     try
                     {
                         synchronized (monitor)
                         {
-                            if ( C.JList.size() != 0 && debut) // besoin car sinon division par 0 et ça fait tout planter
+                            if ( C.JList.size() != 0 )//&& debut) // besoin car sinon division par 0 et ça fait tout planter
                             {
-                                System.out.println("Je vais attendre");
-                                monitor.wait();
-                                debut = false;
+                                while ( have_token == false)
+                                {
+                                    monitor.wait(100);
+                                }
+  //                              debut = false;
                             }
                         }
                         System.out.println("À mon tour.");
                         //System.out.println("je prend des ressources " + C.PList.get(0).getStock( 10 , TYPE.OR));
                         //System.out.println("je prend des ressources " + C.PList.get(0).getStock( 10 , TYPE.BOIS));
-                        System.out.println("je prend des ressources " + C.PList.get(0).getStock( 9 , TYPE.OR));
+                        //System.out.println("je prend des ressources " + C.PList.get(0).getStock( 9 , TYPE.OR));
                         TimeUnit.SECONDS.sleep(3);
                         if(C.JList.size() != 0) // besoin car sinon division par 0 et ça fait tout planter
+                        {
+                            System.out.println(" envoie token a " + ((id +1) %C.JList.size()) );
+                            have_token = false;
                             C.JList.get((id +1) %C.JList.size()).receiveToken();
+                        }
                     }
                     catch (InterruptedException re) { System.out.println(re) ; }
                     catch (RemoteException re) { System.out.println(re) ; }
@@ -114,6 +120,8 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
     public void receiveToken()
     throws RemoteException
     {
+        System.out.println("J'ai eu le token");
+        have_token = true;
         synchronized(monitor)
         {monitor.notify();}
     }

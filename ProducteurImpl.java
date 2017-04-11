@@ -11,10 +11,8 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
 {
     public ArrayList<Ressource> RList;
     int id;
-    
-    
     static MessageControle M; // Objet grâce auquel le producteur communique avec le contrôleur
-    
+    static Object ObjSynchro = new Object();
     
     
     public static void main (String [] args)
@@ -56,12 +54,7 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
             RList.add(i, new Ressource(RI));
         
 	}
-	 // sert à rien 
-    public void salut()
-    throws RemoteException
-    {
-        System.out.println("Salut on vient de t'ajouter");
-    }
+    
     
     // renvoie la quantité de la ressource N°ressource 
     public int askRessourceAmount( int ressource)
@@ -103,11 +96,14 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
                 int i;
                 while(true)
                 {
-                    System.out.println("j'ajoute des ressources");
-                    for(i = 0 ; i< RList.size() ; i++)
+                    synchronized(ObjSynchro) // synchronized sert à faire des sections critiques ( section exécutée de façon atomique )
                     {
-                        RList.get(i).increaseRessource( q );
-                        System.out.println("ressource " + RList.get(i).getStockType() + " : " + RList.get(i).getStock());
+                        System.out.println("j'ajoute des ressources");
+                        for(i = 0 ; i< RList.size() ; i++)
+                        {
+                            RList.get(i).increaseRessource( q );
+                            System.out.println("ressource " + RList.get(i).getStockType() + " : " + RList.get(i).getStock());
+                        }
                     }
                     try { Thread.sleep(time); }catch (InterruptedException re) { System.out.println(re) ; };
                 }
@@ -125,60 +121,62 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
         ArrayList<Ressource> RL = new ArrayList<Ressource>(); // y met les ressources de ce type
 
         System.out.println("On me demande de " + T );
-
-        for (i = 0 ; i < RList.size() ; i++)
-        {
-            if(RList.get(i).getStockType() == T)
-            {
-                nType++;
-                RL.add(RList.get(i));
-                total +=RList.get(i).getStock();
-            }
-        }
-        if(nType == 0)
-        {
-            System.out.println("On me demande des ressources que j'ai pas ");
-            return 0;
-        }
-        // on prend des ressources en proportionnelle arrondi a la partie entière
         
-        if( total < quantity )  // on a pas assez de ressources -> on transmet ce qu'on a
+        synchronized (ObjSynchro) // synchronized sert à faire des sections critiques ( section exécutée de façon atomique )
         {
-            for( i=0 ; i < nType ; i ++)
+            for (i = 0 ; i < RList.size() ; i++)
             {
-                System.out.println("\t\t\tJe prends " + RL.get(i).getStock() + " du prod " + i);
-                takenRessources += RL.get(i).takeRessource( RL.get(i).getStock() );
+                if(RList.get(i).getStockType() == T)
+                {
+                    nType++;
+                    RL.add(RList.get(i));
+                    total +=RList.get(i).getStock();
+                }
             }
-        }
-        else
-        {
-            for( i=0 ; i < nType ; i++)
+            if(nType == 0)
             {
-                System.out.println("\t\t\tJe prends " + ( (RL.get(i).getStock()  * quantity) / total) + " du prod " + i);
-                takenRessources += RL.get(i).takeRessource( (RL.get(i).getStock()  * quantity) / total);
+                System.out.println("On me demande des ressources que j'ai pas ");
+                return 0;
             }
-            i=0;
+            // on prend des ressources en proportionnelle arrondi a la partie entière
+            
+            if( total < quantity )  // on a pas assez de ressources -> on transmet ce qu'on a
+            {
+                for( i=0 ; i < nType ; i ++)
+                {
+                    System.out.println("\t\t\tJe prends " + RL.get(i).getStock() + " du prod " + i);
+                    takenRessources += RL.get(i).takeRessource( RL.get(i).getStock() );
+                }
+            }
+            else
+            {
+                for( i=0 ; i < nType ; i++)
+                {
+                    System.out.println("\t\t\tJe prends " + ( (RL.get(i).getStock()  * quantity) / total) + " du prod " + i);
+                    takenRessources += RL.get(i).takeRessource( (RL.get(i).getStock()  * quantity) / total);
+                }
+                i=0;
 
-            // Maintenant il faut chercher le restant des ressources 
-            while(takenRessources != quantity)
+                // Maintenant il faut chercher le restant des ressources 
+                while(takenRessources != quantity)
+                {
+                    takenRessources += RL.get(i).takeRessource( quantity - takenRessources );
+                    i++;
+                }
+            }
+            
+            System.out.println("on a " + takenRessources + " et il faut : " + quantity);
+            // Maintenant qu'on a toutes les ressources (ou qu'on a prit ce qu'on pouvait)
+            // On met à jour les ressources
+            for(i=0 ; i < RList.size() ; i++)
             {
-                takenRessources += RL.get(i).takeRessource( quantity - takenRessources );
-                i++;
+                if( RList.get(i).getStockType() == T)
+                {
+                    RList.get(i).setRessource( RL.get(0).getStock() );
+                    RL.remove( 0 );
+                }
             }
         }
-        
-        System.out.println("on a " + takenRessources + " et il faut : " + quantity);
-        // Maintenant qu'on a toutes les ressources (ou qu'on a prit ce qu'on pouvait)
-        // On met à jour les ressources
-        for(i=0 ; i < RList.size() ; i++)
-        {
-            if( RList.get(i).getStockType() == T)
-            {
-                RList.get(i).setRessource( RL.get(0).getStock() );
-                RL.remove( 0 );
-            }
-        }
-
         return takenRessources;
     }
     

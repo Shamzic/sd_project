@@ -17,6 +17,8 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
     final static Object monitor = new Object();
     static JoueurImpl J;
     static boolean have_token = false;
+    public COMPORTEMENT comportement= COMPORTEMENT.VOLEUR;
+
     
     public static void main (String [] args)
     {
@@ -111,14 +113,14 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                         //System.out.println("je prend des ressources " + C.PList.get(0).getStock( 10 , TYPE.OR));
                         //System.out.println("je prend des ressources " + C.PList.get(0).getStock( 10 , TYPE.BOIS));
                         int ressources_prises = C.PList.get(0).getStock( 9 , TYPE.OR);
-                        System.out.println("je prend "+ressources_prises+" ressources d'or !");
+                        System.out.println("Je prend "+ressources_prises+" ressources d'or !");
                        	increaseRessourceAmout(TYPE.OR,ressources_prises);
 
                         TimeUnit.SECONDS.sleep(3);
 
                         if(C.JList.size() != 0) // besoin car sinon division par 0 et ça fait tout planter
                         {
-                            System.out.println(" envoie token a " + ((id +1) %C.JList.size()) );
+                            System.out.println("Envoie token a " + ((id +1) %C.JList.size()) );
                             have_token = false;
                             C.JList.get((id +1) %C.JList.size()).receiveToken();
                      	}
@@ -132,7 +134,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
     }
 
     /**
-         * Demande une quantitée de ressource d'un certains type à un producteur
+         * Demande une quantité de ressource d'un certains type à un producteur
          * 
          * @param productorNumber
          *            Le numero du producteur.
@@ -148,7 +150,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
     	 if(ressources_prises>0)
     	 	System.out.println(""+ressources_prises+" ressources d'or prises au producteur "+productorNumber);
     	 else
-    	 	System.out.println("Le producteur"+productorNumber+" n'as pas pu fournir  de ressources "+t);
+    	 	System.out.println("Le producteur"+productorNumber+" n'as pas pu fournir de ressources "+t);
     }
     
     /**

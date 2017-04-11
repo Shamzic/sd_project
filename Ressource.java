@@ -39,13 +39,15 @@ public class Ressource
         else
             T = TYPE.OR;
         System.out.println("J'ai créé la ressource " + T);
+        System.out.println("De stock initial " +stockInit);
+
     }
 
     // Constructeur utile pour init la liste de ressouces
     // d'un joueur
     Ressource (int stockInit, TYPE T )
     {
-        this.stock = 0;
+        this.stock = stockInit ;
         this.T =T;
     }
 

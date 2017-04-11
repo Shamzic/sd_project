@@ -8,7 +8,7 @@ import java.net.MalformedURLException ;
 // Une méthode de cette classe est appelée à chaque fois que le controlleur ajoute une machine
 class ConnexionImpl extends UnicastRemoteObject implements Connexion
 {
-    
+    public static final long serialVersionUID = 1L; // Utilie uniquement pour régler les warning de serial
     public ArrayList<Joueur> JList = new ArrayList<Joueur>();
     
     public ArrayList<Producteur> PList = new ArrayList<Producteur>();

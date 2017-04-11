@@ -1,9 +1,5 @@
-import java.util.ArrayList;
-import java.lang.Runtime;
-
 import java.net.* ;
 import java.rmi.* ;
-import java.io.* ;
 
 /* Arguments du Controlleur
  * port rmiregistry du controlleur
@@ -29,8 +25,6 @@ public class Controller
     
 	Controller (String args[])
 	{
-        
-		int i ;
 		nbJoueurs = Integer.parseInt( args[0] ); // nombre de joueur qu'on veut pour lancer la partie
         nbProducteurs = Integer.parseInt( args[1] ); // nombre de producteurs qu'on veut
         nbRessourcesInitiales = 5; // amount de chaque ressource à l'état initial

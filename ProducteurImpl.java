@@ -9,6 +9,7 @@ import java.net.MalformedURLException ;
     
 class ProducteurImpl extends UnicastRemoteObject implements Producteur
 {
+    public static final long serialVersionUID = 1L; // Utilie uniquement pour régler les warning de serial
     public ArrayList<Ressource> RList;
     int id;
     static MessageControle M; // Objet grâce auquel le producteur communique avec le contrôleur
@@ -18,7 +19,6 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
     public static void main (String [] args)
     {
         ProducteurImpl P; // Objet qui instancie le producteur
-        int i;
         if ( args.length != 4)
         {
             System.err.println( "usage : <ControllerMachineName> <ControllerPort> <JoueurMachineName> <ProducteurPort>");
@@ -117,7 +117,7 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
     {
         // Commence par compter le nombre de ressources de ce type chez ce producteur 
         int nType = 0, total = 0, takenRessources = 0 , i;
-        int RNonDivisibles;
+       // int RNonDivisibles; // non utilisé
         ArrayList<Ressource> RL = new ArrayList<Ressource>(); // y met les ressources de ce type
 
         System.out.println("On me demande de " + T );

@@ -19,7 +19,6 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
     static boolean have_token = false;
     public COMPORTEMENT comportement= COMPORTEMENT.VOLEUR;
 
-    
     public static void main (String [] args)
     {
         if ( args.length != 4)

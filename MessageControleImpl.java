@@ -8,6 +8,7 @@ import java.net.MalformedURLException ;
 
 public class MessageControleImpl extends UnicastRemoteObject implements MessageControle
 {
+    public static final long serialVersionUID = 1L; // Utilie uniquement pour régler les warning de serial
 	public int IdProducteur = 0, IdJoueur = 0; // id des producteurs et des joueurs
     public int nbProducteurs, nbJoueurs; // nombre de joueurs et producteurs qu'on veut 
     
@@ -24,7 +25,6 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
     public MessageControleImpl(int nbRessourcesInitiales, int nbRessourcesDifferentes, int nbProducteurs, int nbJoueurs, String Name, int port)
     throws RemoteException
     {
-        int i;
         this.nbRessourcesInitiales = nbRessourcesInitiales;
         this.nbRessourcesDifferentes = nbRessourcesDifferentes;
         this.Name = Name;

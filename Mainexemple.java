@@ -24,7 +24,9 @@ public class Mainexemple
 	        System.out.println("*** Configuration du jeu ***");
 	        System.out.println("Nombre de producteurs : "+nbP);
 	        System.out.println("Nombre de joueurs : "+nbJ);
-	        Controller C = new Controller(S);
+	        
+			new Controller(S); // A la place de :
+							   // Controller C = new Controller(S);
 	}
 }
 

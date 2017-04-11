@@ -89,4 +89,17 @@ public class Ressource
         return r;
         
     }
+
+    public String  toString()
+    {
+        if(T == TYPE.ARGENT)
+            return "Ressource d'argent de quantité "+String.valueOf(this.getStock());
+        if(T == TYPE.OR)
+            return "Ressource d'or de quantité "+String.valueOf(this.getStock());
+        if(T == TYPE.BOIS)
+            return "Ressource de bois de quantité "+String.valueOf(this.getStock());
+        else 
+             return "Ressource de type inconnu et de quantité "+String.valueOf(this.getStock());
+
+    }
 }

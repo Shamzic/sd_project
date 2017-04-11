@@ -110,10 +110,13 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                         System.out.println("À mon tour.");
                         //System.out.println("je prend des ressources " + C.PList.get(0).getStock( 10 , TYPE.OR));
                         //System.out.println("je prend des ressources " + C.PList.get(0).getStock( 10 , TYPE.BOIS));
+<<<<<<< HEAD
+                        //System.out.println("je prend des ressources " + C.PList.get(0).getStock( 9 , TYPE.OR));
+=======
                         int ressources_prises = C.PList.get(0).getStock( 9 , TYPE.OR);
                         System.out.println("je prend "+ressources_prises+" ressources d'or !");
                        	increaseRessourceAmout(TYPE.OR,ressources_prises);
-
+>>>>>>> c386b05d79067b61426cb9ff10234a4f7a687fbb
                         TimeUnit.SECONDS.sleep(3);
 
                         if(C.JList.size() != 0) // besoin car sinon division par 0 et ça fait tout planter
@@ -121,10 +124,13 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                             System.out.println(" envoie token a " + ((id +1) %C.JList.size()) );
                             have_token = false;
                             C.JList.get((id +1) %C.JList.size()).receiveToken();
-                     	}
+<<<<<<< HEAD
+                        }
+=======
 
                         /* Affichage des ressources du joueur */
                         displayRessourceList();
+>>>>>>> c386b05d79067b61426cb9ff10234a4f7a687fbb
                     }
                     catch (InterruptedException re) { System.out.println(re) ; }
                     catch (RemoteException re) { System.out.println(re) ; }

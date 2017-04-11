@@ -50,7 +50,6 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
         this.id = id;
         RList = new ArrayList<Ressource> (RD);
         for (i=0; i< RD; i++) // initialise toutes les ressources du producteur
-            //RList.add(i, new Ressource(RI));
             RList.add(i, new Ressource(RI));
         
 	}

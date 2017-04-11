@@ -1,7 +1,8 @@
 import java.util.Random;
+import java.io.Serializable;
 
 // Ressource 
-public class Ressource
+public class Ressource implements Serializable
 {
     
     TYPE T = TYPE.ARGENT;

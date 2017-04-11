@@ -1,6 +1,8 @@
 
 import java.rmi.Remote ; 
 import java.rmi.RemoteException ; 
+import java.util.ArrayList;
+
 
 public interface MessageControle extends Remote
 {
@@ -20,5 +22,8 @@ public interface MessageControle extends Remote
         throws RemoteException;
     
     public SerializableList<SerializableList<TYPE>> getStocksTypesAllProducteurs()
+        throws RemoteException;
+
+    public void sendInformation(int idPlayer, SerializableList<Ressource> Ressources)
         throws RemoteException;
 }

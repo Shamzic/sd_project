@@ -41,8 +41,5 @@ public class Controller
         catch (RemoteException re) { System.out.println(re) ; }
         catch (MalformedURLException e) { System.out.println(e) ; }
 	}
-	
-	
-	
-	
+
 }

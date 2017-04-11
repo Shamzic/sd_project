@@ -3,8 +3,8 @@ import java.rmi.RemoteException ;
 import java.util.ArrayList;
 import java.rmi.* ; 
 import java.net.MalformedURLException ; 
-
-
+import java.io.PrintWriter ;
+import java.io.IOException ;
 
 public class MessageControleImpl extends UnicastRemoteObject implements MessageControle
 {
@@ -22,6 +22,11 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
     public ArrayList<Producteur> PList = new ArrayList<Producteur>(); // Liste de objets producteur avec lesquels on communique avec les producteurs
     public ArrayList<Joueur> JList = new ArrayList<Joueur>(); // Liste d'objet joueurs avec lesquels on communique avec les joueurs
     
+    PrintWriter writer; // objet avec lequel on écrit dans le fichier
+    int turn = 1; // tour ( sert à écrire dans le fichier )
+
+    
+    
     public MessageControleImpl(int nbRessourcesInitiales, int nbRessourcesDifferentes, int nbProducteurs, int nbJoueurs, String Name, int port)
     throws RemoteException
     {
@@ -30,7 +35,12 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
         this.Name = Name;
         this.port = port;
         this.nbProducteurs = nbProducteurs;
-        this.nbJoueurs = nbJoueurs;        
+        this.nbJoueurs = nbJoueurs;
+        try
+        {
+             writer = new PrintWriter("actionLog.txt","UTF-8");
+        }
+        catch (IOException e) { System.out.println(e) ; }
     }
     
     // Envoie les infos initiales au joueur
@@ -118,6 +128,30 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
         else
             System.out.println("Il manque " + (nbJoueurs - IdJoueur) + " Joueurs et " + (nbProducteurs - IdProducteur) + " Producteurs ");
         
+    }
+    
+    /* Joueur envoie les informations du tour au coordinateur qui l'écrit dans un fichier
+     * =>TOUR NB
+     * IdJoueur <Liste des ressources par joueur  
+    */
+    public void sendInformation(int idPlayer, SerializableList<Ressource> Ressources)
+        throws RemoteException
+    {
+        int i;
+        String S=""+idPlayer;
+
+        for(i = 0 ; i < TYPE.values().length ; i++ )
+        {
+            S += " " + Ressources.get(i).getStock();
+            System.out.println(S);
+            writer.println(S);
+            //System.out.println( " val du type " + Ressources.get(i).getStockType() + " a une valeur de "  + Ressources.get(i).getStock());
+        }
+        if(idPlayer == IdJoueur -1)
+        {
+            System.out.println("Passe au prochain tour");
+            turn ++;
+        }
     }
     
     // Envoie la liste des types de tous les producteurs au joueur qui la demande

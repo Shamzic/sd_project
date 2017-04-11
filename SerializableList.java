@@ -11,6 +11,11 @@ public class SerializableList <T> implements Serializable
         L = new ArrayList<T>();
     }
     
+    SerializableList( int i)
+    {
+        L = new ArrayList<T>(i);
+    }
+    
     public void add (T ajout)
     {
         L.add(ajout);

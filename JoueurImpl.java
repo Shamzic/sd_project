@@ -10,7 +10,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
 {
 	public static final long serialVersionUID = 1L; // Utilie uniquement pour régler les warning de serial
     public static int id, RD, RI;
-    public static ArrayList<Ressource> RList;
+    public static SerializableList<Ressource> RList;
     static ConnexionImpl C;
     static MessageControle M;
     Thread T ;
@@ -83,7 +83,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
 		JoueurImpl.id = id;
         JoueurImpl.RD = RD; // Ressources différentes ??
         JoueurImpl.RI = RI; // Ressources initiales du joueur, inutile ???
-        RList = new ArrayList<Ressource> (RD);
+        RList = new SerializableList<Ressource> (RD);
         // Boucle pour init la liste des ressources du joueur
         // Ayant des quantité nulles pour chaque type
         for (TYPE t : TYPE.values())
@@ -141,13 +141,15 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
   //                              debut = false;
                             }
                         }
-                        System.out.println("À mon tour.");
                         //System.out.println("je prend des ressources " + C.PList.get(0).getStock( 10 , TYPE.OR));
                         //System.out.println("je prend des ressources " + C.PList.get(0).getStock( 10 , TYPE.BOIS));
                         int ressources_prises = C.PList.get(0).getStock( 9 , TYPE.OR);
                         System.out.println("Je prend "+ressources_prises+" ressources d'or !");
                        	increaseRessourceAmout(TYPE.OR,ressources_prises);
-
+                        /* Affichage des ressources du joueur */
+                        displayRessourceList();
+                        
+                        M.sendInformation(id, RList);
                         TimeUnit.SECONDS.sleep(3);
 
                         if(C.JList.size() != 0) // besoin car sinon division par 0 et ça fait tout planter
@@ -157,8 +159,6 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                             C.JList.get((id +1) %C.JList.size()).receiveToken();
                      	}
 
-                        /* Affichage des ressources du joueur */
-                        displayRessourceList();
                     }
                     catch (InterruptedException re) { System.out.println(re) ; }
                     catch (RemoteException re) { System.out.println(re) ; }

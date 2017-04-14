@@ -1,23 +1,10 @@
-D'abord aller dans le dossier où sont les programmes et lancer : 
-rmiregistry 5000 &
-rmiregistry 5001 &
-rmiregistry 5002 &
-
-ensuite lancer dans des terminaux différents :
-java Mainexemple
-
-java ProducteurMain localhost 5000 lalhost 5001
-
-java JoueurMain localhost 5000 localst 5002
-
-
-
-
 # sd_project
 
 Corrigé des TPs + sujet projet : https://dpt-info.u-strasbg.fr/~g.frey/SD/
 
 Diagramme UML draw.io : https://drive.google.com/file/d/0B0OIKQIdHBm8Qi16NDBucFFaakE/view?usp=sharing
+
+Graphique : http://www.jfree.org/jfreechart/api/javadoc/org/jfree/chart/renderer/xy/DeviationRenderer.html
 
 # Petites infos précisées en TP :
 
@@ -93,6 +80,21 @@ Il existe des libraires de représentation des graphes (on fait simplement dix n
 Il ne faut pas passer trop de temps sur la visualisation.
 
 L'interface avec des graphes a l'air plus simple à réaliser affichant simplement un graphe du nombre de ressources des joueurs et des producteurs en fonction du temps.
+
+# Exemple de lancement du jeu
+
+D'abord aller dans le dossier où sont les programmes et lancer : 
+rmiregistry 5000 &
+rmiregistry 5001 &
+rmiregistry 5002 &
+
+Ensuite lancer dans des terminaux différents :
+java Mainexemple
+
+java ProducteurMain localhost 5000 lalhost 5001
+
+java JoueurMain localhost 5000 localst 5002
+
 
 
 

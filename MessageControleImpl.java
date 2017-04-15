@@ -131,6 +131,8 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
         int i;
         String S=""+idPlayer;
 
+        if (idPlayer == 0)
+            writer.println("TURN " + turn);
         for(i = 0 ; i < TYPE.values().length ; i++ )
         {
             S += " " + Ressources.get(i).getStock();

@@ -34,13 +34,14 @@ public class Ressource implements Serializable
 
     Ressource (int stockInit, int type)
     {
-        System.out.println(type);
+        stock = stockInit;
         if(type == 0)
             T = TYPE.ARGENT;
-        else
+        else if (type == 1)
             T = TYPE.OR;
+        else
+            T = TYPE.BOIS;
         System.out.println("J'ai créé la ressource " + T);
-        System.out.println("De stock initial " +stockInit);
 
     }
 

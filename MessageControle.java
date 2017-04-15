@@ -8,13 +8,13 @@ public interface MessageControle extends Remote
 {
     public int getIdProducteur()
         throws RemoteException ;
-    public TripleImpl getPlayerInitialInfo()
+        
+    public InitialInfoImpl getPlayerInitialInfo()
         throws RemoteException;
         
-    
-    public TripleImpl getProducteurInitialInfo()
+    public InitialInfoImpl getProducteurInitialInfo()
         throws RemoteException;
-        
+
     public void addMachine( String MachineName, int port)
         throws RemoteException;
 
@@ -25,5 +25,8 @@ public interface MessageControle extends Remote
         throws RemoteException;
 
     public void sendInformation(int idPlayer, SerializableList<Ressource> Ressources)
+        throws RemoteException;
+        
+    public void GameEnded()
         throws RemoteException;
 }

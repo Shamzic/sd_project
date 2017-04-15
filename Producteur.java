@@ -23,4 +23,6 @@ public interface Producteur extends Remote
     public int getStock(int quantity, TYPE T)
         throws RemoteException ;
 
+    public void end()
+        throws RemoteException;
 }

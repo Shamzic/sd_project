@@ -14,7 +14,7 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
     int id;
     static MessageControle M; // Objet grâce auquel le producteur communique avec le contrôleur
     static Object ObjSynchro = new Object();
-    
+    Thread t;
     
     public static void main (String [] args)
     {
@@ -28,11 +28,11 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
 		{
             // débute la communication avec le controller
             M = (MessageControle) Naming.lookup("rmi://" + args[0] + ":" + args[1] + "/MessageControleGlobal");
-            TripleImpl  T = M.getProducteurInitialInfo(); // demande les informations initiales au contrôleur
+            InitialInfoImpl  I = M.getProducteurInitialInfo(); // demande les informations initiales au contrôleur
             
             
             // initialise le serveur producteur
-            P = new ProducteurImpl(T.x,T.y, T.z); // Fait le producteur
+            P = new ProducteurImpl(I); // Fait le producteur
             Naming.rebind( "rmi://localhost:"+args[3] + "/Producteur", P);
             M.addProducteur( args[2], Integer.parseInt(args[3]) ); // Maintenant envoie ses "coordonnées" au Coordinateur
             System.out.println("Le producteur a été ajouté");
@@ -43,14 +43,14 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
         
     }
     
-	ProducteurImpl (int id, int RI, int RD)
+	ProducteurImpl (InitialInfoImpl  I)
     throws RemoteException
 	{
         int i;
-        this.id = id;
-        RList = new ArrayList<Ressource> (RD);
-        for (i=0; i< RD; i++) // initialise toutes les ressources du producteur
-            RList.add(i, new Ressource(RI));
+        this.id = I.IdProducteur;
+        RList = new ArrayList<Ressource> (I.nbRessourcesDifferentes);
+        for (i=0; i< I.nbRessourcesDifferentes; i++) // initialise toutes les ressources du producteur
+            RList.add(i, new Ressource(I.nbRessourcesInitiales));
         
 	}
     
@@ -88,7 +88,7 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
     {
         final int time = ms;
         final int q = quantity;
-        Thread t = new Thread()
+        t = new Thread()
         {
             public void run()
             {
@@ -104,7 +104,8 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
                             System.out.println("ressource " + RList.get(i).getStockType() + " : " + RList.get(i).getStock());
                         }
                     }
-                    try { Thread.sleep(time); }catch (InterruptedException re) { System.out.println(re) ; };
+                    try { Thread.sleep(time); }
+                        catch (InterruptedException re) { System.out.println(re) ; System.exit(0);};
                 }
             }
         };
@@ -178,6 +179,17 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
         }
         return takenRessources;
     }
+    
+    /**
+     * Termine le programme
+     */
+    public void end()
+    throws RemoteException
+    {
+        System.out.println("J'arrête le producteur");
+        t.interrupt();
+    }
+    
     
 }
 

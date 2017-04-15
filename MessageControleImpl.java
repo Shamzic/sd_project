@@ -8,13 +8,9 @@ import java.io.IOException ;
 
 public class MessageControleImpl extends UnicastRemoteObject implements MessageControle
 {
+    public InitialInfoImpl I;
     public static final long serialVersionUID = 1L; // Utilie uniquement pour régler les warning de serial
-	public int IdProducteur = 0, IdJoueur = 0; // id des producteurs et des joueurs
-    public int nbProducteurs, nbJoueurs; // nombre de joueurs et producteurs qu'on veut 
-    
-    public int nbRessourcesInitiales, nbRessourcesDifferentes; 
-    public String Name; // nom de la machine du contrôleur
-    public int port; // port du rmiregistry du contrôleur
+
     public SerializableList<Tuple> SList = new SerializableList<Tuple>(); // Liste avec les coordonnées des joueurs ( NomDeMachine , port)
     public SerializableList<Tuple> prodCoordList = new SerializableList<Tuple>(); // liste avec les coordonnées des producteurs ( NomDeMachine , port)
     public SerializableList<SerializableList<TYPE>> ListProducteurRTypes = new SerializableList<SerializableList<TYPE>>();
@@ -27,15 +23,10 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
 
     
     
-    public MessageControleImpl(int nbRessourcesInitiales, int nbRessourcesDifferentes, int nbProducteurs, int nbJoueurs, String Name, int port)
+    public MessageControleImpl(int nbRessourcesInitiales, int nbRessourcesDifferentes, int nbProducteurs, int nbJoueurs, String Name, int port, int victory_condition, SerializableList<Ressource> L)
     throws RemoteException
     {
-        this.nbRessourcesInitiales = nbRessourcesInitiales;
-        this.nbRessourcesDifferentes = nbRessourcesDifferentes;
-        this.Name = Name;
-        this.port = port;
-        this.nbProducteurs = nbProducteurs;
-        this.nbJoueurs = nbJoueurs;
+        I = new InitialInfoImpl( nbRessourcesInitiales, nbRessourcesDifferentes, Name, port, nbProducteurs, nbJoueurs, victory_condition, L);
         try
         {
              writer = new PrintWriter("actionLog.txt","UTF-8");
@@ -44,22 +35,21 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
     }
     
     // Envoie les infos initiales au joueur
-    public TripleImpl getPlayerInitialInfo()
+    public InitialInfoImpl getPlayerInitialInfo()
     throws RemoteException
     {
-        TripleImpl T = new TripleImpl(IdJoueur++, nbRessourcesInitiales, nbRessourcesDifferentes);
-        System.out.println("je donne les infos initiales pour joueur");
-        return T;
+        System.out.println("je donne les infos initiales au nouveau joueur de id " + I.IdJoueur);
+        I.IdJoueur++;
+        return I;
     }
     
-    
     // Envoie les infos initiales au producteur
-    public TripleImpl getProducteurInitialInfo()
-        throws RemoteException
+    public InitialInfoImpl getProducteurInitialInfo()
+    throws RemoteException
     {
-        TripleImpl T = new TripleImpl(IdProducteur++, nbRessourcesInitiales,nbRessourcesDifferentes);
-        System.out.println("je donne les infos initiales pour producteur");
-        return T;
+        System.out.println("je donne les infos initiales au nouveau producteur");
+        I.IdProducteur ++;
+        return I;
     }
     
     // Add le joueur de la machine MachineName et du port port
@@ -90,13 +80,13 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
         catch (NotBoundException re) { System.out.println(re) ; }
         catch (MalformedURLException e) { System.out.println(e) ; }
         
-        if( (IdJoueur  == nbJoueurs) &&  ( IdProducteur  == nbProducteurs))
+        if( (I.IdJoueur  == I.nbJoueurs -1 ) &&( I.IdProducteur == I.nbProducteurs -1 ))
         {
             System.out.println("Le jeu va commencer");
             JList.get(0).receiveToken();
         }
         else
-            System.out.println("Il manque " + (nbJoueurs - IdJoueur) + " Joueurs et " + (nbProducteurs - IdProducteur) + " Producteurs ");
+            System.out.println("Il manque " + (I.nbJoueurs - I.IdJoueur -1) + " Joueurs et " + (I.nbProducteurs - I.IdProducteur -1) + " Producteurs ");
     }
     
     // Add le producteur de la machine MachineName et du port port
@@ -123,10 +113,11 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
         catch (MalformedURLException e) { System.out.println(e) ; }
         
 
-        if( (IdJoueur  == nbJoueurs) &&( IdProducteur == nbProducteurs))
+        if( (I.IdJoueur  == I.nbJoueurs -1 ) &&( I.IdProducteur == I.nbProducteurs -1 ))
             JList.get(0).receiveToken();
         else
-            System.out.println("Il manque " + (nbJoueurs - IdJoueur) + " Joueurs et " + (nbProducteurs - IdProducteur) + " Producteurs ");
+            System.out.println("Il manque " + (I.nbJoueurs - I.IdJoueur -1) + " Joueurs et " + (I.nbProducteurs - I.IdProducteur -1) + " Producteurs ");
+        System.out.println("" + I.nbJoueurs + "   " +  (-1*I.IdJoueur -1) + " Joueurs et " + I.nbProducteurs  + "   " + (-1*I.IdProducteur -1));
         
     }
     
@@ -143,16 +134,18 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
         for(i = 0 ; i < TYPE.values().length ; i++ )
         {
             S += " " + Ressources.get(i).getStock();
-            System.out.println(S);
-            writer.println(S);
             //System.out.println( " val du type " + Ressources.get(i).getStockType() + " a une valeur de "  + Ressources.get(i).getStock());
         }
-        if(idPlayer == IdJoueur -1)
+        System.out.println(S);
+        writer.println(S);
+        if(idPlayer == I.IdJoueur -1)
         {
+            
             System.out.println("Passe au prochain tour");
             turn ++;
         }
     }
+    
     
     // Envoie la liste des types de tous les producteurs au joueur qui la demande
     // Dans chaque entrée i de la liste se trouve une liste contenant les types de ressources du producteur i
@@ -164,12 +157,17 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
     
     
     public int getIdProducteur()
-    throws RemoteException
+        throws RemoteException
     {
-        System.out.println("Give id " + IdProducteur );
-        return IdProducteur ++;
+        System.out.println("Give id " + I.IdProducteur );
+        return I.IdProducteur ++;
     }
     
+    public void GameEnded()
+        throws RemoteException
+    {
+        writer.close();
+    }
     
 }
 

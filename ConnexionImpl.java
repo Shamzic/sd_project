@@ -38,7 +38,6 @@ class ConnexionImpl extends UnicastRemoteObject implements Connexion
                 System.out.println("Machine :" + L.get(i).MN + " :" + L.get(i).port);
                 Joueur P = (Joueur) Naming.lookup("rmi://" +  L.get(i).MN + ":" + L.get(i).port + "/Joueur") ;
                 JList.add( P );
-                P.salut();
             }
             
         }
@@ -74,7 +73,6 @@ class ConnexionImpl extends UnicastRemoteObject implements Connexion
         {
             Joueur J = (Joueur) Naming.lookup("rmi://" + MachineName + ":" + port + "/Joueur") ;
             JList.add( J );
-            J.salut();
         }
         catch (NotBoundException re) { System.out.println(re) ; }
         catch (MalformedURLException e) { System.out.println(e) ; }
@@ -112,7 +110,29 @@ class ConnexionImpl extends UnicastRemoteObject implements Connexion
 
     }
     
-    
-    
+    // envoie un message à tous les agents pour qu'ils se terminent ( lorsqu'on est arrivé à la fin du jeu
+    public void endAllAgents(int id)
+    {
+        System.out.println("j'arrête tout id "+ id);
+        int i;
+        try
+        {
+            for(i=0 ; i < JList.size() ; i++)
+            {
+                System.out.println("j'arrête le joueur : "+ i);
+                if( i != id ) // évite que l'agent s'arrête lui même avant d'avoir arrêté tout le monde
+                JList.get(i).end();
+            }
+            for(i=0 ; i < PList.size() ; i++)
+            {
+                System.out.println("j'arrête le producteur : "+ i);
+                PList.get(i).end();
+            }
+            System.out.println("j'ai tout fini maintenant je m'arrête");
+            JList.get(id).end(); // s'arrête
+        }
+        catch (RemoteException re) { System.out.println(re) ; }
+
+    }
 	
 }

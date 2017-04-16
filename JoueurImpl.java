@@ -96,6 +96,26 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
         {
         	RList.add(new Ressource(0,t));
         }
+
+        // Init comportement random
+        Random randomitude = new Random();
+        switch(randomitude.nextInt(3))
+        {
+            case 0:
+            {
+                T = TYPE.Coopératif;
+                break;
+            }
+            case 1:
+            {
+                T = TYPE.OR;
+                break;
+            }
+            case 2:
+            {
+                T = TYPE.BOIS;
+            }
+
         // initialise le serveur connexion pour que le controlleur puisse lui envoyer les nouveaux connectés
         C = new ConnexionImpl();
         try
@@ -147,8 +167,59 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
   //                    debut = false;
                     }
                 }
-                //System.out.println("je prend des ressources " + C.PList.get(0).getStock( 10 , TYPE.OR));
+                /*****************************************
+                 * Ici on va implémenter les comportements
+                 *****************************************
+                  - Individualiste : 
+                    Prend autant de ressources que possible pour atteindre l'objectif (10 max par tour).
+
+                    -> Demande au premier producteur si il a les ressources nécessaires...
+                        - Si oui, alors il se sert comme un rat et en prend 10.
+                        - Si non, alors il demande au producteur suivant.
+                            - puis il termine son tour.
+
+                    -----------------------------------------------------
+
+                    -Voleur :
+                    Observe les joueurs et leur vole des ressources.
+
+                    -> Demande au premier joueur si il a des ressources nécessaire pour gagner
+                        - Si oui alors il les prends (15 max par tour) 
+                        - Si non alors il observe le joueur suivant
+                             - si après avoir parcouru tous les joueurs il n'y en a aucun qu'on peut voler
+                               alors le voleur devient un individualiste pour 1 tour puis redevient voleur.
+                    - puis il termine son tour et recommence
+
+                    -----------------------------------------------------
+                    
+                    -Coopératif
+                    Observe les joueurs et prends des ressources si le producteur en as produit au moins
+                    la moitié du nombre de ressources à atteindre
+
+                    -> observe un producteur 
+                        - si il a au moins la moitié des ressources nécessaire alors il se sert (10 max)
+                        - si le producteur en a , mais pas assez alors il attend
+                        - si le producteur n'en produit pas alors il passe au producteur suivant
+                            - fin du tour
+
+                     -----------------------------------------------------
+
+                    -Traitre
+                    Mode coopératif et puis devient voleur
+
+                    -> observe un producteur 
+                        - si il a au moins la moitié des ressources nécessaire alors il se sert (10 max)
+                          puis passe en mode voleur
+                        - si le producteur en a, mais pas assez alors il attend
+                        - si le producteur n'en produit pas alors il passe au producteur suivant
+                            - fin du tour
+
+                 */
+
+
                 //System.out.println("je prend des ressources " + C.PList.get(0).getStock( 10 , TYPE.BOIS));
+
+                // ici il devrait prendre un nombre aléatoire (entre 1 et 10 par ex) de ressource de type aléatoire
                 int ressources_prises = C.PList.get(0).getStock( 9 , TYPE.OR);
                 System.out.println("Je prend "+ressources_prises+" ressources d'or !");
                 increaseRessourceAmout(TYPE.OR,ressources_prises);

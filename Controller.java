@@ -1,4 +1,12 @@
-
+import java.util.ArrayList;
+import java.rmi.server.UnicastRemoteObject ;
+import java.rmi.RemoteException ;
+import java.rmi.* ; 
+import java.net.MalformedURLException ; 
+public class Controller
+{
+    public Controller(String args[])
+    {
 		try
 		{
             // Fait une liste de ressource qu'il faut pour gagner
@@ -8,7 +16,7 @@
             L.add(new Ressource(0,2));
 
 	    // Commence par faire l'objet grâce auquel le Controlleur communique avec les agents
-            MessageControleImpl MC = new MessageControleImpl(5,3, nbProducteurs,nbJoueurs,"localhost",5000,0,L);
+            MessageControleImpl MC = new MessageControleImpl(5,3, Integer.parseInt(args[1]),Integer.parseInt(args[0]),"localhost",5000,0,L);
             Naming.rebind( "rmi://localhost:"+5000 +"/MessageControleGlobal", MC); 
 
             

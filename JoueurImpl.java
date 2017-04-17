@@ -346,13 +346,8 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
     // test de fin de jeu
     public void victory_test()
     {
-<<<<<<< HEAD
         int i = 0;
-        System.out.println("je rentre dans le test");
-=======
-        int i;
         System.out.println("**** TEST victoire *****");
->>>>>>> 2200f89f2a6e28c9ab758796b24c03784a2b35f9
         try
         {
             if( have_win() )
@@ -421,14 +416,12 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                 RJ = RList.get(i);
                 if( RJ.getStockType() == RWIN.getStockType() )
                 {
-<<<<<<< HEAD
 //                    System.out.println("je fais le test de ressource pour gagner, il me faut " + RWIN.getStock()*(1+id) + " et j'ai " + RJ.getStock());
                     if( RJ.getStock() < RWIN.getStock()* (1+id) ) // pas assez de ressources
-=======
-                    System.out.println("Pour gagner, il me faut "+RWIN.getStock()+" "+RWIN.getStockType()+" et j'ai "+ RJ.getStock());
-                    if( RJ.getStock() < RWIN.getStock() ) // pas assez de ressources
->>>>>>> 2200f89f2a6e28c9ab758796b24c03784a2b35f9
+                    {
+                        System.out.println("Pour gagner, il me faut "+RWIN.getStock()+" "+RWIN.getStockType()+" et j'ai "+ RJ.getStock());
                         return false;
+                    }
                     break; // passe à la prochaine ressource RWIN
                 }
             }

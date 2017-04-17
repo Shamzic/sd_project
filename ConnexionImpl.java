@@ -148,25 +148,10 @@ class ConnexionImpl extends UnicastRemoteObject implements Connexion
     public void deletePlayer(int id)
     {
         int i;
-        //try
-       // {
-            FinishedPlayerList.add( JList.get(id));
-            System.out.println("Le joueur " + id + " à gagné le jeu en " + FinishedPlayerList.size() + " place ");
-            //~ 
-            //~ for(i=0;i<JList.size();i++)
-            //~ {
-                //~ if( JList.get(i).getId() == id )
-                //~ {    
-                    //~ System.out.println("Je supprime le joueur d'id " + id);
-                    //~ FinishedPlayerList.add( JList.get(i));
-                    //~ JList.remove(i);
-                    //~ break;
-                //~ }
-            //~ }
-     //   }
-     //   catch (RemoteException re) { System.out.println(re) ; }
-        
+        FinishedPlayerList.add( JList.get(id));
+        System.out.println("Le joueur " + id + " à gagné le jeu en " + FinishedPlayerList.size() + " place ");
     }
+    
     
     // demande à tous les joueurs de supprimer le joueur d'id id
     public void deleteToAllPlayer(int id)
@@ -177,13 +162,9 @@ class ConnexionImpl extends UnicastRemoteObject implements Connexion
         {
             for (i=0;i<JList.size();i++)
             {
-                if(JList.get(i).getId( ) != id)
-                {
-                    JList.get(i).deletePlayer(id);
-                }
+                JList.get(i).deletePlayer(id); // supprime le joueur
             }
             System.out.println("Je dis à "+ id + " de supprimer " +id);
-            deletePlayer(id);
         }
         catch (RemoteException re) { System.out.println(re) ; }
     }

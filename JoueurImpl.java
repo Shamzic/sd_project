@@ -264,7 +264,9 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                                         else
                                         {
                                             System.out.print("Les producteurs n'ont pas encore produit plus la moitié ");
-                                            System.out.println("du nombre de ressource nécessaires à la victoire, alors j'attends !");
+                                            System.out.println("du nombre de ressource nécessaires à la victoire, alors j'attends et je passe au suivant !");
+                                            System.out.println("(nombre de producteurs dispo : "+C.PList.size()+") !");
+                                            parcours_prod = (parcours_prod +1) %C.PList.size();
                                         }
                                     }
                                     else

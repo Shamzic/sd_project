@@ -24,4 +24,5 @@ public class InitialInfoImpl implements Serializable
         this.victory_condition = victory_condition;
         this.VLC = VLC;
     }
+    
 }

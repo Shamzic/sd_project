@@ -50,8 +50,7 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
         this.id = I.IdProducteur;
         RList = new ArrayList<Ressource> (I.nbRessourcesDifferentes);
         for (i=0; i< I.nbRessourcesDifferentes; i++) // initialise toutes les ressources du producteur
-            RList.add(i, new Ressource(I.nbRessourcesInitiales));
-        
+            RList.add(i, new Ressource(I.nbRessourcesInitiales,i));
 	}
     
     
@@ -84,10 +83,9 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
         RList.get(ressource).decreaseRessource(x);
     }
     
-    public void fonctionThread ( int ms, int quantity)
+    public void fonctionThread ( int ms)
     {
         final int time = ms;
-        final int q = quantity;
         t = new Thread()
         {
             public void run()
@@ -97,11 +95,15 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
                 {
                     synchronized(ObjSynchro) // synchronized sert à faire des sections critiques ( section exécutée de façon atomique )
                     {
-                        System.out.println("j'ajoute des ressources");
+
+                        System.out.println("J'ajoute des ressources...");
+                        int q=0;
                         for(i = 0 ; i< RList.size() ; i++)
                         {
-                            RList.get(i).increaseRessource( q );
-                            System.out.println("ressource " + RList.get(i).getStockType() + " : " + RList.get(i).getStock());
+                            q= RList.get(i).getStock();
+                            q=q/3+3;
+                            RList.get(i).increaseRessource(q);
+                            System.out.println("Ressource " + RList.get(i).getStockType() + " : " + RList.get(i).getStock());
                         }
                     }
                     try { Thread.sleep(time); }
@@ -135,7 +137,7 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
             }
             if(nType == 0)
             {
-                System.out.println("On me demande des ressources que j'ai pas ");
+                System.out.println("On me demande des ressources que je n'ai pas ");
                 return 0;
             }
             // on prend des ressources en proportionnelle arrondi a la partie entière

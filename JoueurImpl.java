@@ -19,7 +19,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
     static boolean have_token = false;
     InitialInfoImpl I;
     boolean game = true;
-    //public COMPORTEMENT comportement= COMPORTEMENT.VOLEUR;
+    public COMPORTEMENT comportement= COMPORTEMENT.COOPERATIF;
 
     /**
 	 *
@@ -37,9 +37,9 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
      */
     public static void main (String [] args)
     {
-        if ( args.length != 4)
+        if ( args.length != 5)
         {
-            System.err.println( "usage : <ControllerMachineName> <ControllerPort> <JoueurMachineName> <ProducterPort>");
+            System.err.println( "usage : <ControllerMachineName> <ControllerPort> <JoueurMachineName> <ProducterPort> <comportement>");
             System.exit(1);
         }
         try
@@ -52,7 +52,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
             System.out.println("Le joueur reçoit l'id : " + I.IdJoueur + ", RI : " + I.nbRessourcesInitiales + ", RD : " + I.nbRessourcesDifferentes);
             id = I.IdJoueur;
             // initialise le serveur joueur
-            J = new JoueurImpl (I,args[3]);
+            J = new JoueurImpl (I,args[3],args[4]);
             Naming.rebind( "rmi://localhost:"+args[3] + "/Joueur", J);
             
             // Maintenant envoie ses "coordonnées" au Coordinateur
@@ -83,7 +83,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
      *            qui a atteint le but, 1 : chaque joueur s'arrête quand
      *            il a atteint le but
      */
-	JoueurImpl( InitialInfoImpl I, String portSelf)
+	JoueurImpl( InitialInfoImpl I, String portSelf,String comportement)
     throws RemoteException
 	{
 		this.id = id;
@@ -97,24 +97,28 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
         	RList.add(new Ressource(0,t));
         }
 
-        // Init comportement random
-        Random randomitude = new Random();
-        switch(randomitude.nextInt(3))
+        // Init comportement
+        switch(comportement)
         {
-            case 0:
+            case "coop":
             {
-                T = TYPE.Coopératif;
+                this.comportement = COMPORTEMENT.COOPERATIF;
+                System.out.println("Comportement du joueur : coopératif.");
                 break;
             }
-            case 1:
+            case "indiv":
             {
-                T = TYPE.OR;
+                this.comportement = COMPORTEMENT.INDIVIDUALISTE;
+                System.out.println("Comportement du joueur : individualiste.");
                 break;
             }
-            case 2:
+             default: 
             {
-                T = TYPE.BOIS;
+                this.comportement = COMPORTEMENT.COOPERATIF;
+                System.out.println("Comportement par défaut du joueur : coopératif.");
+                break;
             }
+        }
 
         // initialise le serveur connexion pour que le controlleur puisse lui envoyer les nouveaux connectés
         C = new ConnexionImpl();
@@ -151,6 +155,8 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
     public  void start()
     throws RemoteException
     {
+
+        int parcours_prod=0;
 //        boolean debut = true;
         while(game)
         {
@@ -164,21 +170,116 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                         {
                             monitor.wait(100);
                         }
-  //                    debut = false;
                     }
                 }
+
+                // Maintenant on a le jeton => Comportement joueur activé !
+
                 /*****************************************
                  * Ici on va implémenter les comportements
                  *****************************************
                   - Individualiste : 
-                    Prend autant de ressources que possible pour atteindre l'objectif (10 max par tour).
+                    Prend autant de ressources que possible pour atteindre l'objectif (9 par tour).
 
                     -> Demande au premier producteur si il a les ressources nécessaires...
-                        - Si oui, alors il se sert comme un rat et en prend 10.
+                        - Si oui, alors il se sert comme un rapiat et en prend 10.
                         - Si non, alors il demande au producteur suivant.
                             - puis il termine son tour.
+                    ---------------------------------------------------
+                    */
+                    if(this.comportement == COMPORTEMENT.INDIVIDUALISTE)
+                    {
+                        int i;
+                        Ressource RWIN, RJ;
+                        SerializableList<Ressource> LWIN = I.VLC ;
+                        for( i = 0 ; i < LWIN.size() ; i++ )
+                        {
+                            RWIN = I.VLC.get(i);
+                            RJ = RList.get(i);
 
-                    -----------------------------------------------------
+                            if( RJ.getStockType() == RWIN.getStockType() )
+                            {
+                                    //System.out.println("je fais le test de ressource pour gagner, il me faut " + RWIN.getStock() + " et j'ai " + RJ.getStock());
+                                if( RJ.getStock() < RWIN.getStock() && RWIN.getStock()>0) // pas assez de ressources
+                                {
+                                    int ressources_prises = C.PList.get(parcours_prod).getStock(9, RWIN.getStockType());
+                                    if(ressources_prises >0) // le producteur a des ressources
+                                    {
+                                        System.out.println("Je prends "+ressources_prises+" ressources d'or au producteur n°"+parcours_prod);
+                                        increaseRessourceAmout(RWIN.getStockType(),ressources_prises);
+                                    }
+                                    else
+                                    {
+                                        System.out.println("Pas assez de ressource nécessaire dans le producteur n°"+parcours_prod);
+                                        System.out.println("(nombre de producteurs dispo : "+C.PList.size()+") On passe au suivant !");
+                                        parcours_prod = (parcours_prod +1) %C.PList.size();
+                                    }
+                                }  
+                            }
+                        }     
+                    }
+
+                    System.out.println("Tour joueur terminé");
+                    /*
+                    -Coopératif
+                    Observe les joueurs et prends des ressources si le producteur en as produit au moins
+                    la moitié du nombre de ressources à atteindre
+
+                    -> observe un producteur 
+                        - si il a au moins la moitié des ressources nécessaire alors il se sert (10 max)
+                        - si le producteur en a , mais pas assez alors il attend
+                        - si le producteur n'en produit pas alors il passe au producteur suivant
+                            - fin du tour
+
+                     -----------------------------------------------------
+                    */
+
+                     if(this.comportement == COMPORTEMENT.COOPERATIF)
+                    {
+                        int i;
+                        Ressource RWIN, RJ;
+                        SerializableList<Ressource> LWIN = I.VLC ;
+                        for( i = 0 ; i < LWIN.size() ; i++ )
+                        {
+                            RWIN = I.VLC.get(i);
+                            RJ = RList.get(i);
+
+                            if( RJ.getStockType() == RWIN.getStockType() )
+                            {
+                                    //System.out.println("je fais le test de ressource pour gagner, il me faut " + RWIN.getStock() + " et j'ai " + RJ.getStock());
+                                if( RJ.getStock() < RWIN.getStock() && RWIN.getStock()>0) // si le joueur a encore besoin de ressources pour gagner
+                                {
+                                    int ressources_prises = C.PList.get(parcours_prod).getStock(9, RWIN.getStockType());
+
+                                    // Test
+       
+                                    if(ressources_prises >0) // le producteur a des ressources
+                                    {
+
+                                        if (ressources_prises >= RWIN.getStock()/2)
+                                        {
+                                            System.out.println("Je prends "+ressources_prises+" ressources d'or au producteur n°"+parcours_prod);
+                                            increaseRessourceAmout(RWIN.getStockType(),ressources_prises);
+                                        }
+                                        else
+                                        {
+                                            System.out.print("Les producteurs n'ont pas encore produit plus la moitié ");
+                                            System.out.println("du nombre de ressource nécessaires à la victoire, alors j'attends !");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        System.out.println("Plus de ressource nécessaire dans le producteur n°"+parcours_prod);
+                                        System.out.println("(nombre de producteurs dispo : "+C.PList.size()+") On passe au suivant !");
+                                        parcours_prod = (parcours_prod +1) %C.PList.size();
+                                    }
+                                }
+                            }
+                        }     
+                    }
+                    
+
+                    /*
 
                     -Voleur :
                     Observe les joueurs et leur vole des ressources.
@@ -191,18 +292,10 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                     - puis il termine son tour et recommence
 
                     -----------------------------------------------------
+                    */
+
                     
-                    -Coopératif
-                    Observe les joueurs et prends des ressources si le producteur en as produit au moins
-                    la moitié du nombre de ressources à atteindre
-
-                    -> observe un producteur 
-                        - si il a au moins la moitié des ressources nécessaire alors il se sert (10 max)
-                        - si le producteur en a , mais pas assez alors il attend
-                        - si le producteur n'en produit pas alors il passe au producteur suivant
-                            - fin du tour
-
-                     -----------------------------------------------------
+                     /*
 
                     -Traitre
                     Mode coopératif et puis devient voleur
@@ -220,9 +313,13 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                 //System.out.println("je prend des ressources " + C.PList.get(0).getStock( 10 , TYPE.BOIS));
 
                 // ici il devrait prendre un nombre aléatoire (entre 1 et 10 par ex) de ressource de type aléatoire
+               /*
+
                 int ressources_prises = C.PList.get(0).getStock( 9 , TYPE.OR);
                 System.out.println("Je prend "+ressources_prises+" ressources d'or !");
                 increaseRessourceAmout(TYPE.OR,ressources_prises);
+                */
+
                 /* Affichage des ressources du joueur */
     //          displayRessourceList();
                 
@@ -242,7 +339,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
     public void victory_test()
     {
         int i;
-        System.out.println("je rentre dans le test");
+        System.out.println("**** TEST victoire *****");
         try
         {
             if( have_win() )
@@ -287,7 +384,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                 RJ = RList.get(i);
                 if( RJ.getStockType() == RWIN.getStockType() )
                 {
-                    System.out.println("je fais le test de ressource pour gagner, il me faut " + RWIN.getStock() + " et j'ai " + RJ.getStock());
+                    System.out.println("Pour gagner, il me faut "+RWIN.getStock()+" "+RWIN.getStockType()+" et j'ai "+ RJ.getStock());
                     if( RJ.getStock() < RWIN.getStock() ) // pas assez de ressources
                         return false;
                     break; // passe à la prochaine ressource RWIN

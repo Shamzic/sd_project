@@ -17,6 +17,7 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
     public ArrayList<Connexion> CList = new ArrayList<Connexion>(); // Liste contenant les objets connexion avec lesquels on communique des infos du contrôleur aux joueurs ( ex un nouveau joueur / producteur s'est ajouté
     public ArrayList<Producteur> PList = new ArrayList<Producteur>(); // Liste de objets producteur avec lesquels on communique avec les producteurs
     public ArrayList<Joueur> JList = new ArrayList<Joueur>(); // Liste d'objet joueurs avec lesquels on communique avec les joueurs
+    public ArrayList<Joueur> FinishedPlayerList = new ArrayList<Joueur>();
     
     PrintWriter writer; // objet avec lequel on écrit dans le fichier
     int turn = 1; // tour ( sert à écrire dans le fichier )
@@ -38,7 +39,6 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
     public InitialInfoImpl getPlayerInitialInfo()
     throws RemoteException
     {
-        System.out.println("je donne les infos initiales au nouveau joueur de id " + I.IdJoueur);
         I.IdJoueur++;
         return I;
     }
@@ -47,7 +47,6 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
     public InitialInfoImpl getProducteurInitialInfo()
     throws RemoteException
     {
-        System.out.println("je donne les infos initiales au nouveau producteur");
         I.IdProducteur ++;
         return I;
     }
@@ -128,24 +127,36 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
     public void sendInformation(int idPlayer, SerializableList<Ressource> Ressources)
         throws RemoteException
     {
-        int i;
+        int i, initId = 0;
         String S=""+idPlayer;
+        // On cherche le joueur avec l'id minimal qui est encore actif
+        while ( FinishedPlayerList.contains(JList.get(initId)) )
+        {
+            initId ++;
+        }
+            
+        if(FinishedPlayerList.size() == JList.size()) // tout le monde est fini
+        {
+            System.out.println("Le jeu est fini");
+            writer.close();
+            return;
+        }
 
-        if (idPlayer == 0)
+        if (idPlayer == initId) // tout le monde a joué on revient au joueur init
+        {
             writer.println("TURN " + turn);
+            System.out.println("Passe au prochain tour");
+            turn ++;
+        }    
         for(i = 0 ; i < TYPE.values().length ; i++ )
         {
             S += " " + Ressources.get(i).getStock();
             //System.out.println( " val du type " + Ressources.get(i).getStockType() + " a une valeur de "  + Ressources.get(i).getStock());
         }
         System.out.println(S);
+        
         writer.println(S);
-        if(idPlayer == I.IdJoueur -1)
-        {
-            
-            System.out.println("Passe au prochain tour");
-            turn ++;
-        }
+        
     }
     
     
@@ -170,6 +181,17 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
     {
         writer.close();
     }
+    
+    public void deletePlayer( int id)
+        throws RemoteException
+    {
+        int i = 0;
+        // ajoute le joueur de façon à ce que la liste soit triée
+        while( i < FinishedPlayerList.size() - 1 && id < FinishedPlayerList.get(i).getId() ) 
+            i++;
+        FinishedPlayerList.add( i, JList.get(id) );
+    }
+    
     
 }
 

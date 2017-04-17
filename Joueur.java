@@ -23,5 +23,10 @@ public interface Joueur extends Remote
         
     public void end()
         throws RemoteException;
+        
+    public int getId()
+        throws RemoteException;
 
+    public void deletePlayer(int id)
+        throws RemoteException;
 }

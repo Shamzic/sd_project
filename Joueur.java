@@ -12,6 +12,9 @@ public interface Joueur extends Remote
     public  void start()
     	throws RemoteException;
 
+    public int getStock(int quantity,TYPE t)
+    throws RemoteException;
+
     public void askProdForRessource(int productorNumber, TYPE t, int quantity)
     	throws RemoteException;
 

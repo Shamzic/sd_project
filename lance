@@ -8,6 +8,7 @@ rmiregistry 5001 &
 rmiregistry 5002 &
 rmiregistry 5003 &
 rmiregistry 5004 &
+rmiregistry 5005 &
 
 sleep 2
 echo "Lancement du coordinateur ..."
@@ -31,4 +32,8 @@ xterm -T "Joueur n°1" -e "java JoueurImpl localhost 5000 localhost 5002 indiv; 
 sleep 2
 echo "Lancement du joueur 2 ..."
 xterm -T "Joueur n°2" -e "java JoueurImpl localhost 5000 localhost 5003 coop; $SHELL" &
+
+sleep 2
+echo "Lancement du joueur 3 ..."
+xterm -T "Joueur n°3" -e "java JoueurImpl localhost 5000 localhost 5005 voleur; $SHELL" &
 

@@ -20,6 +20,8 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
     InitialInfoImpl I;
     boolean game = true;
     public COMPORTEMENT comportement= COMPORTEMENT.COOPERATIF;
+    public ETAT etat = ETAT.ATTEND;
+    static Object ObjSynchro = new Object();
 
     /**
 	 *
@@ -112,6 +114,12 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                 System.out.println("Comportement du joueur : individualiste.");
                 break;
             }
+             case "voleur":
+            {
+                this.comportement = COMPORTEMENT.VOLEUR;
+                System.out.println("Comportement du joueur : voleur.");
+                break;
+            }
              default: 
             {
                 this.comportement = COMPORTEMENT.COOPERATIF;
@@ -157,6 +165,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
     {
 
         int parcours_prod=0;
+        int parcours_joueurs=0;
 //        boolean debut = true;
         while(game)
         {
@@ -205,21 +214,23 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                                     int ressources_prises = C.PList.get(parcours_prod).getStock(9, RWIN.getStockType());
                                     if(ressources_prises >0) // le producteur a des ressources
                                     {
+                                        etat=ETAT.PREND_RESSOURCES;
                                         System.out.println("Je prends "+ressources_prises+" ressources d'or au producteur n°"+parcours_prod);
                                         increaseRessourceAmout(RWIN.getStockType(),ressources_prises);
+                                        
                                     }
                                     else
                                     {
                                         System.out.println("Pas assez de ressource nécessaire dans le producteur n°"+parcours_prod);
                                         System.out.println("(nombre de producteurs dispo : "+C.PList.size()+") On passe au suivant !");
                                         parcours_prod = (parcours_prod +1) %C.PList.size();
+                                        etat=ETAT.ATTEND;
                                     }
                                 }  
                             }
                         }     
                     }
 
-                    System.out.println("Tour joueur terminé");
                     /*
                     -Coopératif
                     Observe les joueurs et prends des ressources si le producteur en as produit au moins
@@ -258,11 +269,13 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
 
                                         if (ressources_prises >= RWIN.getStock()/2)
                                         {
+                                            etat=ETAT.PREND_RESSOURCES;
                                             System.out.println("Je prends "+ressources_prises+" ressources d'or au producteur n°"+parcours_prod);
                                             increaseRessourceAmout(RWIN.getStockType(),ressources_prises);
                                         }
                                         else
                                         {
+                                            etat=ETAT.ATTEND;
                                             System.out.print("Les producteurs n'ont pas encore produit plus la moitié ");
                                             System.out.println("du nombre de ressource nécessaires à la victoire, alors j'attends et je passe au suivant !");
                                             System.out.println("(nombre de producteurs dispo : "+C.PList.size()+") !");
@@ -271,6 +284,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                                     }
                                     else
                                     {
+                                        etat=ETAT.ATTEND;
                                         System.out.println("Plus de ressource nécessaire dans le producteur n°"+parcours_prod);
                                         System.out.println("(nombre de producteurs dispo : "+C.PList.size()+") On passe au suivant !");
                                         parcours_prod = (parcours_prod +1) %C.PList.size();
@@ -279,11 +293,9 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                             }
                         }     
                     }
-                    
 
-                    /*
+                    /* -Voleur :
 
-                    -Voleur :
                     Observe les joueurs et leur vole des ressources.
 
                     -> Demande au premier joueur si il a des ressources nécessaire pour gagner
@@ -292,14 +304,52 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                              - si après avoir parcouru tous les joueurs il n'y en a aucun qu'on peut voler
                                alors le voleur devient un individualiste pour 1 tour puis redevient voleur.
                     - puis il termine son tour et recommence
+                    ----------------------------------------------------- */
+                    if(this.comportement == COMPORTEMENT.VOLEUR)
+                    {
+                        int i;
+                        Ressource RWIN, RJ;
+                        SerializableList<Ressource> LWIN = I.VLC ;
+                        for( i = 0 ; i < LWIN.size() ; i++ )
+                        {
+                            RWIN = I.VLC.get(i);
+                            RJ = RList.get(i);
 
-                    -----------------------------------------------------
-                    */
+                            if( RJ.getStockType() == RWIN.getStockType() )
+                            {
+                                    //System.out.println("je fais le test de ressource pour gagner, il me faut " + RWIN.getStock() + " et j'ai " + RJ.getStock());
+                                if( RJ.getStock() < RWIN.getStock() && RWIN.getStock()>0) // si le joueur a encore besoin de ressources pour gagner
+                                {
+                                    if(etat==ETAT.ATTEND)
+                                    {
+                                        System.out.println("Observe le joueur "+parcours_joueurs);
+                                        etat=ETAT.OBSERVE;
+                                    }
+                                    else if (etat==ETAT.OBSERVE || etat==ETAT.VOLE) 
+                                    {
+                                        int ressources_prises = C.JList.get(parcours_joueurs).getStock(9, RWIN.getStockType());
+                                        if(ressources_prises >0) // le joueur a des ressources
+                                        {
+                                            etat=ETAT.VOLE;
+                                            System.out.println("Je vole "+ressources_prises+" ressources de "+ RWIN.getStockType()+" au joueur n°"+parcours_joueurs);
+                                            increaseRessourceAmout(RWIN.getStockType(),ressources_prises);
+                                        }
+                                        else
+                                        {
+                                            System.out.println("Pas assez de ressource nécessaire dans le joueur n°"+parcours_joueurs);
+                                            System.out.println("(nombre de joueurs dispo : "+C.JList.size()+") On passe au suivant (joueur "+((parcours_joueurs +1) %(C.JList.size()-1))+")");
+                                            parcours_joueurs = (parcours_joueurs +1) %C.JList.size()-1;
+                                            etat=ETAT.ATTEND;
+                                        }
+                                    }
+                                    parcours_joueurs = (parcours_joueurs+1) %C.JList.size()-1;
+                                    // observe 1 joueur
+                                }
+                            }
+                        }     
+                    }
+                     /* -Traitre
 
-                    
-                     /*
-
-                    -Traitre
                     Mode coopératif et puis devient voleur
 
                     -> observe un producteur 
@@ -308,8 +358,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                         - si le producteur en a, mais pas assez alors il attend
                         - si le producteur n'en produit pas alors il passe au producteur suivant
                             - fin du tour
-
-                 */
+                    ----------------------------------------------------------- */
 
 
                 //System.out.println("je prend des ressources " + C.PList.get(0).getStock( 10 , TYPE.BOIS));
@@ -325,6 +374,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                 /* Affichage des ressources du joueur */
     //          displayRessourceList();
                 
+                System.out.println("Tour joueur terminé en état "+etat);
                 M.sendInformation(id, RList);
                 
                 TimeUnit.SECONDS.sleep(3);
@@ -394,6 +444,53 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
             }
         }
         return true;
+    }
+
+     /**
+     * Retourne le nombre de ressources du joueur 
+     * en prévelant une quantité voulue en paramètre.
+     *
+     *<p>
+     * Fonction utilisée pour le vol sur un joueur
+     *</p> 
+     *
+     * @param t
+     *            Le type de la ressource.
+     * @param quantity
+     *            La quantité de ressource désirée.
+     * @return takenRessources
+     *            Le nombre de ressources qu'on a pu voler
+     */
+    public int getStock(int quantity,TYPE t)
+    throws RemoteException
+    {
+        int takenRessources=0;
+        int nbressources_joueur=0;
+
+        System.out.println("Je me fais dérober des ressources en " + t);
+        synchronized (ObjSynchro) // section critique
+        {
+            for(int i=0 ; i < RList.size() ; i++)
+            {
+                if(RList.get(i).getStockType()==t)
+                {
+                    nbressources_joueur+=RList.get(i).getStock();
+                    if(nbressources_joueur<=quantity) // On a demandé tout ce que le joueur possédait ou plus
+                    {
+                        System.out.println("On m'a vidé mon "+t);
+                        RList.get(i).setRessource(0);
+                        return nbressources_joueur;
+                    }
+                    else if(nbressources_joueur>quantity && nbressources_joueur>0) // on a demandé moins que ce que le joueur avait
+                    {
+                        System.out.println("On m'a volé "+quantity+" de mon "+t);
+                        RList.get(i).setRessource(nbressources_joueur-quantity);
+                        return quantity;
+                    }
+                }
+            }
+            return 0; // si le joueur n'avait rien de la ressource demandée
+        }
     }
     
     

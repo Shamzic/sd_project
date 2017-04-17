@@ -57,7 +57,6 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
             
             // Maintenant envoie ses "coordonnées" au Coordinateur
             M.addMachine( args[2], Integer.parseInt(args[3]) );
-
             J.start();
         }
         catch (RemoteException re) { System.out.println(re) ; }
@@ -84,7 +83,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
      *            il a atteint le but
      */
 	JoueurImpl( InitialInfoImpl I, String portSelf)
-    throws RemoteException
+        throws RemoteException
 	{
 		this.id = id;
         this.I = I;
@@ -116,7 +115,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
      *            La quantité de ressource à augmenter.
      */
 	public void increaseRessourceAmout(TYPE t, int x)
-    throws RemoteException
+        throws RemoteException
     {
     	for(int i=0 ; i < RList.size() ; i++)
            if(RList.get(i).getStockType()==t)
@@ -129,7 +128,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
      *
      */
     public  void start()
-    throws RemoteException
+        throws RemoteException
     {
 //        boolean debut = true;
         while(game)
@@ -155,11 +154,17 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                 /* Affichage des ressources du joueur */
     //          displayRessourceList();
                 
+                System.out.println("debute la com avec M");
                 M.sendInformation(id, RList);
-                
+                System.out.println("fini la com avec M");
                 TimeUnit.SECONDS.sleep(3);
                 // test de victoire et passe le jeton
                 victory_test();
+                if( C.JList.size() == C.FinishedPlayerList.size() ) // Tous on fini 
+                {
+                    C.endAllProducteurs();
+                    return ;
+                }
             }
             catch (InterruptedException re) { System.out.println(re) ; }
             catch (RemoteException re) { System.out.println(re) ; }
@@ -170,7 +175,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
     // test de fin de jeu
     public void victory_test()
     {
-        int i;
+        int i = 0;
         System.out.println("je rentre dans le test");
         try
         {
@@ -185,17 +190,41 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                 }
                 else // termine le jeu progressivement
                 {
-                    
+                    // Envoie d'abord à tous les joueurs un msg pour qu'ils le suppriment
+                    C.deleteToAllPlayer(id);
+                    // supprime le joueur de la liste des joueurs actifs du coordinateur en l'ajoutant à la liste des joueurs ayant finis
+                    M.deletePlayer(id); 
+                    if(C.JList.size() != 0) // besoin car sinon division par 0 et ça fait tout planter
+                    {
+                        if( C.JList.size() == C.FinishedPlayerList.size() ) // Tous on fini 
+                            return ;
+                        else
+                        { // l'envoie au prochain qui n'a pas encore fini
+                            i = (id +1) % C.JList.size();
+                            while( C.FinishedPlayerList.contains( C.JList.get(i) ) ) // parcours tous les joueurs et regarde s'ils ont déjà finis
+                                i = (i+1) % C.JList.size();
+                            System.out.println("Envoie token a " + i);
+                            have_token = false;
+                            C.JList.get( i ).receiveToken();
+                        }
+                    }
+                    else
+                        System.out.println("La liste est vide");
                 }
-
             }
-
-
-            if(C.JList.size() != 0) // besoin car sinon division par 0 et ça fait tout planter
+            else
             {
-                System.out.println("Envoie token a " + ((id +1) %C.JList.size()) );
-                have_token = false;
-                C.JList.get((id +1) %C.JList.size()).receiveToken();
+                if(C.JList.size() != 0) // besoin car sinon division par 0 et ça fait tout planter
+                {
+                    i = (id +1) % C.JList.size();
+                    while( C.FinishedPlayerList.contains( C.JList.get(i) ) ) // parcours tous les joueurs et regarde s'ils ont déjà finis
+                        i = (i+1) % C.JList.size();
+                    System.out.println("Envoie token a " + i);
+                    have_token = false;
+                    C.JList.get( i ).receiveToken();
+                }
+                else
+                    System.out.println("La liste est vide");
             }
         }
         catch (RemoteException re) { System.out.println(re) ; }
@@ -216,8 +245,8 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                 RJ = RList.get(i);
                 if( RJ.getStockType() == RWIN.getStockType() )
                 {
-                    System.out.println("je fais le test de ressource pour gagner, il me faut " + RWIN.getStock() + " et j'ai " + RJ.getStock());
-                    if( RJ.getStock() < RWIN.getStock() ) // pas assez de ressources
+//                    System.out.println("je fais le test de ressource pour gagner, il me faut " + RWIN.getStock()*(1+id) + " et j'ai " + RJ.getStock());
+                    if( RJ.getStock() < RWIN.getStock()* (1+id) ) // pas assez de ressources
                         return false;
                     break; // passe à la prochaine ressource RWIN
                 }
@@ -238,7 +267,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
      *            La quantité de ressource à prendre.
      */
     public void askProdForRessource(int productorNumber, TYPE t, int quantity)
-    throws RemoteException
+        throws RemoteException
     {
     	 int ressources_prises = C.PList.get(productorNumber).getStock(quantity,t);
     	 if(ressources_prises>0)
@@ -253,7 +282,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
      *
      */
     public void displayRessourceList()
-    throws RemoteException
+        throws RemoteException
     {
     	System.out.println("******* ETAT DES RESSOURCES JOUEUR *******");
         for(int i=0;i<RList.size();i++)
@@ -270,9 +299,9 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
      *
      */
     public void receiveToken()
-    throws RemoteException
+        throws RemoteException
     {
-        System.out.println("J'ai eu le token");
+        System.out.println("Je suis " +id +" et j'ai eu le token");
         have_token = true;
         synchronized(monitor)
         {monitor.notify();}
@@ -282,10 +311,22 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
      * Termine le programme
      */
     public void end()
-    throws RemoteException
+        throws RemoteException
     {
         System.out.println("Je m'arrête");
         game = false;
+    }
+    
+    public int getId()
+        throws RemoteException
+    {
+        return id;
+    }
+    
+    public void deletePlayer(int id)
+        throws RemoteException
+    {
+        C.deletePlayer(id);
     }
 }
 

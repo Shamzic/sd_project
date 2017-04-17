@@ -29,4 +29,7 @@ public interface MessageControle extends Remote
         
     public void GameEnded()
         throws RemoteException;
+        
+    public void deletePlayer( int id)
+        throws RemoteException;
 }

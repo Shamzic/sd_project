@@ -21,6 +21,10 @@ public class SerializableList <T> implements Serializable
         L.add(ajout);
     }
     
+    public void add (T ajout, int index)
+    {
+        L.add(index,ajout);
+    }
     public T get (int index)
     {
         return L.get(index);
@@ -31,5 +35,14 @@ public class SerializableList <T> implements Serializable
         return L.size();
     }
     
+    public void remove(int i)
+    {
+        L.remove(i);
+    }
+    
+    public boolean contains( T val)
+    {
+        return L.contains(val);
+    }
 } 
 

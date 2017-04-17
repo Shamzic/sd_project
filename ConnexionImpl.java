@@ -10,6 +10,7 @@ class ConnexionImpl extends UnicastRemoteObject implements Connexion
 {
     public static final long serialVersionUID = 1L; // Utilie uniquement pour régler les warning de serial
     public ArrayList<Joueur> JList = new ArrayList<Joueur>();
+    public ArrayList<Joueur> FinishedPlayerList = new ArrayList<Joueur>();
     
     public ArrayList<Producteur> PList = new ArrayList<Producteur>();
 
@@ -71,12 +72,12 @@ class ConnexionImpl extends UnicastRemoteObject implements Connexion
     {
         try
         {
+            System.out.println("J'ajoute le joueur de port " + port);
             Joueur J = (Joueur) Naming.lookup("rmi://" + MachineName + ":" + port + "/Joueur") ;
             JList.add( J );
         }
         catch (NotBoundException re) { System.out.println(re) ; }
         catch (MalformedURLException e) { System.out.println(e) ; }
-        System.out.println("J'ai ajouté le joueur " + MachineName + ":"+ port);
         
     }
 
@@ -113,7 +114,6 @@ class ConnexionImpl extends UnicastRemoteObject implements Connexion
     // envoie un message à tous les agents pour qu'ils se terminent ( lorsqu'on est arrivé à la fin du jeu
     public void endAllAgents(int id)
     {
-        System.out.println("j'arrête tout id "+ id);
         int i;
         try
         {
@@ -123,16 +123,68 @@ class ConnexionImpl extends UnicastRemoteObject implements Connexion
                 if( i != id ) // évite que l'agent s'arrête lui même avant d'avoir arrêté tout le monde
                 JList.get(i).end();
             }
-            for(i=0 ; i < PList.size() ; i++)
-            {
-                System.out.println("j'arrête le producteur : "+ i);
-                PList.get(i).end();
-            }
-            System.out.println("j'ai tout fini maintenant je m'arrête");
+            endAllProducteurs();
             JList.get(id).end(); // s'arrête
         }
         catch (RemoteException re) { System.out.println(re) ; }
 
     }
+    
+    public void endAllProducteurs()
+    {
+        int i;
+        try
+        {
+            for(i=0 ; i < PList.size() ; i++)
+            {
+                System.out.println("j'arrête le producteur : "+ i);
+                PList.get(i).end();
+            }
+        }
+        catch (RemoteException re) { System.out.println(re) ; }
+    }
 	
+    // supprime le joueur d'id id
+    public void deletePlayer(int id)
+    {
+        int i;
+        //try
+       // {
+            FinishedPlayerList.add( JList.get(id));
+            System.out.println("Le joueur " + id + " à gagné le jeu en " + FinishedPlayerList.size() + " place ");
+            //~ 
+            //~ for(i=0;i<JList.size();i++)
+            //~ {
+                //~ if( JList.get(i).getId() == id )
+                //~ {    
+                    //~ System.out.println("Je supprime le joueur d'id " + id);
+                    //~ FinishedPlayerList.add( JList.get(i));
+                    //~ JList.remove(i);
+                    //~ break;
+                //~ }
+            //~ }
+     //   }
+     //   catch (RemoteException re) { System.out.println(re) ; }
+        
+    }
+    
+    // demande à tous les joueurs de supprimer le joueur d'id id
+    public void deleteToAllPlayer(int id)
+    {
+        int i;
+        System.out.println("Je donne l'ordre de supp de " +id + " taille de liste " + JList.size());
+        try
+        {
+            for (i=0;i<JList.size();i++)
+            {
+                if(JList.get(i).getId( ) != id)
+                {
+                    JList.get(i).deletePlayer(id);
+                }
+            }
+            System.out.println("Je dis à "+ id + " de supprimer " +id);
+            deletePlayer(id);
+        }
+        catch (RemoteException re) { System.out.println(re) ; }
+    }
 }

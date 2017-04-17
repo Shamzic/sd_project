@@ -1,7 +1,7 @@
 import java.io.Serializable;
 
 
-// Juste une classe qui permet d'envoyer 3 int dans un return
+// Juste une classe qui permet d'envoyer 4 int dans un return
 public class QuadrupleImpl  implements Serializable
 { 
 	public static final long serialVersionUID = 1L; // Utilie uniquement pour régler les warning de serial

@@ -82,9 +82,13 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
      *            qui a atteint le but, 1 : chaque joueur s'arrête quand
      *            il a atteint le but
      */
-
+<<<<<<< HEAD
+	JoueurImpl( InitialInfoImpl I, String portSelf)
+        throws RemoteException
+=======
 	JoueurImpl( InitialInfoImpl I, String portSelf,String comportement)
     throws RemoteException
+>>>>>>> 2200f89f2a6e28c9ab758796b24c03784a2b35f9
 	{
 		this.id = id;
         this.I = I;

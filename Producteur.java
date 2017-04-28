@@ -23,6 +23,8 @@ public interface Producteur extends Remote
     public int getStock(int quantity, TYPE T)
         throws RemoteException ;
 
+    public SerializableList<Tuple<TYPE,Integer>> getStock()
+        throws RemoteException;
     public void end()
         throws RemoteException;
 }

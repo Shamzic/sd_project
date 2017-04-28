@@ -62,7 +62,7 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
             Connexion CNew = (Connexion) Naming.lookup("rmi://" + MachineName + ":" + port + "/Connexion");
             ///////////////// j'ai changé ça de place après le for pour que les joueurs senregistres aussi :::::::::::::::::::::::::::::::::::::
             CList.add(CNew); // l'ajoute à la list de connexions
-            SList.add(new Tuple(MachineName,port)); // l'ajoute à la liste de tuples (MachineName,port) servant à l'interconnexion des différents hôtes
+            SList.add(new Tuple<String,Integer>(MachineName,port)); // l'ajoute à la liste de tuples (MachineName,port) servant à l'interconnexion des différents hôtes
             
             
             CNew.initialSetPlayer(SList); // envoie au joueur qui s'est connecté les coordonnées des autres joueurs
@@ -95,7 +95,7 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
         int i;
         try
         {
-            prodCoordList.add(new Tuple(MachineName,port)); // l'ajoute à la liste contenant les coordonnées du joueur
+            prodCoordList.add(new Tuple<String,Integer>(MachineName,port)); // l'ajoute à la liste contenant les coordonnées du joueur
             Producteur P = (Producteur) Naming .lookup("rmi://" + MachineName + ":" + port + "/Producteur"); // établi une connexion avec le producteur
             PList.add(P); // Ajoute le producteur à la liste des producteurs
             for( i = 0 ; i < CList.size() ; i ++)
@@ -132,6 +132,10 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
         {
             //writer.print(turn);
             System.out.println("Passe au prochain tour");
+            System.out.print("Pour gagner il faut " );
+            for( i = 0; i < I.VLC.size() ; i++)
+                System.out.print(" " + I.VLC.get(i).stock + " " + I.VLC.get(i).T);
+            System.out.println("");
             turn ++;
         }  
         String S=""+turn+" "+idPlayer;
@@ -143,7 +147,7 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
             
         if(FinishedPlayerList.size() == JList.size()) // tout le monde est fini
         {
-            System.out.println("Le jeu est fini");
+            System.out.println("Le jeu à fini");
             writer.close();
             return;
         }

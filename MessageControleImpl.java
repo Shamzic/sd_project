@@ -30,7 +30,7 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
         I = new InitialInfoImpl( nbRessourcesInitiales, nbRessourcesDifferentes, Name, port, nbProducteurs, nbJoueurs, victory_condition, L);
         try
         {
-             writer = new PrintWriter("actionLog.txt","UTF-8");
+            writer = new PrintWriter("actionLog.dat","UTF-8");
         }
         catch (IOException e) { System.out.println(e) ; }
     }
@@ -128,7 +128,13 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
         throws RemoteException
     {
         int i, initId = 0;
-        String S=""+idPlayer;
+	if (idPlayer == initId) // tout le monde a joué on revient au joueur init
+        {
+            //writer.print(turn);
+            System.out.println("Passe au prochain tour");
+            turn ++;
+        }  
+        String S=""+turn+" "+idPlayer;
         // On cherche le joueur avec l'id minimal qui est encore actif
         while ( FinishedPlayerList.contains(JList.get(initId)) )
         {
@@ -142,15 +148,11 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
             return;
         }
 
-        if (idPlayer == initId) // tout le monde a joué on revient au joueur init
-        {
-            writer.println("TURN " + turn);
-            System.out.println("Passe au prochain tour");
-            turn ++;
-        }    
+        
         for(i = 0 ; i < TYPE.values().length ; i++ )
         {
-            S += " " + Ressources.get(i).getStock();
+	    //writer.print(turn);
+            S +=" " + Ressources.get(i).getStock();
             //System.out.println( " val du type " + Ressources.get(i).getStockType() + " a une valeur de "  + Ressources.get(i).getStock());
         }
         System.out.println(S);

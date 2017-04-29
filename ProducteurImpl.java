@@ -50,7 +50,12 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
         this.id = I.IdProducteur;
         RList = new ArrayList<Ressource> (I.nbRessourcesDifferentes);
         for (i=0; i< I.nbRessourcesDifferentes; i++) // initialise toutes les ressources du producteur
-            RList.add(i, new Ressource(I.nbRessourcesInitiales,i));
+        {
+            if( id == 0 ) // s'assure qu'il existe au moins un producteur qui produit tout
+                RList.add(i, new Ressource(I.nbRessourcesInitiales,i)); //-> fait 1 de chaque ressource
+            else
+                RList.add(i, new Ressource(I.nbRessourcesInitiales));
+        }
 	}
     
     
@@ -77,7 +82,40 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
         return L;
     }
 
-    public void decreaseRessourceAmount(int ressource, int x)
+    // Envoie au joueur la liste des ressources + quantitée
+    // Si le producteur possède 2 ressources identiques les mets dans un champ et l'envoie au joueur
+    public synchronized SerializableList<Tuple<TYPE,Integer>> getStock()
+    {
+        int i,j ;
+        TYPE tmp;
+        boolean inclus;
+        Tuple<TYPE,Integer> tmpR;
+        SerializableList<Tuple<TYPE,Integer>> RepL = new SerializableList<Tuple<TYPE,Integer>>(); 
+        for( i = 0; i < RList.size() ; i++)
+        {
+            inclus = false;
+            tmp = RList.get(i).getStockType();
+            for ( j = 0; j < RepL.size() ; j++)
+            {
+                tmpR = RepL.get(j);
+                if(tmpR.x == tmp) // Type déjà présent dans la liste
+                {
+                    tmpR.y = tmpR.y + RList.get(i).getStock();
+                    RepL.set( j, tmpR);
+                    inclus = true;
+                    break;
+                }
+            }
+            if( ! inclus) // Ressource pas encore dans la liste -> l'ajoute
+            {
+                RepL.add( new Tuple<TYPE,Integer>(tmp, RList.get(i).getStock()));
+            }
+        }
+        
+        return RepL;
+    }
+
+    public synchronized void decreaseRessourceAmount(int ressource, int x)
         throws RemoteException 
     {
         RList.get(ressource).decreaseRessource(x);
@@ -96,15 +134,16 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
                     synchronized(ObjSynchro) // synchronized sert à faire des sections critiques ( section exécutée de façon atomique )
                     {
 
-                        System.out.println("J'ajoute des ressources...");
+                        System.out.print("Ajout de ressources. Stock actuel :");
                         int q=0;
                         for(i = 0 ; i< RList.size() ; i++)
                         {
                             q= RList.get(i).getStock();
                             q=q/3+3;
                             RList.get(i).increaseRessource(q);
-                            System.out.println("Ressource " + RList.get(i).getStockType() + " : " + RList.get(i).getStock());
+                            System.out.print(" " + RList.get(i).getStockType() + " : " + RList.get(i).getStock());
                         }
+                        System.out.println("");
                     }
                     try { Thread.sleep(time); }
                         catch (InterruptedException re) { System.out.println(re) ; System.exit(0);};
@@ -121,8 +160,6 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
         int nType = 0, total = 0, takenRessources = 0 , i;
        // int RNonDivisibles; // non utilisé
         ArrayList<Ressource> RL = new ArrayList<Ressource>(); // y met les ressources de ce type
-
-        System.out.println("On me demande de " + T );
         
         synchronized (ObjSynchro) // synchronized sert à faire des sections critiques ( section exécutée de façon atomique )
         {

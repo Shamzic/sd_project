@@ -10,29 +10,27 @@ public class Ressource implements Serializable
     int stock;
     Ressource (int stockInit)
     {
-        
+        stock = stockInit;
+        Random rn = new Random();
+        switch(rn.nextInt(3))
+        {
+            case 0:
+            {
+                T = TYPE.ARGENT;
+                break;
+            }
+            case 1:
+            {
+                T = TYPE.OR;
+                break;
+            }
+            case 2:
+            {
+                T = TYPE.BOIS;
+            }
+        }
+        System.out.println("J'ai créé la ressource " + T);
     }
-        //~ stock = stockInit;
-        //~ Random rn = new Random();
-        //~ switch(rn.nextInt(3))
-        //~ {
-            //~ case 0:
-            //~ {
-                //~ T = TYPE.ARGENT;
-                //~ break;
-            //~ }
-            //~ case 1:
-            //~ {
-                //~ T = TYPE.OR;
-                //~ break;
-            //~ }
-            //~ case 2:
-            //~ {
-                //~ T = TYPE.BOIS;
-            //~ }
-        //~ }
-        //~ System.out.println("J'ai créé la ressource " + T);
-    //~ }
 
     Ressource (int stockInit, int type)
     {

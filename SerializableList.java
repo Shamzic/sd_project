@@ -44,5 +44,10 @@ public class SerializableList <T> implements Serializable
     {
         return L.contains(val);
     }
+    
+    public void set ( int index , T elt)
+    {
+        L.set(index, elt);
+    }
 } 
 

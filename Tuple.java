@@ -1,13 +1,13 @@
 import java.io.Serializable;
 
-public class Tuple implements Serializable
+public class Tuple<X,Y> implements Serializable
 {
     public static final long serialVersionUID = 1L; // Utilie uniquement pour régler les warning de serial
-    String MN ;
-    int port;
-    Tuple(String MachineName, int port)
+    X x ;
+    Y y;
+    Tuple(X MachineName, Y port)
     {
-        this.MN = MachineName;
-        this.port = port;
+        this.x = MachineName;
+        this.y = port;
     }
 }

@@ -36,8 +36,8 @@ class ConnexionImpl extends UnicastRemoteObject implements Connexion
         {
             for( i = 0 ; i< L.size() ; i++)
             {
-                System.out.println("Machine :" + L.get(i).MN + " :" + L.get(i).port);
-                Joueur P = (Joueur) Naming.lookup("rmi://" +  L.get(i).MN + ":" + L.get(i).port + "/Joueur") ;
+                //System.out.println("Machine :" + L.get(i).MN + " :" + L.get(i).port);
+                Joueur P = (Joueur) Naming.lookup("rmi://" +  L.get(i).x + ":" + L.get(i).y + "/Joueur") ;
                 JList.add( P );
             }
             
@@ -57,8 +57,8 @@ class ConnexionImpl extends UnicastRemoteObject implements Connexion
         {
             for(i=0; i < size ; i++)
             {
-                System.out.println("Ajoute le producteur " + i + " au port " + PCoordList.get(i).port + " nom de machine : " + PCoordList.get(i).MN);
-                Producteur P = (Producteur) Naming.lookup("rmi://" +  PCoordList.get(i).MN + ":"+PCoordList.get(i).port+"/Producteur");
+                System.out.println("Ajoute le producteur " + i + " au port " + PCoordList.get(i).y + " nom de machine : " + PCoordList.get(i).x);
+                Producteur P = (Producteur) Naming.lookup("rmi://" +  PCoordList.get(i).x + ":"+PCoordList.get(i).y+"/Producteur");
                 PList.add(P);
             }
         }
@@ -119,7 +119,7 @@ class ConnexionImpl extends UnicastRemoteObject implements Connexion
         {
             for(i=0 ; i < JList.size() ; i++)
             {
-                System.out.println("j'arrête le joueur : "+ i);
+                //System.out.println("J'arrête le joueur : "+ i);
                 if( i != id ) // évite que l'agent s'arrête lui même avant d'avoir arrêté tout le monde
                 JList.get(i).end();
             }
@@ -137,7 +137,7 @@ class ConnexionImpl extends UnicastRemoteObject implements Connexion
         {
             for(i=0 ; i < PList.size() ; i++)
             {
-                System.out.println("j'arrête le producteur : "+ i);
+                //System.out.println("j'arrête le producteur : "+ i);
                 PList.get(i).end();
             }
         }
@@ -157,14 +157,13 @@ class ConnexionImpl extends UnicastRemoteObject implements Connexion
     public void deleteToAllPlayer(int id)
     {
         int i;
-        System.out.println("Je donne l'ordre de supp de " +id + " taille de liste " + JList.size());
         try
         {
             for (i=0;i<JList.size();i++)
             {
                 JList.get(i).deletePlayer(id); // supprime le joueur
             }
-            System.out.println("Je dis à "+ id + " de supprimer " +id);
+        //    System.out.println("Je dis à "+ id + " de supprimer " +id);
         }
         catch (RemoteException re) { System.out.println(re) ; }
     }

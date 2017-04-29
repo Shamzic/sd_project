@@ -16,7 +16,7 @@ public class Controller
             L.add(new Ressource(18,2));
 
 	    // Commence par faire l'objet grâce auquel le Controlleur communique avec les agents
-            MessageControleImpl MC = new MessageControleImpl(5,3, Integer.parseInt(args[1]),Integer.parseInt(args[0]),"localhost",5000,0,L);
+            MessageControleImpl MC = new MessageControleImpl(5,3, Integer.parseInt(args[1]),Integer.parseInt(args[0]),"localhost",5000,0,L, 1);
             Naming.rebind( "rmi://localhost:"+5000 +"/MessageControleGlobal", MC); 
 		}
         catch (RemoteException re) { System.out.println(re) ; }

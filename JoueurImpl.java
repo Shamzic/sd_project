@@ -165,22 +165,26 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
 
         int parcours_prod=0;
         int parcours_joueurs=0;
+        boolean begin = true;
 //        boolean debut = true;
         while(game)
         {
             try
             {
-                synchronized (monitor)
+                if (I.playMode == 0 || begin) // mode tour/tour
                 {
-                    if ( C.JList.size() != 0 )//&& debut) // besoin car sinon division par 0 et ça fait tout planter
+                    synchronized (monitor)
                     {
-                        while ( have_token == false)
+                        if ( C.JList.size() != 0 )//&& debut) // besoin car sinon division par 0 et ça fait tout planter
                         {
-                            monitor.wait(100);
+                            while ( have_token == false)
+                            {
+                                monitor.wait(100);
+                            }
                         }
                     }
+                    begin = false;
                 }
-
                 // Maintenant on a le jeton => Comportement joueur activé !
 
                 if(this.comportement == COMPORTEMENT.INDIVIDUALISTE)
@@ -222,7 +226,10 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
 
                 System.out.println("Tour joueur terminé en état "+etat);
                 M.sendInformation(id, RList);
-                TimeUnit.SECONDS.sleep(3);
+                TimeUnit.SECONDS.sleep(1);
+                if(id == 1)
+                    TimeUnit.SECONDS.sleep(1);
+                    
                 // test de victoire et passe le jeton
                 victory_test();
                 if( C.JList.size() == C.FinishedPlayerList.size() ) // Tous on fini 
@@ -308,17 +315,23 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
             }
         }
         
+        if(TypeNb.size()==0)
+        {
+            System.out.println("ATTENTION : il n'y a plus de ressources");
+            etat=ETAT.ATTEND;
+            return;
+        }
         // Maintenant doit décider ce qu'il veut prendre comme ressource
         // Cherche d'abord à avoir la ressource avec le moins de producteur ( multiplicateur d'importance *10) et le moins de ressource 
         for (i=0 ; i< TypeNb.size() ; i++)
         {
             tmp = TypeNb.get(i).y * 10 + TypeQuantite.get(i).y;
-            if( min == -1)
+            if( min == -1 && TypeQuantite.get(i).y != 0) // initialisation +évite de chercher des ressources quand il n'y en a aucune de disponible
             {
                 min = tmp;
                 index = i;
             }
-            else if (tmp < min)
+            else if (tmp < min && TypeQuantite.get(i).y !=0) // évite de chercher des ressources quand il n'y en a aucune de disponible
             {
                 min = tmp;
                 index = i;
@@ -379,7 +392,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
         if( ressources_prises > 0) // le producteur a des ressources
         {
             etat = ETAT.PREND_RESSOURCES;
-            System.out.println("Je prends "+ressources_prises+" ressources d'or au producteur n°"+index2);
+            System.out.println("Je prends "+ressources_prises+" ressources de " + TypeNb.get(index).x +" or au producteur n°"+index2);
             try
             {
                 increaseRessourceAmout( TypeNb.get(index).x,ressources_prises);
@@ -560,8 +573,11 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                             while( C.FinishedPlayerList.contains( C.JList.get(i) ) ) // parcours tous les joueurs et regarde s'ils ont déjà finis
                                 i = (i+1) % C.JList.size();
                           //  System.out.println("Envoie token a " + i);
-                            have_token = false;
-                            C.JList.get( i ).receiveToken();
+                            if( I.playMode == 0)
+                            {
+                                have_token = false;
+                                C.JList.get( i ).receiveToken();
+                            }
                         }
                     }
                     else
@@ -576,8 +592,11 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                     while( C.FinishedPlayerList.contains( C.JList.get(i) ) ) // parcours tous les joueurs et regarde s'ils ont déjà finis
                         i = (i+1) % C.JList.size();
                   //  System.out.println("Envoie token a " + i);
-                    have_token = false;
-                    C.JList.get( i ).receiveToken();
+                    if(I.playMode == 0)
+                    {
+                        have_token = false;
+                        C.JList.get( i ).receiveToken();
+                    }
                 }
                 else
                     System.out.println("La liste est vide");

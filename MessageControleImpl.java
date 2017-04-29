@@ -5,6 +5,8 @@ import java.rmi.* ;
 import java.net.MalformedURLException ; 
 import java.io.PrintWriter ;
 import java.io.IOException ;
+import java.util.Date ;
+
 
 public class MessageControleImpl extends UnicastRemoteObject implements MessageControle
 {
@@ -18,16 +20,18 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
     public ArrayList<Producteur> PList = new ArrayList<Producteur>(); // Liste de objets producteur avec lesquels on communique avec les producteurs
     public ArrayList<Joueur> JList = new ArrayList<Joueur>(); // Liste d'objet joueurs avec lesquels on communique avec les joueurs
     public ArrayList<Joueur> FinishedPlayerList = new ArrayList<Joueur>();
+    Date D = new Date();
+    long beginTime;
     
     PrintWriter writer; // objet avec lequel on écrit dans le fichier
     int turn = 1; // tour ( sert à écrire dans le fichier )
 
     
     
-    public MessageControleImpl(int nbRessourcesInitiales, int nbRessourcesDifferentes, int nbProducteurs, int nbJoueurs, String Name, int port, int victory_condition, SerializableList<Ressource> L)
+    public MessageControleImpl(int nbRessourcesInitiales, int nbRessourcesDifferentes, int nbProducteurs, int nbJoueurs, String Name, int port, int victory_condition, SerializableList<Ressource> L, int playMode)
     throws RemoteException
     {
-        I = new InitialInfoImpl( nbRessourcesInitiales, nbRessourcesDifferentes, Name, port, nbProducteurs, nbJoueurs, victory_condition, L);
+        I = new InitialInfoImpl( nbRessourcesInitiales, nbRessourcesDifferentes, Name, port, nbProducteurs, nbJoueurs, victory_condition, L, playMode);
         try
         {
             writer = new PrintWriter("actionLog.dat","UTF-8");
@@ -82,7 +86,14 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
         if( (I.IdJoueur  == I.nbJoueurs -1 ) &&( I.IdProducteur == I.nbProducteurs -1 ))
         {
             System.out.println("Le jeu va commencer");
-            JList.get(0).receiveToken();
+            if( I.playMode == 0) // mode tour/tour
+                JList.get(0).receiveToken(); // lance le 1er joueur
+            else // autre mode
+            {
+                beginTime = D.getTime();
+                for(i =0 ; i< JList.size() ;i++)
+                    JList.get(i).receiveToken();
+            }
         }
         else
             System.out.println("Il manque " + (I.nbJoueurs - I.IdJoueur -1) + " Joueurs et " + (I.nbProducteurs - I.IdProducteur -1) + " Producteurs ");
@@ -113,7 +124,17 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
         
 
         if( (I.IdJoueur  == I.nbJoueurs -1 ) &&( I.IdProducteur == I.nbProducteurs -1 ))
-            JList.get(0).receiveToken();
+        {
+            System.out.println("Le jeu va commencer");
+            if( I.playMode == 0) // mode tour/tour
+                JList.get(0).receiveToken(); // lance le 1er joueur
+            else // autre mode
+            {
+                beginTime = D.getTime();
+                for(i =0 ; i< JList.size() ;i++)
+                    JList.get(i).receiveToken();
+            }
+        }
         else
             System.out.println("Il manque " + (I.nbJoueurs - I.IdJoueur -1) + " Joueurs et " + (I.nbProducteurs - I.IdProducteur -1) + " Producteurs ");
         System.out.println("" + I.nbJoueurs + "   " +  (-1*I.IdJoueur -1) + " Joueurs et " + I.nbProducteurs  + "   " + (-1*I.IdProducteur -1));
@@ -121,14 +142,15 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
     }
     
     /* Joueur envoie les informations du tour au coordinateur qui l'écrit dans un fichier
-     * =>TOUR NB
-     * IdJoueur <Liste des ressources par joueur  
+     * Au tour/tour =>TURN_NB  IdJoueur <Liste des ressources du oueur>
+     * Autre mode => TIME IdJoueur <Liste des ressources du joueur
     */
     public void sendInformation(int idPlayer, SerializableList<Ressource> Ressources)
         throws RemoteException
     {
         int i, initId = 0;
-	if (idPlayer == initId) // tout le monde a joué on revient au joueur init
+        String S;
+        if (idPlayer == initId && I.playMode == 0) // tout le monde a joué on revient au joueur init ET on est dans le mode tour/tour
         {
             //writer.print(turn);
             System.out.println("Passe au prochain tour");
@@ -137,8 +159,14 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
                 System.out.print(" " + I.VLC.get(i).stock + " " + I.VLC.get(i).T);
             System.out.println("");
             turn ++;
-        }  
-        String S=""+turn+" "+idPlayer;
+        }
+        if( I.playMode == 0)
+            S=""+turn+" "+idPlayer;
+        else // sinon écrit time à la place du tour
+        {
+            long currentTime = D.getTime() - beginTime;
+            S = "" + currentTime + " " + idPlayer;
+        }
         // On cherche le joueur avec l'id minimal qui est encore actif
         while ( FinishedPlayerList.contains(JList.get(initId)) )
         {

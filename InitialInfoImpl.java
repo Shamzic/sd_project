@@ -27,4 +27,14 @@ public class InitialInfoImpl implements Serializable
         this.playMode = playMode;
     }
     
+    public int getStockQuantity(TYPE T)
+    {
+        int i;
+        for(i = 0 ; i< VLC.size() ;i++)
+        {
+            if( VLC.get(i).getStockType() == T)
+                return VLC.get(i).getStock();
+        }
+        return 0;
+    }
 }

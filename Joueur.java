@@ -29,4 +29,8 @@ public interface Joueur extends Remote
 
     public void deletePlayer(int id)
         throws RemoteException;
+    
+    public SerializableList<Tuple<TYPE,Integer>> getStock()
+        throws RemoteException;
+    
 }

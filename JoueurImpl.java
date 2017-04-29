@@ -194,7 +194,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
 
                 if(this.comportement == COMPORTEMENT.COOPERATIF)
                 {
-                    comportement_cooperatif();  
+                    comportement_cooperatif(1.5);  
                 }
 
                 if(this.comportement == COMPORTEMENT.VOLEUR)
@@ -250,12 +250,13 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
     - Individualiste : 
     * Recherche en priorité la ressource qui existe le moins (et qui sera donc le moins produite)
     * Prend le max qu'il a besoin pour cette ressource
-    * 
-    Prend autant de ressources que possible pour atteindre l'objectif (9 par tour).
-    -> Demande au premier producteur si il a les ressources nécessaires...
-    - Si oui, alors il se sert comme un rapiat et en prend 9.
-    - Si non, alors il demande au producteur suivant.
-    - puis il termine son tour.
+    * Fait un calcul pour savoir quelle ressource il va prendre en priorité : il compte la 
+    * quantité disponible pour chaque ressource et le nombre de producteurs qui la produisent
+    * puis fait le calcul importance = RessourceQuantitée + nbProducteurs * multiplicateur
+    * avec multiplicateur un nombre utilisé pour donner de l'importance au nombre de producteurs produisants cette ressource
+    * Recherche en priorité la ressource avec le facteur le plus petit
+    * Ces calculs ne sont effectués que sur les ressources dont les conditions de victoire n'ont pas encore été remplies
+
     ---------------------------------------------------
     */
     void comportement_individualiste()
@@ -411,17 +412,13 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
 
     /*
     -Coopératif
-    Observe les joueurs et prends des ressources si le producteur en as produit au moins
-    la moitié du nombre de ressources à atteindre
-
-    -> observe un producteur 
-        - si il a au moins la moitié des ressources nécessaire alors il se sert (10 max)
-        - si le producteur en a , mais pas assez alors il attend
-        - si le producteur n'en produit pas alors il passe au producteur suivant
-        - fin du tour
+    Attend qu'il y ai assez * multiplicateur ressources pour tous le monde avant de prendre quoi que ce soit
+    * Pour cela calcule à chaque tour l'ensemble des ressources des producteurs et des joueurs
+    * Puis regarde si leurs somme est supérieur à multiplicateur x la quantité de ressource nécessaire pour
+    * que l'ensemble des joueurs puissent gagner la partie
     -----------------------------------------------------
     */
-    void comportement_cooperatif()
+    void comportement_cooperatif(double multiplicateur)
     {
         int i,j,k;
         int ressources_prises = 0, needed_ressources = 0;
@@ -519,16 +516,16 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
         }
         
         // Maintenant choisi la ressource qu'il voudra prendre
-        // regarde si on a atteint <Total des ressources des producteurs> + <Total des ressources des joueurs> > 1.5 * <Ressources Nécessaires Victoire> * nbJoueurs
-        // On multiplie par 1.5 car il y a plusieurs producteurs ->  augmente les chances qu'un joueur ne doit pas aller chercher ses ressources chez 2-3 producteurs différents
+        // regarde si on a atteint <Total des ressources des producteurs> + <Total des ressources des joueurs> > multiplicateur * <Ressources Nécessaires Victoire> * nbJoueurs
+        // On multiplie par multiplicateur car il y a plusieurs producteurs ->  augmente les chances qu'un joueur ne doit pas aller chercher ses ressources chez 2-3 producteurs différents
         for( i = 0; i <TypeQuantiteP.size() ; i++) // pour chaque ressource
         {
-            if( TypeQuantiteP.get(i).y + TypeQuantiteJ.get(i).y > 1.5 * I.getStockQuantity( TypeQuantiteP.get(i).x )  * I.nbJoueurs ) // s'il y en a assez
+            if( TypeQuantiteP.get(i).y + TypeQuantiteJ.get(i).y > multiplicateur * I.getStockQuantity( TypeQuantiteP.get(i).x )  * I.nbJoueurs ) // s'il y en a assez
             {
                 if ( getStockQuantity( TypeQuantiteP.get(i).x ) < I.getStockQuantity( TypeQuantiteP.get(i).x ) ) // si la ressource n'est pas encore acquise
                     seekedType = TypeQuantiteP.get(i).x ;
             }
-            System.out.println("Il faut "+ (1.5 * I.getStockQuantity( TypeQuantiteP.get(i).x )  * I.nbJoueurs) +" et j'ai " + (TypeQuantiteP.get(i).y + TypeQuantiteJ.get(i).y ) + " de type "  +TypeQuantiteP.get(i).x );
+            System.out.println("Il faut "+ (multiplicateur * I.getStockQuantity( TypeQuantiteP.get(i).x )  * I.nbJoueurs) +" et j'ai " + (TypeQuantiteP.get(i).y + TypeQuantiteJ.get(i).y ) + " de type "  +TypeQuantiteP.get(i).x );
         }
         
         // Maintenant cherche le premier producteur chez qui prendre la ressource

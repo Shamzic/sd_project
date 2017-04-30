@@ -31,6 +31,10 @@ import java.rmi.server.UnicastRemoteObject ;
 import java.rmi.RemoteException ;
 import java.rmi.* ; 
 import java.net.MalformedURLException ; 
+import java.lang.*;
+import java.io.IOException;
+import java.io.*;
+import java.util.concurrent.TimeUnit;
 
 public class Fenetre extends JFrame{
 	int nbJoueurs = 0;
@@ -43,7 +47,7 @@ public class Fenetre extends JFrame{
 	int Tps_max=20;
 	int ModeDeJeu=0; // 0 = tour par tour, 1 = temps réel
 
-    public Fenetre(){
+    public Fenetre() throws IOException, InterruptedException {
 		JPanel content = new JPanel();
 		tabJoueurs = new ArrayList<String>();
 
@@ -200,11 +204,39 @@ public class Fenetre extends JFrame{
 
 
 		BoutonStart.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(ActionEvent e)  {
 				nbJoueurs = getJoueurs();
 				nbProducteurs = (Integer) FormatterProducteurs.getValue();
 				afficherJoueurs();
-
+				
+				/* Lancement des ports rmiregistry */
+				
+				try
+					{
+						System.out.println("pkill ? ");			
+						Runtime runtime = Runtime.getRuntime();
+						runtime.exec(new String[] {"pkill","rmiregistry"});
+						runtime.exec(new String[] {"rmiregistry","5000"} );
+						System.out.println("pkill ... ");
+						for(int i = 0 ; i < nbProducteurs ; i++)
+						{
+							int port_producteur = 5021+i;
+							runtime.exec(new String[] { "rmiregistry",""+port_producteur,"&"} );
+						}
+						for(int i = 0 ; i < nbProducteurs ; i++)
+						{
+							int port_producteur = 5021+i;
+							runtime.exec(new String[] { "rmiregistry",""+port_producteur,"&"} );
+						}
+						for(int i = 0 ; i < nbJoueurs ; i++)
+						{
+							int port_joueur = 5001+i;
+							runtime.exec(new String[] { "rmiregistry",""+port_joueur,"&"} );
+						}
+					}
+				catch(IOException exc){ System.out.println(exc) ; }
+				
+				try { TimeUnit.SECONDS.sleep(1); } catch (InterruptedException re) { System.out.println(re) ; }
 				/* Lancement controlleur */
 				
 					try
@@ -212,9 +244,9 @@ public class Fenetre extends JFrame{
 						// Fait une liste de ressource qu'il faut pour gagner
 						
 						SerializableList<Ressource> L = new SerializableList<Ressource>();
-						L.add(new Ressource(argentWin/10,0)); // Argent
-						L.add(new Ressource(orWin/10,1)); // Or 
-						L.add(new Ressource(boisWin/10,2)); // Bois
+						L.add(new Ressource(argentWin,0)); // Argent
+						L.add(new Ressource(orWin,1)); // Or 
+						L.add(new Ressource(boisWin,2)); // Bois
 
 					// Commence par faire l'objet grâce auquel le Controlleur communique avec les agents
 						MessageControleImpl MC = new MessageControleImpl(5,3,nbProducteurs,nbJoueurs,"localhost",5000,0,L,ModeDeJeu);
@@ -222,10 +254,43 @@ public class Fenetre extends JFrame{
 					}
 					catch (RemoteException re) { System.out.println(re) ; }
 					catch (MalformedURLException excep) { System.out.println(excep) ; }
+					
+					 try { TimeUnit.SECONDS.sleep(1); } catch (InterruptedException re) { System.out.println(re) ; }
+				/* Lancement des producteurs */
+				
+				try
+					{
+						for(int i = 0 ; i < nbProducteurs ; i++)
+						{
+							Runtime runtime = Runtime.getRuntime();
+							String titre_terminal = "\"Producteur n°"+i+"\"";
+							int port_producteur = 5021+i;
+							String commande_lancement_producteur = "java ProducteurImpl localhost 5000 localhost "+port_producteur+"; $SHELL"; 
+							runtime.exec(new String[] { "xterm", "-T", titre_terminal,"-e",commande_lancement_producteur} );
+						}
+					}
+				catch(IOException exc){
+  					System.out.println(exc) ;
 				}
-
-			
-			
+				 try { TimeUnit.SECONDS.sleep(1); } catch (InterruptedException re) { System.out.println(re) ; }
+				/* Lancement des joueurs */
+				try
+					{
+						for(int i = 0 ; i < nbJoueurs ; i++)
+						{
+							Runtime runtime = Runtime.getRuntime();
+							String titre_terminal = "\"Joueur n°"+i+"\"";
+							int port_joueur = 5001+i;
+							String commande_lancement_joueur = "java JoueurImpl localhost 5000 localhost "+port_joueur+" "+tabJoueurs.get(i)+"; $SHELL"; 
+							runtime.exec(new String[] { "xterm", "-T", titre_terminal,"-e",commande_lancement_joueur} );
+						}
+					}
+				catch(IOException exc){
+  					System.out.println(exc) ;
+				}
+				
+				
+			}
 		});
 		
 

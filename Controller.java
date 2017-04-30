@@ -11,9 +11,9 @@ public class Controller
 		{
             // Fait une liste de ressource qu'il faut pour gagner
             SerializableList<Ressource> L = new SerializableList<Ressource>();
-            L.add(new Ressource(9,0));
-            L.add(new Ressource(50,1));
-            L.add(new Ressource(18,2));
+            L.add(new Ressource(9,0)); // Argent
+            L.add(new Ressource(50,1)); // Or
+            L.add(new Ressource(18,2)); // bois
 
 	    // Commence par faire l'objet grâce auquel le Controlleur communique avec les agents
             MessageControleImpl MC = new MessageControleImpl(5,3, Integer.parseInt(args[1]),Integer.parseInt(args[0]),"localhost",5000,0,L);

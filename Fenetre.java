@@ -37,10 +37,11 @@ public class Fenetre extends JFrame{
     int nbProducteurs = 1;
 	ArrayList<String> tabJoueurs;
 	boolean start =false;
-	int orWin=1;
-	int argentWin=1;
-	int boisWin=1;
-	int Tps_max=30;
+	int orWin=5;
+	int argentWin=5;
+	int boisWin=5;
+	int Tps_max=20;
+	int ModeDeJeu=0; // 0 = tour par tour, 1 = temps réel
 
     public Fenetre(){
 		JPanel content = new JPanel();
@@ -86,10 +87,12 @@ public class Fenetre extends JFrame{
 		JButton BoutonReset = new JButton("Reset valeurs");
 		
 		
+		String[] modes = {"Tour par tour","Temps réel"};
+		final JComboBox<String> comboxMode= new JComboBox<>(modes);
+		
 		
 		final JTextArea textArea = new JTextArea();
 
-		//content.setPreferredSize(new Dimension(300, 120));
 		
 		content.setLayout(new GridBagLayout());
 		
@@ -172,15 +175,26 @@ public class Fenetre extends JFrame{
 		content.add(FormatterTempsMax,gc);
 		
 		// Septième ligne
+		gc.gridx=0;
+		gc.gridy=6;
+		gc.anchor = GridBagConstraints.LINE_START;
+		content.add(new JLabel("Mode de jeu : "),gc);
+		gc.gridx=1;
+		gc.gridy=6;
+		gc.gridwidth = GridBagConstraints.REMAINDER;
+		gc.fill = GridBagConstraints.HORIZONTAL;
+		content.add(comboxMode,gc);
+		
+		// Huitième ligne
 		gc.insets = new Insets(10,10,10,10);
 		gc.gridwidth=2; 
 		gc.gridx=0;
-		gc.gridy=6;
+		gc.gridy=7;
 		gc.anchor = GridBagConstraints.LINE_START;
 		content.add(BoutonStart,gc);
 		gc.gridwidth=1; 
 		gc.gridx=2;
-		gc.gridy=6;
+		gc.gridy=7;
 		gc.gridwidth = GridBagConstraints.REMAINDER;
 		content.add(BoutonReset,gc);
 
@@ -203,7 +217,7 @@ public class Fenetre extends JFrame{
 						L.add(new Ressource(boisWin/10,2)); // Bois
 
 					// Commence par faire l'objet grâce auquel le Controlleur communique avec les agents
-						MessageControleImpl MC = new MessageControleImpl(5,3,nbProducteurs,nbJoueurs,"localhost",5000,0,L);
+						MessageControleImpl MC = new MessageControleImpl(5,3,nbProducteurs,nbJoueurs,"localhost",5000,0,L,ModeDeJeu);
 						Naming.rebind( "rmi://localhost:"+5000 +"/MessageControleGlobal", MC); 
 					}
 					catch (RemoteException re) { System.out.println(re) ; }
@@ -213,6 +227,7 @@ public class Fenetre extends JFrame{
 			
 			
 		});
+		
 
 		BoutonReset.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -221,6 +236,7 @@ public class Fenetre extends JFrame{
 				FormatterProducteurs.setValue(1);
 				tabJoueurs.clear();
 				textArea.setText("");
+				comboxMode.setEnabled(true);
 			}
 		});
 
@@ -236,6 +252,13 @@ public class Fenetre extends JFrame{
 				{
 					textArea.append("Joueur "+i+" "+tabJoueurs.get(i)+"\n");
 					i++;
+				}
+				
+				if(comboxJoueur.getSelectedItem()=="Humain")
+				{
+					comboxMode.setSelectedItem("Tour par tour");
+					ModeDeJeu=0;
+					comboxMode.setEnabled(false);
 				}
 			}
 		});

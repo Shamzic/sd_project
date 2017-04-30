@@ -11,9 +11,10 @@ public class InitialInfoImpl implements Serializable
     public String Name; // nom de la machine du contrôleur
     public int port; // port du rmiregistry du contrôleur
     public int IdJoueur = -1, IdProducteur = -1;
+    public int playMode ; // 0 : tour par tour, 1 : dès qu'on peut
     SerializableList<Ressource> VLC ;
     
-    public InitialInfoImpl( int nbRessourcesInitiales, int nbRessourcesDifferentes, String Name, int port, int nbProducteurs, int nbJoueurs, int victory_condition, SerializableList<Ressource> VLC)
+    public InitialInfoImpl( int nbRessourcesInitiales, int nbRessourcesDifferentes, String Name, int port, int nbProducteurs, int nbJoueurs, int victory_condition, SerializableList<Ressource> VLC, int playMode)
     {
         this.nbRessourcesInitiales = nbRessourcesInitiales;
         this.nbRessourcesDifferentes = nbRessourcesDifferentes;
@@ -23,6 +24,17 @@ public class InitialInfoImpl implements Serializable
         this.nbJoueurs = nbJoueurs;
         this.victory_condition = victory_condition;
         this.VLC = VLC;
+        this.playMode = playMode;
     }
     
+    public int getStockQuantity(TYPE T)
+    {
+        int i;
+        for(i = 0 ; i< VLC.size() ;i++)
+        {
+            if( VLC.get(i).getStockType() == T)
+                return VLC.get(i).getStock();
+        }
+        return 0;
+    }
 }

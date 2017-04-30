@@ -82,7 +82,7 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
         return L;
     }
 
-    // Envoie au joueur la liste des ressources + quantitée
+    // Renvoie la liste des ressources + quantitée
     // Si le producteur possède 2 ressources identiques les mets dans un champ et l'envoie au joueur
     public synchronized SerializableList<Tuple<TYPE,Integer>> getStock()
     {
@@ -217,6 +217,17 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
             }
         }
         return takenRessources;
+    }
+    
+    public int getStockQuantity(TYPE T)
+    {
+        int i;
+        for(i = 0 ; i< RList.size() ;i++)
+        {
+            if( RList.get(i).getStockType() == T)
+                return RList.get(i).getStock();
+        }
+        return 0;
     }
     
     /**

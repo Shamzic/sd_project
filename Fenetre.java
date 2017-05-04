@@ -53,7 +53,7 @@ public class Fenetre extends JFrame{
 		tabJoueurs = new ArrayList<String>();
 
 		this.setTitle("Age of Agents");
-		this.setSize(700, 200);
+		this.setSize(1050, 300);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setLocationRelativeTo(null);
 		NumberFormat format = NumberFormat.getInstance();
@@ -66,7 +66,7 @@ public class Fenetre extends JFrame{
 		final JFormattedTextField FormatterProducteurs = new JFormattedTextField(formatter);
 		FormatterProducteurs.setValue(1);
 
-		String[] comportements = {"Coopératif", "Individualiste", "Voleur", "Humain"};
+		String[] comportements = {"cooperatif", "individualiste", "voleur", "humain"};
 		final JComboBox<String> comboxJoueur= new JComboBox<>(comportements);
 
 		NumberFormatter formatterRessources = new NumberFormatter(format);
@@ -213,14 +213,12 @@ public class Fenetre extends JFrame{
 				int nbj = 0;
 				for(nbj =0; nbj < nbJoueurs ; nbj++)
 				{
-					if(tabJoueurs.get(nbj)=="Humain")
+					if(tabJoueurs.get(nbj)=="humain")
 						System.out.println("ON A UN HUMAIN !!!");
 				}
 				if(nbj<1) 
 				{
-					//JOptionPane jp = new JOptionPane();
 					System.out.println("Il faut ajouter un joueur minimum pour lancer la partie !");
-					//Fenetre f2 = new Fenetre();
 					JOptionPane.showMessageDialog(null, "Il faut ajouter un joueur minimum pour lancer la partie !","Erreur lancement" , JOptionPane.ERROR_MESSAGE);
 				}	
 				else
@@ -260,14 +258,29 @@ public class Fenetre extends JFrame{
 						try
 						{
 							// Fait une liste de ressource qu'il faut pour gagner
-						
+							
+							orWin = (Integer) FormatterOr.getValue();
+							argentWin = (Integer) FormatterArgent.getValue();
+							boisWin = (Integer) FormatterBois.getValue();
+													
 							SerializableList<Ressource> L = new SerializableList<Ressource>();
 							L.add(new Ressource(argentWin,0)); // Argent
 							L.add(new Ressource(orWin,1)); // Or 
 							L.add(new Ressource(boisWin,2)); // Bois
 
 						// Commence par faire l'objet grâce auquel le Controlleur communique avec les agents
-							MessageControleImpl MC = new MessageControleImpl(5,3,nbProducteurs,nbJoueurs,"localhost",5000,0,L,ModeDeJeu);
+							String mj = (String) comboxMode.getSelectedItem();
+							if(mj=="Tour par tour")
+								ModeDeJeu=0;
+							else 
+								ModeDeJeu=1;
+								
+							//System.out.println("Mode de jeu activé : "+ModeDeJeu);
+							System.out.println("OR VICTOIRE : "+orWin);
+							  
+							
+							MessageControleImpl MC = new MessageControleImpl(5,3,nbProducteurs,nbJoueurs,"localhost",5000,0,L,ModeDeJeu,1); // Boouchon sur le temps 
+																																		    // pas encore implémenté
 							Naming.rebind( "rmi://localhost:"+5000 +"/MessageControleGlobal", MC); 
 						}
 						catch (RemoteException re) { System.out.println(re) ; }
@@ -301,6 +314,12 @@ public class Fenetre extends JFrame{
 								int port_joueur = 5001+i;
 								String commande_lancement_joueur = "java JoueurImpl localhost 5000 localhost "+port_joueur+" "+tabJoueurs.get(i)+"; $SHELL"; 
 								runtime.exec(new String[] { "xterm", "-T", titre_terminal,"-e",commande_lancement_joueur} );
+								
+								if(tabJoueurs.get(i)=="humain")
+								{
+									
+								
+								}
 							}
 						}
 					catch(IOException exc){

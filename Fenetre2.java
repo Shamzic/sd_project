@@ -27,12 +27,21 @@ import javax.swing.JTextArea;
 import java.awt.Insets;
 
 public class Fenetre2 extends JFrame{
-	int nbJoueurs = 0;
-    int nbProducteurs = 1;
+	int id_joueur;
+	int nb_ressources_vol;
+	int nb_ressource_prendre;
+	int id_joueur_vol;
+	int id_prod_prendre;
+	TYPE ressource_vol;
+	TYPE ressource_prendre;
+	
 	ArrayList<String> tabJoueurs;
 
-    public Fenetre2(){
-    
-    
+    public Fenetre2(int id_joueur){
+    	this.id_joueur=id_joueur;
+    	
+    	
+    	
+    	
     }
 }

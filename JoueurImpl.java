@@ -4,6 +4,8 @@ import java.rmi.RemoteException ;
 import java.rmi.* ; 
 import java.net.MalformedURLException ; 
 import java.util.concurrent.TimeUnit;
+import java.util.Random ;
+
 
 
 class JoueurImpl extends UnicastRemoteObject implements Joueur
@@ -166,7 +168,6 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
         int parcours_prod=0;
         int parcours_joueurs=0;
         boolean begin = true;
-//        boolean debut = true;
         while(game)
         {
             try
@@ -175,11 +176,13 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                 {
                     synchronized (monitor)
                     {
-                        if ( C.JList.size() != 0 )//&& debut) // besoin car sinon division par 0 et ça fait tout planter
+                        if ( C.JList.size() != 0 )// besoin car sinon division par 0 et ça fait tout planter
                         {
                             while ( have_token == false)
                             {
                                 monitor.wait(100);
+                                if(!game)
+                                    return;
                             }
                         }
                     }
@@ -324,22 +327,33 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
         }
         // Maintenant doit décider ce qu'il veut prendre comme ressource
         // Cherche d'abord à avoir la ressource avec le moins de producteur ( multiplicateur d'importance *10) et le moins de ressource 
+        SerializableList<Tuple<TYPE,Integer>> PriorityList = new SerializableList<Tuple<TYPE,Integer> >();
+        boolean inserted = false;
         for (i=0 ; i< TypeNb.size() ; i++)
         {
             tmp = TypeNb.get(i).y * 10 + TypeQuantite.get(i).y;
-            if( min == -1 && TypeQuantite.get(i).y != 0) // initialisation +évite de chercher des ressources quand il n'y en a aucune de disponible
+            if( PriorityList.size() == 0) // liste vide
+                PriorityList.add( new Tuple<TYPE,Integer> ( TypeNb.get(i).x, tmp));
+            else
             {
-                min = tmp;
-                index = i;
+                inserted =false ;
+                for(j=0; j < PriorityList.size() ; j++)
+                {
+                    if( PriorityList.get(j).y > tmp ) // nombre plus grand que tmp
+                    {
+                        PriorityList.add( new Tuple<TYPE,Integer>( TypeNb.get(i).x, tmp) , j);
+                        inserted = true;
+                        break;
+                    }
+                }
+                if( !inserted )
+                    PriorityList.add( new Tuple<TYPE,Integer>( TypeNb.get(i).x, tmp)); // tmp est le plus grand de la liste
             }
-            else if (tmp < min && TypeQuantite.get(i).y !=0) // évite de chercher des ressources quand il n'y en a aucune de disponible
-            {
-                min = tmp;
-                index = i;
-            }
+            
         }
-        
-        
+        Random r = new Random();
+        index = r.nextInt( Math.min(2,PriorityList.size()) ); // choisit soit la première ressource, soit la deuxième, s'il reste une deuxième ressource à chercher
+        System.out.println("J'ai choisi l'index " + index);
         // On a choisi la ressource à la position i de la liste TypeNb
         max = -1;
         // Maintenant il faut choisir le producteur chez qui on prend les ressources -> celui qui en a le plus
@@ -401,8 +415,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
         }
         else
         {
-            System.out.println("Pas assez de ressource nécessaire dans le producteur n°"+index2);
-            System.out.println("(nombre de producteurs dispo : "+C.PList.size()+") On passe au suivant !");
+            System.out.println("Pas assez de ressource disponibles");
             etat=ETAT.ATTEND;
         }
         
@@ -488,17 +501,17 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                 LJoueurs.add( C.JList.get(i).getStock() );
         }  catch (RemoteException re) { System.out.println(re) ; }
         
-        SerializableList<Tuple<TYPE,Integer> > TypeQuantiteJ = new SerializableList< Tuple<TYPE,Integer> > (); // Liste contenant les types et la quantité  de ressource de tous les prod réunis
-        for(i = 0 ; i < L.size(); i++) // Pour chaque producteur
+        SerializableList<Tuple<TYPE,Integer> > TypeQuantiteJ = new SerializableList< Tuple<TYPE,Integer> > (); // Liste contenant les types et la quantité  de ressource de tous les joueurs réunis
+        for(i = 0 ; i < LJoueurs.size(); i++) // Pour chaque producteur
         {
-            for(j=0; j < L.get(i).size() ; j++) // Pour chaque ressource du producteur
+            for(j=0; j < LJoueurs.get(i).size() ; j++) // Pour chaque ressource du producteur
             {
-                Tuple<TYPE,Integer> Ress = L.get(i).get(j); // la ressource en question
+                Tuple<TYPE,Integer> Ress = LJoueurs.get(i).get(j); // la ressource en question
                 if( RHave.contains(Ress.x) ) // évite de prendre en compte des ressources qu'on a déjà
                     continue;
                 
                 inclus = false;
-                for (k = 0 ; k < TypeQuantiteJ.size() ; k++) // pour chaque ressource de la liste TypeNb
+                for (k = 0 ; k < TypeQuantiteJ.size() ; k++) // pour chaque ressource de la liste 
                 {
                     if( Ress.x == TypeQuantiteJ.get(k).x) // type de ressource déjà dans la liste
                     {
@@ -520,12 +533,12 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
         // On multiplie par multiplicateur car il y a plusieurs producteurs ->  augmente les chances qu'un joueur ne doit pas aller chercher ses ressources chez 2-3 producteurs différents
         for( i = 0; i <TypeQuantiteP.size() ; i++) // pour chaque ressource
         {
-            if( TypeQuantiteP.get(i).y + TypeQuantiteJ.get(i).y > multiplicateur * I.getStockQuantity( TypeQuantiteP.get(i).x )  * I.nbJoueurs ) // s'il y en a assez
+            if( TypeQuantiteP.get(i).y + (TypeQuantiteJ.get(i).y * multiplicateur) > multiplicateur * I.getStockQuantity( TypeQuantiteP.get(i).x )  * I.nbJoueurs ) // s'il y en a assez
             {
                 if ( getStockQuantity( TypeQuantiteP.get(i).x ) < I.getStockQuantity( TypeQuantiteP.get(i).x ) ) // si la ressource n'est pas encore acquise
                     seekedType = TypeQuantiteP.get(i).x ;
             }
-            System.out.println("Il faut "+ (multiplicateur * I.getStockQuantity( TypeQuantiteP.get(i).x )  * I.nbJoueurs) +" et j'ai " + (TypeQuantiteP.get(i).y + TypeQuantiteJ.get(i).y ) + " de type "  +TypeQuantiteP.get(i).x );
+            System.out.println("\tIl faut "+ (multiplicateur * I.getStockQuantity( TypeQuantiteP.get(i).x )  * I.nbJoueurs) +" et j'ai " + (TypeQuantiteP.get(i).y + (TypeQuantiteJ.get(i).y * multiplicateur) )+ " de type "  +TypeQuantiteP.get(i).x  );
         }
         
         // Maintenant cherche le premier producteur chez qui prendre la ressource
@@ -560,7 +573,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
         }
         else
         {
-            System.out.println("Pas assez de ressource nécessaire dans le producteur n°"+i);
+            System.out.println("Pas assez de ressources disponibles");
             etat=ETAT.ATTEND;
         }
         
@@ -571,12 +584,11 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
     /* -Voleur :
 
     Observe les joueurs et leur vole des ressources.
-    -> Demande au premier joueur si il a des ressources nécessaire pour gagner
-    - Si oui alors il les prends (15 max par tour) 
-    - Si non alors il observe le joueur suivant
-    - si après avoir parcouru tous les joueurs il n'y en a aucun qu'on peut voler
-        alors le voleur devient un individualiste pour 1 tour puis redevient voleur.
-    - puis il termine son tour et recommence
+    * Regarde d'abord ce que chaque joueur possède
+    * Regarde s'il y en a un qui est proche de la fin
+    *   -> Si oui -> le vole en priorité (la ressource la plus rare)
+    * Sinon cherche la ressource la plus rare chez les joueurs (comme avec les producteurs)
+
     ----------------------------------------------------- */
     void comportement_voleur()
     {

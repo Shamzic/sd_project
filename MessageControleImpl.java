@@ -6,6 +6,7 @@ import java.net.MalformedURLException ;
 import java.io.PrintWriter ;
 import java.io.IOException ;
 import java.util.Date ;
+import java.util.concurrent.TimeUnit;
 
 
 public class MessageControleImpl extends UnicastRemoteObject implements MessageControle
@@ -25,10 +26,10 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
     
     PrintWriter writer; // objet avec lequel on écrit dans le fichier
     int turn = 1; // tour ( sert à écrire dans le fichier )
-
+    Thread T;
     
     
-    public MessageControleImpl(int nbRessourcesInitiales, int nbRessourcesDifferentes, int nbProducteurs, int nbJoueurs, String Name, int port, int victory_condition, SerializableList<Ressource> L, int playMode)
+    public MessageControleImpl(int nbRessourcesInitiales, int nbRessourcesDifferentes, int nbProducteurs, int nbJoueurs, String Name, int port, int victory_condition, SerializableList<Ressource> L, int playMode, int playTime)
     throws RemoteException
     {
         I = new InitialInfoImpl( nbRessourcesInitiales, nbRessourcesDifferentes, Name, port, nbProducteurs, nbJoueurs, victory_condition, L, playMode);
@@ -37,6 +38,26 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
             writer = new PrintWriter("actionLog.dat","UTF-8");
         }
         catch (IOException e) { System.out.println(e) ; }
+        
+        if(victory_condition == 2 ) // arrêt au temps
+        T = new Thread()
+        {
+            public void run()
+            {
+                System.out.println("Compte à rebours lancé");
+                try { TimeUnit.SECONDS.sleep(playTime); } catch (InterruptedException re) { System.out.println(re) ; }
+                int i;
+                System.out.println("Temps écoulé. Fin de partie.");
+                try
+                {
+                for(i=0 ; i < JList.size() ; i++)
+                    JList.get(i).end();
+                for(i=0 ; i < PList.size() ; i++)
+                    PList.get(i).end();
+                }catch (RemoteException re) { System.out.println(re) ; }
+            }
+        };
+        
     }
     
     // Envoie les infos initiales au joueur
@@ -86,6 +107,12 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
         if( (I.IdJoueur  == I.nbJoueurs -1 ) &&( I.IdProducteur == I.nbProducteurs -1 ))
         {
             System.out.println("Le jeu va commencer");
+            
+            // lance tous les producteurs
+            for(i=0;i<PList.size() ; i++)
+                PList.get(i).fonctionThread(2000);
+            try { TimeUnit.SECONDS.sleep(1); } catch (InterruptedException re) { System.out.println(re) ; }
+            
             if( I.playMode == 0) // mode tour/tour
                 JList.get(0).receiveToken(); // lance le 1er joueur
             else // autre mode
@@ -94,6 +121,8 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
                 for(i =0 ; i< JList.size() ;i++)
                     JList.get(i).receiveToken();
             }
+            if( I.victory_condition == 2)
+                T.start();
         }
         else
             System.out.println("Il manque " + (I.nbJoueurs - I.IdJoueur -1) + " Joueurs et " + (I.nbProducteurs - I.IdProducteur -1) + " Producteurs ");
@@ -117,7 +146,6 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
             ListProducteurRTypes.add(LISTE); // ajoute la liste des types de ressources produites par ce producteur
             for ( i = 0 ; i< LISTE.size() ; i++)
                 System.out.println( "Ressource "  +i +" : "+ LISTE.get(i) );
-            P.fonctionThread(3000); // n/2+1
         }
         catch (NotBoundException re) { System.out.println(re) ; }
         catch (MalformedURLException e) { System.out.println(e) ; }
@@ -126,6 +154,13 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
         if( (I.IdJoueur  == I.nbJoueurs -1 ) &&( I.IdProducteur == I.nbProducteurs -1 ))
         {
             System.out.println("Le jeu va commencer");
+            
+            // lance tous les producteurs
+            for(i=0;i<PList.size() ; i++)
+                PList.get(i).fonctionThread(2000);
+            
+            try { TimeUnit.SECONDS.sleep(1); } catch (InterruptedException re) { System.out.println(re) ; }
+            
             if( I.playMode == 0) // mode tour/tour
                 JList.get(0).receiveToken(); // lance le 1er joueur
             else // autre mode
@@ -134,10 +169,11 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
                 for(i =0 ; i< JList.size() ;i++)
                     JList.get(i).receiveToken();
             }
+            if(I.victory_condition == 2 )
+                T.start();
         }
         else
             System.out.println("Il manque " + (I.nbJoueurs - I.IdJoueur -1) + " Joueurs et " + (I.nbProducteurs - I.IdProducteur -1) + " Producteurs ");
-        System.out.println("" + I.nbJoueurs + "   " +  (-1*I.IdJoueur -1) + " Joueurs et " + I.nbProducteurs  + "   " + (-1*I.IdProducteur -1));
         
     }
     
@@ -164,7 +200,8 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
             S=""+turn+" "+idPlayer;
         else // sinon écrit time à la place du tour
         {
-            long currentTime = D.getTime() - beginTime;
+            Date presentDate = new Date();
+            long currentTime = presentDate.getTime() - beginTime;
             S = "" + currentTime + " " + idPlayer;
         }
         // On cherche le joueur avec l'id minimal qui est encore actif

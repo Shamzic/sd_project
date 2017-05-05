@@ -278,6 +278,7 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
         while( i < FinishedPlayerList.size() - 1 && id < FinishedPlayerList.get(i).getId() ) 
             i++;
         FinishedPlayerList.add( i, JList.get(id) );
+        System.out.println("Joueur a finit " + id);
     }
     
     

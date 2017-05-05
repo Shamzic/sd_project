@@ -1316,7 +1316,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
     public void deletePlayer(int id)
         throws RemoteException
     {
-        C.deletePlayer(id);
+        C.deletePlayer(id, M);
     }
     
     public void Observer()

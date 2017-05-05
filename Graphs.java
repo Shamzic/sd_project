@@ -23,11 +23,11 @@ public class Graphs {
 	
 	String cmd_plot1 = "sin(x)";
 	
-	ressource1.setTitle("Evolution des ressources des joueurs en fonction des tours");
+	ressource1.setTitle("Evolution de l or des joueurs en fonction des tours");
 
 	ressource1.set("xlabel","'Tour ou millisecondes selon votre mode de jeu'");
 	ressource1.set("ylabel","'Nombre de ressources'");
-	ressource1.set("key","on outside left bmargin box title 'Légende'");
+	ressource1.set("key","on outside left bmargin box title 'Légende'");// title \'Légende\'
 	
     ressource1.addPlot("sin(x)");
     ressource2.addPlot("");

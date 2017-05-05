@@ -33,6 +33,8 @@ import java.rmi.* ;
 
 import java.net.MalformedURLException ; 
 
+import com.panayotis.gnuplot.JavaPlot;
+
 public class Fenetre2 extends JFrame{
 	int id_joueur;
 	int nb_ressources_vol;
@@ -48,6 +50,11 @@ public class Fenetre2 extends JFrame{
 	ArrayList<String> tabJoueurs;
 
     public Fenetre2(int id_joueur, MessageControleImpl MC){
+    
+    //javac -cp ./JavaPlot-0.5.0/dist/JavaPlot.jar *.java
+    
+    
+    	
     	this.id_joueur=id_joueur;
     	this.setTitle("Joueur humain (id="+id_joueur);
     	this.setSize(1050, 300);
@@ -204,9 +211,9 @@ public class Fenetre2 extends JFrame{
                 if( BoutonPrendre.isSelected() ) // Veut prendre des ressources
                 {
                     String comport = (String) comboxRessTypes2.getSelectedItem();
-                    System.out.println("Choix de Prendre "+ FormatterNb_ressources_vol.getValue() +"des ressources de " + comport + " au producteur " + FormatterId_joueur_vol.getValue());
-                    nb = (Integer)FormatterNb_ressources_vol.getValue();
-                    id = (Integer) FormatterId_joueur_vol.getValue();
+                    System.out.println("Choix de Prendre "+ FormatterNb_ressources_prendre.getValue() +"des ressources de " + comport + " au producteur " + FormatterId_joueur_vol.getValue());
+                    nb = (Integer)FormatterNb_ressources_prendre.getValue();
+                    id = (Integer) FormatterId_prod_prendre.getValue();
                     type =(String)comport;
                     J.PrendRessources( nb, id,type);
                 }
@@ -222,6 +229,7 @@ public class Fenetre2 extends JFrame{
                 else if ( BoutonObserver.isSelected())
                 {
                     System.out.println("Choix de Observer");
+                    
                     J.Observer();                    
                 }
                 

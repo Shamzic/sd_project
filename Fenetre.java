@@ -67,7 +67,7 @@ public class Fenetre extends JFrame{
 		final JFormattedTextField FormatterProducteurs = new JFormattedTextField(formatter);
 		FormatterProducteurs.setValue(1);
 
-		String[] comportements = {"cooperatif", "individualiste", "voleur", "humain"};
+		String[] comportements = {"cooperatif", "individualiste", "voleur","attentionnel","brute","humain"};
 		final JComboBox<String> comboxJoueur= new JComboBox<>(comportements);
 
 		NumberFormatter formatterRessources = new NumberFormatter(format);
@@ -91,6 +91,7 @@ public class Fenetre extends JFrame{
 		JButton BoutonAdd = new JButton("Ajouter joueur");
 		JButton BoutonStart = new JButton("Lancer le jeu");
 		JButton BoutonReset = new JButton("Reset valeurs");
+		JButton BoutonGraph = new JButton("Afficher les graphiques");
 		
 		
 		String[] modes = {"Tour par tour","Temps réel"};
@@ -203,6 +204,12 @@ public class Fenetre extends JFrame{
 		gc.gridy=7;
 		gc.gridwidth = GridBagConstraints.REMAINDER;
 		content.add(BoutonReset,gc);
+		
+		gc.gridwidth=4; 
+		gc.gridx=0;
+		gc.gridy=8;
+		gc.anchor = GridBagConstraints.LINE_START;
+		content.add(BoutonGraph,gc);
 
 		// Lance le jeu depuis le bouton start
 		BoutonStart.addActionListener(new ActionListener()  {
@@ -269,7 +276,7 @@ public class Fenetre extends JFrame{
 							L.add(new Ressource(orWin,1)); // Or 
 							L.add(new Ressource(boisWin,2)); // Bois
 
-						// Commence par faire l'objet grâce auquel le Controlleur communique avec les agents
+							// Commence par faire l'objet grâce auquel le Controlleur communique avec les agents
                             System.out.println("Mode de jeu "+ ModeDeJeu + " .Il faut " + argentWin + " et " + orWin+"  et " + boisWin);
 
 							String mj = (String) comboxMode.getSelectedItem();
@@ -279,7 +286,7 @@ public class Fenetre extends JFrame{
 								ModeDeJeu=1;
 								
 							//System.out.println("Mode de jeu activé : "+ModeDeJeu);
-							System.out.println("OR VICTOIRE : "+orWin);
+							//System.out.println("OR VICTOIRE : "+orWin);
 							  
 							
 							MC = new MessageControleImpl(5,3,nbProducteurs,nbJoueurs,"localhost",5000,0,L,ModeDeJeu,1); // Boouchon sur le temps 
@@ -290,46 +297,47 @@ public class Fenetre extends JFrame{
 						catch (MalformedURLException excep) { System.out.println(excep) ; }
 					
 						 try { TimeUnit.SECONDS.sleep(1); } catch (InterruptedException re) { System.out.println(re) ; }
-					/* Lancement des producteurs */
+						 
+						/* Lancement des producteurs */
 				
-					try
-						{
-							for(int i = 0 ; i < nbProducteurs ; i++)
+						try
 							{
-								Runtime runtime = Runtime.getRuntime();
-								String titre_terminal = "\"Producteur n°"+i+"\"";
-								int port_producteur = 5021+i;
-								String commande_lancement_producteur = "java ProducteurImpl localhost 5000 localhost "+port_producteur+"; $SHELL"; 
-								runtime.exec(new String[] { "xterm", "-T", titre_terminal,"-e",commande_lancement_producteur} );
-							}
-						}
-					catch(IOException exc){
-	  					System.out.println(exc) ;
-					}
-					 try { TimeUnit.SECONDS.sleep(1); } catch (InterruptedException re) { System.out.println(re) ; }
-					/* Lancement des joueurs */
-					try
-						{
-							for(int i = 0 ; i < nbJoueurs ; i++)
-							{
-                                try{Thread.sleep(1000); } catch   (InterruptedException re) { System.out.println(re) ; }
-                                if(tabJoueurs.get(i)=="humain")
-                                {
-									Fenetre2 f2 = new Fenetre2(i,MC);
-									f2.setVisible(true);
-                                    continue;
+								for(int i = 0 ; i < nbProducteurs ; i++)
+								{
+									Runtime runtime = Runtime.getRuntime();
+									String titre_terminal = "\"Producteur n°"+i+"\"";
+									int port_producteur = 5021+i;
+									String commande_lancement_producteur = "java ProducteurImpl localhost 5000 localhost "+port_producteur+"; $SHELL"; 
+									runtime.exec(new String[] { "xterm", "-T", titre_terminal,"-e",commande_lancement_producteur} );
 								}
-                                Runtime runtime = Runtime.getRuntime();
-								String titre_terminal = "\"Joueur n°"+i+"\"";
-								int port_joueur = 5001+i;
-                                System.out.println(tabJoueurs.get(i));
-								String commande_lancement_joueur = "java JoueurImpl localhost 5000 localhost "+port_joueur+" "+tabJoueurs.get(i)+"; $SHELL"; 
-								runtime.exec(new String[] { "xterm", "-T", titre_terminal,"-e",commande_lancement_joueur} );
-
 							}
+						catch(IOException exc){
+		  					System.out.println(exc) ;
 						}
-					catch(IOException exc){
-	  					System.out.println(exc) ;
+						 try { TimeUnit.SECONDS.sleep(1); } catch (InterruptedException re) { System.out.println(re) ; }
+						/* Lancement des joueurs */
+						try
+							{
+								for(int i = 0 ; i < nbJoueurs ; i++)
+								{
+		                            try{Thread.sleep(1000); } catch   (InterruptedException re) { System.out.println(re) ; }
+		                            if(tabJoueurs.get(i)=="humain")
+		                            {
+										Fenetre2 f2 = new Fenetre2(i,MC);
+										f2.setVisible(true);
+		                                continue;
+									}
+		                            Runtime runtime = Runtime.getRuntime();
+									String titre_terminal = "\"Joueur n°"+i+"\"";
+									int port_joueur = 5001+i;
+		                            System.out.println(tabJoueurs.get(i));
+									String commande_lancement_joueur = "java JoueurImpl localhost 5000 localhost "+port_joueur+" "+tabJoueurs.get(i)+"; $SHELL"; 
+									runtime.exec(new String[] { "xterm", "-T", titre_terminal,"-e",commande_lancement_joueur} );
+
+								}
+							}
+						catch(IOException exc){
+		  					System.out.println(exc) ;
 					}
 				}
 			}
@@ -367,6 +375,14 @@ public class Fenetre extends JFrame{
 					ModeDeJeu=0;
 					comboxMode.setEnabled(false);
 				}
+			}
+		});
+		
+		BoutonGraph.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new Graphs(getJoueurs());
+				
+				
 			}
 		});
 

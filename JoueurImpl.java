@@ -889,6 +889,8 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                 {
                     C.endAllAgents(id); // termine tous les agents
                     M.GameEnded(); // envoie au coordinateur l'information que le jeu est terminé
+                    
+                    
                     return;
                 }
                 else // termine le jeu progressivement

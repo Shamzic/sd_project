@@ -9,8 +9,7 @@ public class Test {
 	 public static void main(String[] args)throws IOException, InterruptedException {
 	 	Fenetre f = new Fenetre();
 	 	f.setVisible(true);
-	 	/*Runtime runtime = Runtime.getRuntime();
-runtime.exec(new String[] { "xterm", "-T", "\"yolo\"","-e", "java Mainexemple" } );*/
-
+		// Test
+		//new Graphs(3);
 	}
 }

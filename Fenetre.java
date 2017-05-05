@@ -317,7 +317,8 @@ public class Fenetre extends JFrame{
 								
 								if(tabJoueurs.get(i)=="humain")
 								{
-									
+									Fenetre2 f2 = new Fenetre2(i);
+									f2.setVisible(true);
 								
 								}
 							}

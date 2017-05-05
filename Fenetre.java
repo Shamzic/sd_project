@@ -66,7 +66,7 @@ public class Fenetre extends JFrame{
 		final JFormattedTextField FormatterProducteurs = new JFormattedTextField(formatter);
 		FormatterProducteurs.setValue(1);
 
-		String[] comportements = {"Coopératif", "Individualiste", "Voleur", "Humain"};
+		String[] comportements = {"coopératif", "individualiste", "voleur", "humain"};
 		final JComboBox<String> comboxJoueur= new JComboBox<>(comportements);
 
 		NumberFormatter formatterRessources = new NumberFormatter(format);
@@ -267,7 +267,8 @@ public class Fenetre extends JFrame{
 							L.add(new Ressource(boisWin,2)); // Bois
 
 						// Commence par faire l'objet grâce auquel le Controlleur communique avec les agents
-							MessageControleImpl MC = new MessageControleImpl(5,3,nbProducteurs,nbJoueurs,"localhost",5000,0,L,ModeDeJeu);
+                            System.out.println("Mode de jeu "+ ModeDeJeu + " .Il faut " + argentWin + " et " + orWin+"  et " + boisWin);
+							MessageControleImpl MC = new MessageControleImpl(5,3,nbProducteurs,nbJoueurs,"localhost",5000,0,L,ModeDeJeu,50);
 							Naming.rebind( "rmi://localhost:"+5000 +"/MessageControleGlobal", MC); 
 						}
 						catch (RemoteException re) { System.out.println(re) ; }
@@ -299,6 +300,7 @@ public class Fenetre extends JFrame{
 								Runtime runtime = Runtime.getRuntime();
 								String titre_terminal = "\"Joueur n°"+i+"\"";
 								int port_joueur = 5001+i;
+                                System.out.println(tabJoueurs.get(i));
 								String commande_lancement_joueur = "java JoueurImpl localhost 5000 localhost "+port_joueur+" "+tabJoueurs.get(i)+"; $SHELL"; 
 								runtime.exec(new String[] { "xterm", "-T", titre_terminal,"-e",commande_lancement_joueur} );
 							}

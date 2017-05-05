@@ -32,5 +32,14 @@ public interface Joueur extends Remote
     
     public SerializableList<Tuple<TYPE,Integer>> getStock()
         throws RemoteException;
+  
+    public int getStockQuantity(TYPE T)
+        throws RemoteException;
+        
+    public int totalStockQuantity()
+        throws RemoteException;
+    
+    public void attacked( int turns)
+        throws RemoteException;
     
 }

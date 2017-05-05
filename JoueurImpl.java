@@ -60,6 +60,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
             Naming.rebind( "rmi://localhost:"+args[3] + "/Joueur", J);
             
             // Maintenant envoie ses "coordonnées" au Coordinateur
+        //    System.out.println("je vais ajouter " + args[2] + "    "  + Integer.parseInt(args[3]));
             M.addMachine( args[2], Integer.parseInt(args[3]) );
             J.start();
         }
@@ -121,6 +122,19 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                 System.out.println("Comportement du joueur : voleur.");
                 break;
             }
+            case "attentionnel":
+            {
+                this.comportement = COMPORTEMENT.ATTENTIONNEL;
+                System.out.println("Comportement du joueur : attentionnel.");
+                break;
+            }
+            case "brute":
+            {
+                this.comportement = COMPORTEMENT.BRUTE;
+                System.out.println("Comportement du joueur : brute.");
+                break;
+            }
+            
             default: 
             {
                 this.comportement = COMPORTEMENT.COOPERATIF;
@@ -188,46 +202,53 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                     }
                     begin = false;
                 }
-                // Maintenant on a le jeton => Comportement joueur activé !
-
-                if(this.comportement == COMPORTEMENT.INDIVIDUALISTE)
+                
+                
+                if( etat == ETAT.PENALITE3) // c'est fait prendre en volant au tour d'avant
                 {
-                    comportement_individualiste();
+                    System.out.println("Je dois attendre ce tour");
+                    etat = ETAT.PENALITE2;
+                }
+                if( etat == ETAT.PENALITE2) // c'est fait prendre en volant au tour d'avant
+                {
+                    System.out.println("Je dois attendre ce tour");
+                    etat = ETAT.PENALITE;
+                }
+                else if( etat == ETAT.PENALITE) // c'est fait prendre en volant au tour d'avant
+                {
+                    System.out.println("Je dois attendre ce tour");
+                    etat = ETAT.ATTEND;
+                }
+                else
+                {
+                    // Maintenant on a le jeton et on peut jouer=> Comportement joueur activé !
+
+                    if(this.comportement == COMPORTEMENT.INDIVIDUALISTE)
+                    {
+                        comportement_individualiste();
+                    }
+
+                    if(this.comportement == COMPORTEMENT.COOPERATIF)
+                    {
+                        comportement_cooperatif(1.5);  
+                    }
+
+                    if(this.comportement == COMPORTEMENT.VOLEUR)
+                    {
+                        comportement_voleur();
+                    }
+                    if(this.comportement == COMPORTEMENT.ATTENTIONNEL)
+                    {
+                        comportement_attentionnel();
+                    }
+                    if(this.comportement == COMPORTEMENT.BRUTE)
+                    {
+                        comportement_attack();
+                    }
                 }
 
-                if(this.comportement == COMPORTEMENT.COOPERATIF)
-                {
-                    comportement_cooperatif(1.5);  
-                }
 
-                if(this.comportement == COMPORTEMENT.VOLEUR)
-                {
-                    comportement_voleur();
-                }
-                     /* -Traitre
-
-                    Mode coopératif et puis devient voleur
-
-                    -> observe un producteur 
-                        - si il a au moins la moitié des ressources nécessaire alors il se sert (10 max)
-                          puis passe en mode voleur
-                        - si le producteur en a, mais pas assez alors il attend
-                        - si le producteur n'en produit pas alors il passe au producteur suivant
-                            - fin du tour
-                    ----------------------------------------------------------- */
-
-
-                //System.out.println("je prend des ressources " + C.PList.get(0).getStock( 10 , TYPE.BOIS));
-
-                // ici il devrait prendre un nombre aléatoire (entre 1 et 10 par ex) de ressource de type aléatoire
-               /*
-
-                int ressources_prises = C.PList.get(0).getStock( 9 , TYPE.OR);
-                System.out.println("Je prend "+ressources_prises+" ressources d'or !");
-                increaseRessourceAmout(TYPE.OR,ressources_prises);
-                */
-
-                System.out.println("Tour joueur terminé en état "+etat);
+                System.out.println("\tTour joueur terminé en état "+etat);
                 M.sendInformation(id, RList);
                 TimeUnit.SECONDS.sleep(1);
                 if(id == 1)
@@ -353,7 +374,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
         }
         Random r = new Random();
         index = r.nextInt( Math.min(2,PriorityList.size()) ); // choisit soit la première ressource, soit la deuxième, s'il reste une deuxième ressource à chercher
-        System.out.println("J'ai choisi l'index " + index);
+        //System.out.println("J'ai choisi l'index " + index);
         // On a choisi la ressource à la position i de la liste TypeNb
         max = -1;
         // Maintenant il faut choisir le producteur chez qui on prend les ressources -> celui qui en a le plus
@@ -439,7 +460,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
         int min =-1, max , tmp;
         // débute par chercher la liste des ressources ainsi que leurs nombre chez les producteurs
         SerializableList< SerializableList < Tuple<TYPE,Integer> > > L  = new SerializableList< SerializableList < Tuple<TYPE,Integer> > >() ; // Pour chaque producteur, liste des types et quantitée de ressources
-        SerializableList< SerializableList < Tuple<TYPE,Integer> > > LJoueurs  = new SerializableList< SerializableList < Tuple<TYPE,Integer> > >() ; // Pour chaque producteur, liste des types et quantitée de ressources
+        SerializableList< SerializableList < Tuple<TYPE,Integer> > > LJoueurs  = new SerializableList< SerializableList < Tuple<TYPE,Integer> > >() ; // Pour chaque joueur, liste des types et quantitée de ressources
         TYPE seekedType = TYPE.OR;
         try
         {
@@ -538,7 +559,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                 if ( getStockQuantity( TypeQuantiteP.get(i).x ) < I.getStockQuantity( TypeQuantiteP.get(i).x ) ) // si la ressource n'est pas encore acquise
                     seekedType = TypeQuantiteP.get(i).x ;
             }
-            System.out.println("\tIl faut "+ (multiplicateur * I.getStockQuantity( TypeQuantiteP.get(i).x )  * I.nbJoueurs) +" et j'ai " + (TypeQuantiteP.get(i).y + (TypeQuantiteJ.get(i).y * multiplicateur) )+ " de type "  +TypeQuantiteP.get(i).x  );
+        //    System.out.println("\tIl faut "+ (multiplicateur * I.getStockQuantity( TypeQuantiteP.get(i).x )  * I.nbJoueurs) +" et j'ai " + (TypeQuantiteP.get(i).y + (TypeQuantiteJ.get(i).y * multiplicateur) )+ " de type "  +TypeQuantiteP.get(i).x  );
         }
         
         // Maintenant cherche le premier producteur chez qui prendre la ressource
@@ -592,53 +613,255 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
     ----------------------------------------------------- */
     void comportement_voleur()
     {
-        int i;
-        Ressource RWIN, RJ;
-        SerializableList<Ressource> LWIN = I.VLC ;
-        int parcours_prod=0, parcours_joueurs = 0,ressources_prises =0;
-        for( i = 0 ; i < LWIN.size() ; i++ )
+        int Res =0, index,i,j,k, needed_ressources = 0;
+        boolean inclus;
+        int max, ressources_prises =0, tmp;
+        TYPE choosenType;
+        ArrayList<TYPE> RHave = new ArrayList<TYPE>();
+        SerializableList< SerializableList < Tuple<TYPE,Integer> > > LJoueurs  = new SerializableList< SerializableList < Tuple<TYPE,Integer> > >() ; // Pour chaque joueur, liste des types et quantitée de ressources
+        SerializableList<Tuple<TYPE,Integer> > TypeQuantiteJ = new SerializableList< Tuple<TYPE,Integer> > (); // Liste contenant les types et la quantité  de ressource de tous les joueurs réunis
+        
+        // débute par faire une liste des ressources qu'on a déjà
+        for (i=0 ; i < I.VLC.size() ; i++)
         {
-            RWIN = I.VLC.get(i);
-            RJ = RList.get(i);
-
-            if( RJ.getStockType() == RWIN.getStockType() )
+            if( RList.get(i).getStock() >= I.VLC.get(i).getStock() )
             {
-                //System.out.println("je fais le test de ressource pour gagner, il me faut " + RWIN.getStock() + " et j'ai " + RJ.getStock());
-                if( RJ.getStock() < RWIN.getStock() && RWIN.getStock()>0) // si le joueur a encore besoin de ressources pour gagner
+                RHave.add(I.VLC.get(i).getStockType());
+                System.out.println("\t\tRécolte de " + I.VLC.get(i).getStockType() + " Terminée");
+            }
+        }
+        
+        // Maintenant recherche les ressources chez les joueurs
+        try
+        {
+            for (i=0 ; i < C.JList.size() ; i++)
+                LJoueurs.add( C.JList.get(i).getStock() );
+        }  catch (RemoteException re) { System.out.println(re) ; }
+        
+        for(i = 0 ; i < LJoueurs.size(); i++) // Pour chaque joueur
+        {
+            if(i== I.IdJoueur) // ne se compte pas soit même
+                continue;
+            for(j=0; j < LJoueurs.get(i).size() ; j++) // Pour chaque ressource du joueur
+            {
+                Tuple<TYPE,Integer> Ress = LJoueurs.get(i).get(j); // la ressource en question
+                if( RHave.contains(Ress.x) ) // évite de prendre en compte des ressources qu'on a déjà
+                    continue;
+                
+                inclus = false;
+                for (k = 0 ; k < TypeQuantiteJ.size() ; k++) // pour chaque ressource de la liste 
                 {
-                    if(etat==ETAT.ATTEND)
+                    if( Ress.x == TypeQuantiteJ.get(k).x) // type de ressource déjà dans la liste
                     {
-                        System.out.println("Observe le joueur "+parcours_joueurs);
-                        etat=ETAT.OBSERVE;
+                        TypeQuantiteJ.set(k, new Tuple<TYPE,Integer>( Ress.x, TypeQuantiteJ.get(k).y + Ress.y )) ;
+                        inclus = true;
+                        break;
                     }
-                    else if (etat==ETAT.OBSERVE || etat==ETAT.VOLE) 
+                }
+                if( !inclus ) // ressource pas encore dans liste
+                {
+                    TypeQuantiteJ.add( new Tuple<TYPE,Integer>( Ress.x,Ress.y));
+                }
+                
+            }
+        }
+        
+        // Maintenant doit décider ce qu'il veut prendre comme ressource
+        // Cherche d'abord à avoir la ressource avec le moins de joueurs ( multiplicateur d'importance *10) et le moins de ressource 
+        SerializableList<Tuple<TYPE,Integer>> PriorityList = new SerializableList<Tuple<TYPE,Integer> >();
+        boolean inserted = false;
+        for (i=0 ; i< TypeQuantiteJ.size() ; i++)
+        {
+            tmp = TypeQuantiteJ.get(i).y;
+            if( PriorityList.size() == 0) // liste vide
+                PriorityList.add( new Tuple<TYPE,Integer> ( TypeQuantiteJ.get(i).x, tmp));
+            else
+            {
+                inserted =false ;
+                for(j=0; j < PriorityList.size() ; j++)
+                {
+                    if( PriorityList.get(j).y > tmp ) // nombre plus grand que tmp
                     {
-                        try
-                        {
-                            ressources_prises = C.PList.get(parcours_prod).getStock(9, RWIN.getStockType());
-                        }
-                        catch (RemoteException re) { System.out.println(re) ; }
-                        if(ressources_prises >0) // le joueur a des ressources
-                        {
-                            etat=ETAT.VOLE;
-                            System.out.println("Je vole "+ressources_prises+" ressources de "+ RWIN.getStockType()+" au joueur n°"+parcours_joueurs);
-                            try
-                            {
-                                increaseRessourceAmout(RWIN.getStockType(),ressources_prises);
-                            }
-                            catch (RemoteException re) { System.out.println(re) ; }
-                        }
-                        else
-                        {
-                            System.out.println("Pas assez de ressource nécessaire dans le joueur n°"+parcours_joueurs);
-                            System.out.println("(nombre de joueurs dispo : "+C.JList.size()+") On passe au suivant (joueur "+((parcours_joueurs +1) %(C.JList.size()-1))+")");
-                            parcours_joueurs = (parcours_joueurs +1) %C.JList.size()-1;
-                            etat=ETAT.ATTEND;
-                        }
+                        PriorityList.add( new Tuple<TYPE,Integer>( TypeQuantiteJ.get(i).x, tmp) , j);
+                        inserted = true;
+                        break;
                     }
-                    parcours_joueurs = (parcours_joueurs+1) %C.JList.size()-1;
+                }
+                if( !inserted )
+                    PriorityList.add( new Tuple<TYPE,Integer>( TypeQuantiteJ.get(i).x, tmp)); // tmp est le plus grand de la liste
+            }
+            
+        }
+        Random r = new Random();
+        index = r.nextInt( Math.min(2,PriorityList.size()) ); // choisit soit la première ressource, soit la deuxième, s'il reste une deuxième ressource à chercher
+        choosenType = PriorityList.get( PriorityList.size()-1 ).x;
+        
+        max = -1;
+        // Maintenant il faut choisir le joueur chez qui on prend les ressources -> celui qui en a le plus
+        for(i=0 ; i < C.JList.size() ; i++)
+        {
+            if(i== I.IdJoueur) // ne se compte pas soit même
+                continue;
+            try
+            {
+                Res = C.JList.get(i).getStockQuantity( choosenType);
+            }catch (RemoteException re) { System.out.println(re) ; }
+         
+            if(max == -1)
+            {
+                max = Res;
+                index = i;
+            }
+            else if( Res > max )
+            {
+                max = Res;
+                index = i;
+            }
+        }
+        
+        
+        
+        // Calcul le nombre de ressources qu'il faut pour gagner
+        for(i=0 ; i < I.VLC.size() ; i++)
+        {
+            if(  I.VLC.get(i).getStockType() == choosenType )
+            {
+                needed_ressources =  I.VLC.get(i).getStock();
+                break;
+            }
+        }
+        for(i=0 ; i < RList.size() ; i++)
+        {
+            if( RList.get(i).getStockType() == choosenType )
+            {
+                needed_ressources -= RList.get(i).getStock();
+                break;
+            }
+        }
+        
+        
+        // cherche la ressource chez le joueur
+        try
+        {
+            ressources_prises = C.JList.get(index).getStock( needed_ressources , choosenType) ;
+        }catch (RemoteException re) { System.out.println(re) ; }
+                    
+        if( ressources_prises >= 0) // le joueur a donné ressources
+        {
+            etat = ETAT.VOLE;
+            System.out.println("Je prends "+ressources_prises+" ressources de " + choosenType +" au joueur n°"+index);
+            try
+            {
+                increaseRessourceAmout( choosenType,ressources_prises);
+            } catch (RemoteException re) { System.out.println(re) ; }
+        }
+        else
+        {
+            System.out.println("Je me suis fais avoir :-(");
+            etat=ETAT.PENALITE;
+        }
+        
+    }
+
+
+    // a une chance sur 2 d'observer
+    void comportement_attentionnel()
+    {
+        Random r = new Random();
+        int choix = r.nextInt(2 ); // choisit soit la première ressource, soit la deuxième, s'il reste une deuxième ressource à chercher
+        if(choix == 1)
+            comportement_individualiste();
+        else
+            etat = ETAT.OBSERVE;
+        
+    
+    }
+    
+    // a une chance sur 2 d'attaquer le 1 er ou 2ème joueur avec le plus de ressources
+    void comportement_attack()
+    {
+        Random r = new Random();
+        int choix = r.nextInt( 2 ); // choisit soit la première ressource, soit la deuxième, s'il reste une deuxième ressource à chercher
+        int succes, attacked ,index = 0, max=-1, turns= 2; 
+        int i;
+        
+        if(choix == 1)
+            comportement_individualiste();
+        else
+        {
+            String action ;
+            // 1/10 : echec critique, 1/10 : succès critique, 1/10 : rien, 6/10 : 2 tour pénalité, 2/10 : 1 tour pénalité
+            succes = r.nextInt( 10 );
+            switch(succes)
+            {
+                case 0:
+                {
+                    System.out.println("Echec critique");
+                    etat = ETAT.PENALITE2;
+                    return;
+                }
+                case 1:
+                {
+                    System.out.println("Coup critique");
+                    action = "coup critique";
+                    turns = 3;
+                    break;
+                }
+                default:
+                {
+                    if( succes == 2|| succes ==3) // rien
+                    {
+                        System.out.println("J'ai pas réussi mon coup");
+                        etat = ETAT.ATTEND;
+                        return;
+                    }
+                    else
+                    {
+                        System.out.println("Je fais une attaque normale");
+                        action = "attaque normale";
+                    }
                 }
             }
+            
+            SerializableList <Integer> LJoueurs  = new SerializableList <Integer>() ; // Pour chaque joueur, liste des types et quantitée de ressources
+            try
+            {
+                for (i=0 ; i < C.JList.size() ; i++)
+                    LJoueurs.add( C.JList.get(i).totalStockQuantity() );
+            }  catch (RemoteException re) { System.out.println(re) ; }
+            
+            attacked = r.nextInt(Math.min(2, C.JList.size())); // s'il y a au moins 2 joueurs alors attaque l'un des 2 meilleurs
+            
+            for(i=0;i<C.JList.size();i++)
+            {
+                if (i == I.IdJoueur)
+                    continue;
+                if( LJoueurs.get(i) > max )
+                {
+                    max = LJoueurs.get(i);
+                    index = i;
+                }
+            }
+            
+            try
+            {
+                C.JList.get(attacked).attacked(turns); // attaque le joueur
+            } catch (RemoteException re) { System.out.println(re) ; }
+        
+        }
+    }
+    
+    public void attacked( int turns)
+    {
+        if(turns == 2)
+        {
+            System.out.println("J'ai été attaqué et je saute " + turns );
+            etat = ETAT.PENALITE2;
+        }
+        else
+        {
+            System.out.println("J'ai été attaqué et je saute " + turns );
+            etat = ETAT.PENALITE3;
         }
     }
     
@@ -722,7 +945,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                 if( RJ.getStockType() == RWIN.getStockType() )
                 {
 //                    System.out.println("je fais le test de ressource pour gagner, il me faut " + RWIN.getStock()*(1+id) + " et j'ai " + RJ.getStock());
-                    if( RJ.getStock() < RWIN.getStock()* (1+id) ) // pas assez de ressources
+                    if( RJ.getStock() < RWIN.getStock() ) // pas assez de ressources
                     {
                     //    System.out.println("Pour gagner, il faut "+RWIN.getStock()+" "+RWIN.getStockType()+" et j'ai "+ RJ.getStock());
                         return false;
@@ -744,6 +967,17 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
             RepL.add( new Tuple<TYPE,Integer> ( RList.get(i).getStockType(), RList.get(i).getStock() ) );
         }
         return RepL;
+    }
+    
+    public synchronized int totalStockQuantity()
+    {
+        int i;
+        int total =0;
+        for(i = 0 ; i < RList.size() ;i++)
+        {
+            total += RList.get(i).getStock() ;
+        }
+        return total;
     }
 
 
@@ -768,7 +1002,16 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
         int takenRessources=0;
         int nbressources_joueur=0;
 
+        if (quantity > 15)
+            quantity = 15;
         System.out.println("Je me fais dérober des ressources en " + t);
+        
+        if ( etat == ETAT.OBSERVE )
+        {
+            System.out.println("J'observe et j'ai vu qu'on essaie de me voler !!!");
+            return -1;
+        }
+        
         synchronized (ObjSynchro) // section critique
         {
             for(int i=0 ; i < RList.size() ; i++)

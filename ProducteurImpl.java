@@ -139,7 +139,7 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
                         for(i = 0 ; i< RList.size() ; i++)
                         {
                             q= RList.get(i).getStock();
-                            q=q/3+3;
+                            q= Math.min(q/2 + 1, 10000);
                             RList.get(i).increaseRessource(q);
                             System.out.print(" " + RList.get(i).getStockType() + " : " + RList.get(i).getStock());
                         }
@@ -156,6 +156,9 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
     public int getStock(int quantity, TYPE T)
         throws RemoteException 
     {
+        if (quantity > 10)
+            quantity =10;
+        
         // Commence par compter le nombre de ressources de ce type chez ce producteur 
         int nType = 0, total = 0, takenRessources = 0 , i;
        // int RNonDivisibles; // non utilisé

@@ -135,7 +135,7 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
                     try {addStockTurn();}
                         catch (RemoteException re) { System.out.println(re) ; }
                     try { Thread.sleep(time); }
-                        catch (InterruptedException re) { System.out.println(re) ; System.exit(0);};
+                        catch (InterruptedException re) { System.out.println("Fin de partie") ; System.exit(0);};
                 }
             }
         };
@@ -154,7 +154,14 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
             {
                 q= RList.get(i).getStock();
                 ajout= q/2 + 5;
-                RList.get(i).increaseRessource( Math.min( q + ajout, 10000 ) ) ;
+                
+                if( q >= 10000 )
+                    ; // n'ajoute rien
+                else if ( 10000 - q < ajout)
+                    RList.get(i).increaseRessource( 10000 - q); // devrait théoriquement ajouter plus que ce qu'il reste pour atteindre 10 000,
+                                                                // ajoute donc juste ce qui manque pour atteindre 10 000
+                else
+                    RList.get(i).increaseRessource( Math.min( ajout, 10000 ) ) ; // ajoute les ressources normalement
                 System.out.print(" " + RList.get(i).getStockType() + " : " + RList.get(i).getStock());
             }
             System.out.println("");
@@ -226,7 +233,7 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
                 }
             }
         }
-        System.out.println( "\t A pris " + takenRessources + ".");
+//        System.out.println( "\t A pris " + takenRessources + ".");
         return takenRessources;
     }
     

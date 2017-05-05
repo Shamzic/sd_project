@@ -463,7 +463,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
         }
         else
         {
-            System.out.println("Pas assez de ressource disponibles");
+            System.out.print("Pas assez de ressource disponibles");
             etat=ETAT.ATTEND;
         }
         
@@ -621,7 +621,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
         }
         else
         {
-            System.out.println("Pas assez de ressources disponibles");
+            System.out.print("Pas assez de ressources disponibles");
             etat=ETAT.ATTEND;
         }
         
@@ -1273,7 +1273,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
             }
             else
             {
-                System.out.println("Pas assez de ressource disponibles");
+                System.out.print("Pas assez de ressource disponibles");
                 etat=ETAT.ATTEND;
             }
             

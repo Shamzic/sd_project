@@ -21,7 +21,7 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
     public ArrayList<Producteur> PList = new ArrayList<Producteur>(); // Liste de objets producteur avec lesquels on communique avec les producteurs
     public ArrayList<Joueur> JList = new ArrayList<Joueur>(); // Liste d'objet joueurs avec lesquels on communique avec les joueurs
     public ArrayList<Joueur> FinishedPlayerList = new ArrayList<Joueur>();
-    Date D = new Date();
+    Date D ;
     long beginTime;
     
     PrintWriter writer; // objet avec lequel on écrit dans le fichier
@@ -32,6 +32,7 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
     public MessageControleImpl(int nbRessourcesInitiales, int nbRessourcesDifferentes, int nbProducteurs, int nbJoueurs, String Name, int port, int victory_condition, SerializableList<Ressource> L, int playMode, int playTime)
     throws RemoteException
     {
+        int i;
         I = new InitialInfoImpl( nbRessourcesInitiales, nbRessourcesDifferentes, Name, port, nbProducteurs, nbJoueurs, victory_condition, L, playMode);
         try
         {
@@ -40,23 +41,29 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
         catch (IOException e) { System.out.println(e) ; }
         
         if(victory_condition == 2 ) // arrêt au temps
-        T = new Thread()
         {
-            public void run()
+            for(i= 0 ; i < L.size() ; i++) // met les ressources à "infini" 
             {
-                System.out.println("Compte à rebours lancé");
-                try { TimeUnit.SECONDS.sleep(playTime); } catch (InterruptedException re) { System.out.println(re) ; }
-                int i;
-                System.out.println("Temps écoulé. Fin de partie.");
-                try
-                {
-                for(i=0 ; i < JList.size() ; i++)
-                    JList.get(i).end();
-                for(i=0 ; i < PList.size() ; i++)
-                    PList.get(i).end();
-                }catch (RemoteException re) { System.out.println(re) ; }
+                L.get(i).setRessource(10000000);
             }
-        };
+            T = new Thread()
+            {
+                public void run()
+                {
+                    int i;
+                    System.out.println("Compte à rebours lancé");
+                    try { TimeUnit.SECONDS.sleep(playTime); } catch (InterruptedException re) { System.out.println(re) ; }
+                    System.out.println("Temps écoulé. Fin de partie.");
+                    try
+                    {
+                    for(i=0 ; i < JList.size() ; i++)
+                        JList.get(i).end();
+                    for(i=0 ; i < PList.size() ; i++)
+                        PList.get(i).end();
+                    }catch (RemoteException re) { System.out.println(re) ; }
+                }
+            };
+        }
         System.out.println("je ne jouerais pas avant " + nbJoueurs);
     }
     
@@ -122,11 +129,12 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
                 JList.get(0).receiveToken(); // lance le 1er joueur
             else // autre mode
             {
+                D = new Date();
                 beginTime = D.getTime();
                 for(i =0 ; i< JList.size() ;i++)
                     JList.get(i).receiveToken();
             }
-            if( I.victory_condition == 2)
+            if( I.victory_condition == 2 || I.playMode == 1 )
                 T.start();
         }
         else
@@ -172,11 +180,12 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
                 JList.get(0).receiveToken(); // lance le 1er joueur
             else // autre mode
             {
+                D = new Date();
                 beginTime = D.getTime();
                 for(i =0 ; i< JList.size() ;i++)
                     JList.get(i).receiveToken();
             }
-            if(I.victory_condition == 2 )
+            if(I.victory_condition == 2 || I.playMode == 1  )
                 T.start();
         }
         else

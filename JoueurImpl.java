@@ -577,7 +577,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
         }
         
         // Maintenant choisi la ressource qu'il voudra prendre
-        // regarde si on a atteint <Total des ressources des producteurs> + <Total des ressources des joueurs> > multiplicateur * <Ressources Nécessaires Victoire> * nbJoueurs
+        // regarde si on a atteint <Total des ressources des producteurs> + <Total des ressources des joueurs>* multiplicateur > multiplicateur * <Ressources Nécessaires Victoire> * nbJoueurs
         // On multiplie par multiplicateur car il y a plusieurs producteurs ->  augmente les chances qu'un joueur ne doit pas aller chercher ses ressources chez 2-3 producteurs différents
         for( i = 0; i <TypeQuantiteP.size() ; i++) // pour chaque ressource
         {

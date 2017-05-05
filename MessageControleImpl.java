@@ -67,7 +67,7 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
                 }
             };
         }
-        System.out.println("je ne jouerais pas avant " + nbJoueurs);
+        System.out.println("J'attends que " + nbJoueurs + " se connectent");
     }
     
     // Envoie les infos initiales au joueur

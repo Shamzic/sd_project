@@ -145,10 +145,14 @@ class ConnexionImpl extends UnicastRemoteObject implements Connexion
     }
 	
     // supprime le joueur d'id id
-    public void deletePlayer(int id)
+    public void deletePlayer(int id, MessageControle M)
     {
         int i;
         FinishedPlayerList.add( JList.get(id));
+        try{
+        M.deletePlayer(id);
+        }
+        catch (RemoteException re) { System.out.println(re) ; }
         System.out.println("Le joueur " + id + " à gagné le jeu en " + FinishedPlayerList.size() + " place ");
     }
     

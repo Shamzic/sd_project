@@ -27,4 +27,8 @@ public interface Producteur extends Remote
         throws RemoteException;
     public void end()
         throws RemoteException;
+        
+    public void addStockTurn()
+        throws RemoteException;
+    
 }

@@ -109,8 +109,13 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
             System.out.println("Le jeu va commencer avec " + JList.size() + " Joueurs");
             
             // lance tous les producteurs
-            for(i=0;i<PList.size() ; i++)
-                PList.get(i).fonctionThread(2000);
+            if( I.playMode != 0 ) // pas le mode tour / tour
+            {
+                for(i=0;i<PList.size() ; i++)
+                    PList.get(i).fonctionThread(2000);
+            }
+            
+            
             try { TimeUnit.SECONDS.sleep(1); } catch (InterruptedException re) { System.out.println(re) ; }
             
             if( I.playMode == 0) // mode tour/tour
@@ -156,9 +161,11 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
             System.out.println("Le jeu va commencer");
             
             // lance tous les producteurs
-            for(i=0;i<PList.size() ; i++)
-                PList.get(i).fonctionThread(2000);
-            
+            if( I.playMode != 0 ) // pas le mode tour / tour
+            {
+                for(i=0;i<PList.size() ; i++)
+                    PList.get(i).fonctionThread(2000);
+            }            
             try { TimeUnit.SECONDS.sleep(1); } catch (InterruptedException re) { System.out.println(re) ; }
             
             if( I.playMode == 0) // mode tour/tour

@@ -204,7 +204,11 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                             {
                                 monitor.wait(100);
                                 if(!game)
-                                    return;
+                                {
+                                    try {Thread.sleep( 1000 );}
+                                        catch (InterruptedException re) { System.out.println(re) ; }
+                                    System.exit( 0 );
+                                }
                             }
                         }
                     }
@@ -216,16 +220,25 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                 {
                     System.out.println("Je dois attendre ce tour");
                     etat = ETAT.PENALITE2;
+                    if( I.playMode == 1 ) 
+                        try {Thread.sleep( 50 );}
+                            catch (InterruptedException re) { System.out.println(re) ; }                
                 }
                 if( etat == ETAT.PENALITE2) // c'est fait prendre en volant au tour d'avant
                 {
                     System.out.println("Je dois attendre ce tour");
                     etat = ETAT.PENALITE;
+                    if( I.playMode == 1 ) 
+                        try {Thread.sleep( 50 );}
+                            catch (InterruptedException re) { System.out.println(re) ; }                
                 }
                 else if( etat == ETAT.PENALITE) // c'est fait prendre en volant au tour d'avant
                 {
                     System.out.println("Je dois attendre ce tour");
                     etat = ETAT.ATTEND;
+                    if( I.playMode == 1 ) 
+                        try {Thread.sleep( 50 );}
+                            catch (InterruptedException re) { System.out.println(re) ; }                
                 }
                 else
                 {
@@ -236,20 +249,20 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                         comportement_individualiste();
                     }
 
-                    if(this.comportement == COMPORTEMENT.COOPERATIF)
+                    else if(this.comportement == COMPORTEMENT.COOPERATIF)
                     {
                         comportement_cooperatif(1.5);  
                     }
 
-                    if(this.comportement == COMPORTEMENT.VOLEUR)
+                    else if(this.comportement == COMPORTEMENT.VOLEUR)
                     {
                         comportement_voleur();
                     }
-                    if(this.comportement == COMPORTEMENT.ATTENTIONNEL)
+                    else if(this.comportement == COMPORTEMENT.ATTENTIONNEL)
                     {
                         comportement_attentionnel();
                     }
-                    if(this.comportement == COMPORTEMENT.BRUTE)
+                    else if(this.comportement == COMPORTEMENT.BRUTE)
                     {
                         comportement_attack();
                     }
@@ -260,7 +273,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                 }
 
 
-                System.out.println("\tTour joueur terminé en état "+etat);
+                System.out.println(". Tour joueur terminé en état "+etat);
                 M.sendInformation(id, RList);
                 TimeUnit.SECONDS.sleep(1);
                     
@@ -275,6 +288,10 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
             catch (InterruptedException re) { System.out.println(re) ; }
             catch (RemoteException re) { System.out.println(re) ; }
         }
+        try {Thread.sleep( 1000 );}
+            catch (InterruptedException re) { System.out.println(re) ; }
+        System.exit( 0 );
+        
     }
 
 
@@ -438,7 +455,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
         if( ressources_prises > 0) // le producteur a des ressources
         {
             etat = ETAT.PREND_RESSOURCES;
-            System.out.println("Je prends "+ressources_prises+" ressources de " + TypeNb.get(index).x +" au producteur n°"+index2);
+            System.out.print("Je prends "+ressources_prises+" ressources de " + TypeNb.get(index).x +" au producteur n°"+index2);
             try
             {
                 increaseRessourceAmout( TypeNb.get(index).x,ressources_prises);
@@ -596,7 +613,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
         if( ressources_prises > 0) // C'est bon on prend des ressources
         {
             etat = ETAT.PREND_RESSOURCES;
-            System.out.println("Je prends "+ressources_prises+" ressources de " + seekedType +" au producteur n°"+ i);
+            System.out.print("Je prends "+ressources_prises+" ressources de " + seekedType +" au producteur n°"+ i);
             try
             {
                 increaseRessourceAmout( seekedType,ressources_prises);
@@ -759,7 +776,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
         if( ressources_prises >= 0) // le joueur a donné ressources
         {
             etat = ETAT.VOLE;
-            System.out.println("Je prends "+ressources_prises+" ressources de " + choosenType +" au joueur n°"+index);
+            System.out.print("Je prends "+ressources_prises+" ressources de " + choosenType +" au joueur n°"+index);
             try
             {
                 increaseRessourceAmout( choosenType,ressources_prises);
@@ -768,7 +785,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
         else
         {
             System.out.println("Je me suis fais avoir :-(");
-            etat=ETAT.PENALITE;
+            etat=ETAT.PENALITE2; // devient indisponible 2 tours
         }
         
     }
@@ -878,7 +895,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
     // test de fin de jeu
     public void victory_test()
     {
-        int i = 0;
+        int i = 0, k = 0;
         //System.out.println("**** TEST victoire *****");
         try
         {
@@ -912,8 +929,13 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                             if( I.playMode == 0)
                             {
                                 have_token = false;
+                                
+                                if ( I.IdJoueur + 1 == C.JList.size() ) // dernier joueur du tour -> Tous les producteurs augmentent leurs ressources
+                                {
+                                    for(k=0 ; k < C.PList.size() ; k++)
+                                        C.PList.get(k).addStockTurn();
+                                }
                                 C.JList.get( i ).receiveToken();
-                        System.out.println("Send token to " + i);
                             }
                         }
                     }
@@ -932,6 +954,11 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                     if(I.playMode == 0)
                     {
                         have_token = false;
+                        if ( I.IdJoueur + 1 == C.JList.size() ) // dernier joueur du tour -> Tous les producteurs augmentent leurs ressources
+                        {
+                            for(k=0 ; k < C.PList.size() ; k++)
+                                C.PList.get(k).addStockTurn();
+                        }
                         C.JList.get( i ).receiveToken();
                         System.out.println("Send token to " + i);
                     }
@@ -1115,105 +1142,159 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
     
     public void VolRessources(int nb, int id, String Res)
     {
-        int ressources_prises =0;
-        TYPE choosenType;
-        if( Res == "OR")
-            choosenType = TYPE.OR;
-        else if( Res == "BOIS")
-            choosenType = TYPE.BOIS;
+        if( etat == ETAT.PENALITE3) // c'est fait prendre en volant au tour d'avant
+        {
+            System.out.println("Je dois attendre ce tour");
+            etat = ETAT.PENALITE2;
+            if( I.playMode == 1 ) 
+                try {Thread.sleep( 50 );}
+                    catch (InterruptedException re) { System.out.println(re) ; }                
+        }
+        if( etat == ETAT.PENALITE2) // c'est fait prendre en volant au tour d'avant
+        {
+            System.out.println("Je dois attendre ce tour");
+            etat = ETAT.PENALITE;
+            if( I.playMode == 1 ) 
+                try {Thread.sleep( 50 );}
+                    catch (InterruptedException re) { System.out.println(re) ; }                
+        }
+        else if( etat == ETAT.PENALITE) // c'est fait prendre en volant au tour d'avant
+        {
+            System.out.println("Je dois attendre ce tour");
+            etat = ETAT.ATTEND;
+            if( I.playMode == 1 ) 
+                try {Thread.sleep( 50 );}
+                    catch (InterruptedException re) { System.out.println(re) ; }                
+        }
         else
-            choosenType = TYPE.ARGENT;
-        
-         // cherche la ressource chez le joueur
-        try
         {
-            ressources_prises = C.JList.get(id).getStock( nb , choosenType) ;
-        }catch (RemoteException re) { System.out.println(re) ; }
-                    
-        if( ressources_prises >= 0) // le joueur a donné ressources
-        {
-            etat = ETAT.VOLE;
-            System.out.println("Je prends "+ressources_prises+" ressources de " + choosenType +" au joueur n°"+id);
+            int ressources_prises =0;
+            TYPE choosenType;
+            if( Res == "OR")
+                choosenType = TYPE.OR;
+            else if( Res == "BOIS")
+                choosenType = TYPE.BOIS;
+            else
+                choosenType = TYPE.ARGENT;
+            
+             // cherche la ressource chez le joueur
             try
             {
-                increaseRessourceAmout( choosenType,ressources_prises);
-            } catch (RemoteException re) { System.out.println(re) ; }
-        }
-        else
-        {
-            System.out.println("Je me suis fais avoir :-(");
-            etat=ETAT.PENALITE;
-        }
-        try
-        {
-            System.out.println("\tTour joueur terminé en état "+etat);
-            System.out.println("Mon id " + id);
-            M.sendInformation(id, RList);
-            TimeUnit.SECONDS.sleep(1);
-            
-            // test de victoire et passe le jeton
-            victory_test();
-            if( C.JList.size() == C.FinishedPlayerList.size() ) // Tous on fini 
+                ressources_prises = C.JList.get(id).getStock( nb , choosenType) ;
+            }catch (RemoteException re) { System.out.println(re) ; }
+                        
+            if( ressources_prises >= 0) // le joueur a donné ressources
             {
-                C.endAllProducteurs();
-                return ;
+                etat = ETAT.VOLE;
+                System.out.print("Je prends "+ressources_prises+" ressources de " + choosenType +" au joueur n°"+id);
+                try
+                {
+                    increaseRessourceAmout( choosenType,ressources_prises);
+                } catch (RemoteException re) { System.out.println(re) ; }
             }
+            else
+            {
+                System.out.println("Je me suis fais avoir :-(");
+                etat=ETAT.PENALITE;
+            }
+            try
+            {
+                System.out.println(". Tour joueur terminé en état "+etat);
+                System.out.println("Mon id " + id);
+                M.sendInformation(id, RList);
+                TimeUnit.SECONDS.sleep(1);
+                
+                // test de victoire et passe le jeton
+                victory_test();
+                if( C.JList.size() == C.FinishedPlayerList.size() ) // Tous on fini 
+                {
+                    C.endAllProducteurs();
+                    return ;
+                }
+            }
+                catch (InterruptedException re) { System.out.println(re) ; }
+                catch (RemoteException re) { System.out.println(re) ; }
         }
-            catch (InterruptedException re) { System.out.println(re) ; }
-            catch (RemoteException re) { System.out.println(re) ; }
     }
     
     
     public void PrendRessources(int nb, int id, String Res)
     {
-        int ressources_prises =0;
-        TYPE choosenType;
-        if( Res == "OR")
-            choosenType = TYPE.OR;
-        else if( Res == "BOIS")
-            choosenType = TYPE.BOIS;
+        if( etat == ETAT.PENALITE3) // c'est fait prendre en volant au tour d'avant
+        {
+            System.out.println("Je dois attendre ce tour");
+            etat = ETAT.PENALITE2;
+            if( I.playMode == 1 ) 
+                try {Thread.sleep( 50 );}
+                    catch (InterruptedException re) { System.out.println(re) ; }                
+        }
+        if( etat == ETAT.PENALITE2) // c'est fait prendre en volant au tour d'avant
+        {
+            System.out.println("Je dois attendre ce tour");
+            etat = ETAT.PENALITE;
+            if( I.playMode == 1 ) 
+                try {Thread.sleep( 50 );}
+                    catch (InterruptedException re) { System.out.println(re) ; }                
+        }
+        else if( etat == ETAT.PENALITE) // c'est fait prendre en volant au tour d'avant
+        {
+            System.out.println("Je dois attendre ce tour");
+            etat = ETAT.ATTEND;
+            if( I.playMode == 1 ) 
+                try {Thread.sleep( 50 );}
+                    catch (InterruptedException re) { System.out.println(re) ; }                
+        }
         else
-            choosenType = TYPE.ARGENT;
-        
-        
-        // cherche la ressource chez le producteur
-        try
         {
-            ressources_prises = C.PList.get(id).getStock( nb , choosenType) ;
-        }catch (RemoteException re) { System.out.println(re) ; }
-                    
-        if( ressources_prises > 0) // le producteur a des ressources
-        {
-            etat = ETAT.PREND_RESSOURCES;
-            System.out.println("Je prends "+ressources_prises+" ressources de " + choosenType +" au producteur n°"+id);
+            int ressources_prises =0;
+            TYPE choosenType;
+            if( Res == "OR")
+                choosenType = TYPE.OR;
+            else if( Res == "BOIS")
+                choosenType = TYPE.BOIS;
+            else
+                choosenType = TYPE.ARGENT;
+            
+            
+            // cherche la ressource chez le producteur
             try
             {
-                increaseRessourceAmout( choosenType,ressources_prises);
-            } catch (RemoteException re) { System.out.println(re) ; }
-        }
-        else
-        {
-            System.out.println("Pas assez de ressource disponibles");
-            etat=ETAT.ATTEND;
-        }
-        
-        try
-        {
-            System.out.println("\tTour joueur terminé en état "+etat);
-            System.out.println("Mon id " + id);
-            M.sendInformation(id, RList);
-            TimeUnit.SECONDS.sleep(1);
-            
-            // test de victoire et passe le jeton
-            victory_test();
-            if( C.JList.size() == C.FinishedPlayerList.size() ) // Tous on fini 
+                ressources_prises = C.PList.get(id).getStock( nb , choosenType) ;
+            }catch (RemoteException re) { System.out.println(re) ; }
+                        
+            if( ressources_prises > 0) // le producteur a des ressources
             {
-                C.endAllProducteurs();
-                return ;
+                etat = ETAT.PREND_RESSOURCES;
+                System.out.print("Je prends "+ressources_prises+" ressources de " + choosenType +" au producteur n°"+id);
+                try
+                {
+                    increaseRessourceAmout( choosenType,ressources_prises);
+                } catch (RemoteException re) { System.out.println(re) ; }
             }
+            else
+            {
+                System.out.println("Pas assez de ressource disponibles");
+                etat=ETAT.ATTEND;
+            }
+            
+            try
+            {
+                System.out.println(". Tour joueur terminé en état "+etat);
+                System.out.println("Mon id " + id);
+                M.sendInformation(id, RList);
+                TimeUnit.SECONDS.sleep(1);
+                
+                // test de victoire et passe le jeton
+                victory_test();
+                if( C.JList.size() == C.FinishedPlayerList.size() ) // Tous on fini 
+                {
+                    C.endAllProducteurs();
+                    return ;
+                }
+            }
+                catch (InterruptedException re) { System.out.println(re) ; }
+                catch (RemoteException re) { System.out.println(re) ; }
         }
-            catch (InterruptedException re) { System.out.println(re) ; }
-            catch (RemoteException re) { System.out.println(re) ; }
     }
     
     /**
@@ -1240,25 +1321,96 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
     
     public void Observer()
     {
-        etat = ETAT.OBSERVE;
-        
-        try
+
+        if( etat == ETAT.PENALITE3) // c'est fait prendre en volant au tour d'avant
         {
-            System.out.println("\tTour joueur terminé en état "+etat);
-            M.sendInformation(id, RList);
-            TimeUnit.SECONDS.sleep(1);
-            
-            // test de victoire et passe le jeton
-            victory_test();
-            if( C.JList.size() == C.FinishedPlayerList.size() ) // Tous on fini 
-            {
-                C.endAllProducteurs();
-                return ;
-            }
+            System.out.println("Je dois attendre ce tour");
+            etat = ETAT.PENALITE2;
+            if( I.playMode == 1 ) 
+                try {Thread.sleep( 50 );}
+                    catch (InterruptedException re) { System.out.println(re) ; }                
         }
-            catch (InterruptedException re) { System.out.println(re) ; }
-            catch (RemoteException re) { System.out.println(re) ; }
+        if( etat == ETAT.PENALITE2) // c'est fait prendre en volant au tour d'avant
+        {
+            System.out.println("Je dois attendre ce tour");
+            etat = ETAT.PENALITE;
+            if( I.playMode == 1 ) 
+                try {Thread.sleep( 50 );}
+                    catch (InterruptedException re) { System.out.println(re) ; }                
+        }
+        else if( etat == ETAT.PENALITE) // c'est fait prendre en volant au tour d'avant
+        {
+            System.out.println("Je dois attendre ce tour");
+            etat = ETAT.ATTEND;
+            if( I.playMode == 1 ) 
+                try {Thread.sleep( 50 );}
+                    catch (InterruptedException re) { System.out.println(re) ; }                
+        }
+        else
+        {
+            etat = ETAT.OBSERVE;
+            
+            try
+            {
+                System.out.println(". Tour joueur terminé en état "+etat);
+                M.sendInformation(id, RList);
+                TimeUnit.SECONDS.sleep(1);
+                
+                // test de victoire et passe le jeton
+                victory_test();
+                if( C.JList.size() == C.FinishedPlayerList.size() ) // Tous on fini 
+                {
+                    C.endAllProducteurs();
+                    return ;
+                }
+            }
+                catch (InterruptedException re) { System.out.println(re) ; }
+                catch (RemoteException re) { System.out.println(re) ; }
+        }
     }
+    /*
+    public void PlayerOrder(String order, int nb, int id, String Res)
+    {
+        if( etat == ETAT.PENALITE3) // c'est fait prendre en volant au tour d'avant
+        {
+            System.out.println("Je dois attendre ce tour");
+            etat = ETAT.PENALITE2;
+            if( I.playMode == 1 ) 
+                try {Thread.sleep( 50 );}
+                    catch (InterruptedException re) { System.out.println(re) ; }                
+        
+        }
+        if( etat == ETAT.PENALITE2) // c'est fait prendre en volant au tour d'avant
+        {
+            System.out.println("Je dois attendre ce tour");
+            etat = ETAT.PENALITE;
+            if( I.playMode == 1 ) 
+                try {Thread.sleep( 50 );}
+                    catch (InterruptedException re) { System.out.println(re) ; }                
+        }
+        else if( etat == ETAT.PENALITE) // c'est fait prendre en volant au tour d'avant
+        {
+            System.out.println("Je dois attendre ce tour");
+            etat = ETAT.ATTEND;
+            if( I.playMode == 1 ) 
+                try {Thread.sleep( 50 );}
+                    catch (InterruptedException re) { System.out.println(re) ; }                
+        }
+        else
+        {
+            if( order == "observer")
+                Observer();
+            else if (order == "PrendRessource")
+                PrendRessources( nb,id,Res);
+            else if (order == "VolRessources")
+                VolRessources(nb,id,Res);
+            else
+                System.out.println("Action non disponible");
+            
+            
+        }
+    }
+    */
     
 }
 

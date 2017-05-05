@@ -12,12 +12,12 @@ public class Controller
             // Fait une liste de ressource qu'il faut pour gagner
             SerializableList<Ressource> L = new SerializableList<Ressource>();
 
-            L.add(new Ressource(20,0)); // Argent
-            L.add(new Ressource(20,1)); // Or
-            L.add(new Ressource(20,2)); // bois
+            L.add(new Ressource(200,0)); // Argent
+            L.add(new Ressource(200,1)); // Or
+            L.add(new Ressource(200,2)); // bois
 
 	    // Commence par faire l'objet grâce auquel le Controlleur communique avec les agents
-            MessageControleImpl MC = new MessageControleImpl(5,3, Integer.parseInt(args[1]),Integer.parseInt(args[0]),"localhost",5000,0,L, 0,5);
+            MessageControleImpl MC = new MessageControleImpl(5,3, Integer.parseInt(args[1]),Integer.parseInt(args[0]),"localhost",5000,0,L, 1,20);
             Naming.rebind( "rmi://localhost:"+5000 +"/MessageControleGlobal", MC); 
 		}
         catch (RemoteException re) { System.out.println(re) ; }

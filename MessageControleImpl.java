@@ -40,11 +40,14 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
         }
         catch (IOException e) { System.out.println(e) ; }
         
-        if(victory_condition == 2 ) // arrêt au temps
+        if(victory_condition == 2 || playMode == 1 ) // arrêt au temps
         {
-            for(i= 0 ; i < L.size() ; i++) // met les ressources à "infini" 
+            if (victory_condition == 2)
             {
-                L.get(i).setRessource(10000000);
+                for(i= 0 ; i < L.size() ; i++) // met les ressources à "infini" 
+                {
+                    L.get(i).setRessource(10000000);
+                }
             }
             T = new Thread()
             {

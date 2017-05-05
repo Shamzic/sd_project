@@ -208,6 +208,8 @@ public class Fenetre2 extends JFrame{
 			public void actionPerformed(ActionEvent e)  {
                 int nb, id;
                 String type;
+                if( J.have_token == false ) // pas à notre tour
+                    return ;
                 if( BoutonPrendre.isSelected() ) // Veut prendre des ressources
                 {
                     String comport = (String) comboxRessTypes2.getSelectedItem();

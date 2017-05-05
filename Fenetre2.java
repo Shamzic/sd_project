@@ -28,6 +28,11 @@ import java.awt.Insets;
 
 import javax.swing.JRadioButton;
 
+import java.rmi.RemoteException ;
+import java.rmi.* ; 
+
+import java.net.MalformedURLException ; 
+
 public class Fenetre2 extends JFrame{
 	int id_joueur;
 	int nb_ressources_vol;
@@ -36,15 +41,19 @@ public class Fenetre2 extends JFrame{
 	int id_prod_prendre;
 	TYPE ressource_vol;
 	TYPE ressource_prendre;
-	
+	MessageControleImpl MC;
+    JoueurImpl J;
+    
+    
 	ArrayList<String> tabJoueurs;
 
-    public Fenetre2(int id_joueur){
+    public Fenetre2(int id_joueur, MessageControleImpl MC){
     	this.id_joueur=id_joueur;
     	this.setTitle("Joueur humain (id="+id_joueur);
     	this.setSize(1050, 300);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setLocationRelativeTo(null);
+        this.MC = MC;
     	JPanel content = new JPanel();
 		JRadioButton BoutonVoler    = new JRadioButton();
 		BoutonVoler.setText("Voler : ");
@@ -149,8 +158,84 @@ public class Fenetre2 extends JFrame{
 		gc.gridy=3;
 		content.add(BoutonObserver,gc);
 	
-		
-	    // Radio bouton pour chaque action
+    
+        
+		JButton BoutonPlay = new JButton("Jouer");
+		gc.gridx=0;
+        gc.gridy=4;
+        content.add(BoutonPlay,gc);
+	    
+        // Créé l'instance du joueur
+        try
+        {
+            InitialInfoImpl I = MC.getPlayerInitialInfo();
+            // initialise le serveur joueur
+            J = new JoueurImpl( I, String.valueOf(5000 + this.id_joueur+1), "humain");
+            J.M = MC;
+            Naming.rebind( "rmi://localhost:"+ String.valueOf(5000 + this.id_joueur+1) + "/Joueur", J);
+            
+            // Maintenant envoie ses "coordonnées" au Coordinateur
+        //    System.out.println("je vais ajouter " + args[2] + "    "  + Integer.parseInt(args[3]));
+            MC.addMachine( "localhost", Integer.parseInt(String.valueOf(5000 + this.id_joueur+1)) );
+            
+            
+            Runnable r1 = new Runnable() 
+            {
+                public void run() 
+                {
+                    try{
+                    J.start();
+                    }catch (RemoteException re) { System.out.println(re) ; }
+                }
+            };
+            
+            
+        } catch (RemoteException re) { System.out.println(re) ; }
+            catch (MalformedURLException e) { System.out.println(e) ; }
+        
+        
+        J.id = id_joueur; // met la bonne id au joueur
+        
+        // Joue le tour
+		BoutonPlay.addActionListener(new ActionListener()  {
+			public void actionPerformed(ActionEvent e)  {
+                int nb, id;
+                String type;
+                if( BoutonPrendre.isSelected() ) // Veut prendre des ressources
+                {
+                    String comport = (String) comboxRessTypes2.getSelectedItem();
+                    System.out.println("Choix de Prendre "+ FormatterNb_ressources_vol.getValue() +"des ressources de " + comport + " au producteur " + FormatterId_joueur_vol.getValue());
+                    nb = (Integer)FormatterNb_ressources_vol.getValue();
+                    id = (Integer) FormatterId_joueur_vol.getValue();
+                    type =(String)comport;
+                    J.PrendRessources( nb, id,type);
+                }
+                else if( BoutonVoler.isSelected() ) // Veut prendre des ressources
+                {
+                    String comport = (String) comboxRessTypes.getSelectedItem();
+                    System.out.println("Choix de Voler "+ FormatterNb_ressources_vol.getValue() +"des ressources de " + comport + " au joueur " + FormatterId_joueur_vol.getValue());
+                    nb = (Integer)FormatterNb_ressources_vol.getValue();
+                    id = (Integer) FormatterId_joueur_vol.getValue();
+                    type =(String)comport;
+                    J.VolRessources( nb, id,type);
+                }
+                else if ( BoutonObserver.isSelected())
+                {
+                    System.out.println("Choix de Observer");
+                    J.Observer();                    
+                }
+                
+                
+                System.out.println("ça fonctionne comme ça ");
+                System.out.println("Il faut prendre " + FormatterNb_ressources_prendre.getValue());
+                System.out.println("Il est checked " + BoutonVoler.isSelected());
+            
+            
+            
+            }
+        });
+        
+        // Radio bouton pour chaque action
 	    
 	    // action voler
 	    // suivit du nombre de ressources
@@ -165,9 +250,14 @@ public class Fenetre2 extends JFrame{
 	    // action observer
 	    
 	    
+        
+        
 	    
     	
     	this.setContentPane(content);
     	this.setVisible(true);
     }
+    
+    
+    
 }

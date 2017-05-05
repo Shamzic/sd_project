@@ -57,7 +57,7 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
                 }catch (RemoteException re) { System.out.println(re) ; }
             }
         };
-        
+        System.out.println("je ne jouerais pas avant " + nbJoueurs);
     }
     
     // Envoie les infos initiales au joueur
@@ -104,9 +104,9 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
         catch (NotBoundException re) { System.out.println(re) ; }
         catch (MalformedURLException e) { System.out.println(e) ; }
         
-        if( (I.IdJoueur  == I.nbJoueurs -1 ) &&( I.IdProducteur == I.nbProducteurs -1 ))
+        if( (JList.size()   == I.nbJoueurs  ) &&( I.IdProducteur == I.nbProducteurs -1 ))
         {
-            System.out.println("Le jeu va commencer");
+            System.out.println("Le jeu va commencer avec " + JList.size() + " Joueurs");
             
             // lance tous les producteurs
             for(i=0;i<PList.size() ; i++)
@@ -151,7 +151,7 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
         catch (MalformedURLException e) { System.out.println(e) ; }
         
 
-        if( (I.IdJoueur  == I.nbJoueurs -1 ) &&( I.IdProducteur == I.nbProducteurs -1 ))
+        if( (JList.size()   == I.nbJoueurs ) &&( I.IdProducteur == I.nbProducteurs -1 ))
         {
             System.out.println("Le jeu va commencer");
             

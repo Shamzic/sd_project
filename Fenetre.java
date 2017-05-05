@@ -47,6 +47,7 @@ public class Fenetre extends JFrame{
 	int boisWin=5;
 	int Tps_max=20;
 	int ModeDeJeu=0; // 0 = tour par tour, 1 = temps réel
+    MessageControleImpl MC;
 
     public Fenetre() throws IOException, InterruptedException {
 		JPanel content = new JPanel();
@@ -218,7 +219,7 @@ public class Fenetre extends JFrame{
 				}
 				if(nbj<1) 
 				{
-					System.out.println("Il faut ajouter un joueur minimum pour lancer la partie !");
+					System.out.println("Il faut au moins un joueur pour lancer la partie !");
 					JOptionPane.showMessageDialog(null, "Il faut ajouter un joueur minimum pour lancer la partie !","Erreur lancement" , JOptionPane.ERROR_MESSAGE);
 				}	
 				else
@@ -269,10 +270,8 @@ public class Fenetre extends JFrame{
 							L.add(new Ressource(boisWin,2)); // Bois
 
 						// Commence par faire l'objet grâce auquel le Controlleur communique avec les agents
-<<<<<<< HEAD
                             System.out.println("Mode de jeu "+ ModeDeJeu + " .Il faut " + argentWin + " et " + orWin+"  et " + boisWin);
-							MessageControleImpl MC = new MessageControleImpl(5,3,nbProducteurs,nbJoueurs,"localhost",5000,0,L,ModeDeJeu,50);
-=======
+
 							String mj = (String) comboxMode.getSelectedItem();
 							if(mj=="Tour par tour")
 								ModeDeJeu=0;
@@ -283,9 +282,8 @@ public class Fenetre extends JFrame{
 							System.out.println("OR VICTOIRE : "+orWin);
 							  
 							
-							MessageControleImpl MC = new MessageControleImpl(5,3,nbProducteurs,nbJoueurs,"localhost",5000,0,L,ModeDeJeu,1); // Boouchon sur le temps 
+							MC = new MessageControleImpl(5,3,nbProducteurs,nbJoueurs,"localhost",5000,0,L,ModeDeJeu,1); // Boouchon sur le temps 
 																																		    // pas encore implémenté
->>>>>>> 78d738d3b46f762fe480fabcd0d0d10ec9bc3e09
 							Naming.rebind( "rmi://localhost:"+5000 +"/MessageControleGlobal", MC); 
 						}
 						catch (RemoteException re) { System.out.println(re) ; }
@@ -314,19 +312,20 @@ public class Fenetre extends JFrame{
 						{
 							for(int i = 0 ; i < nbJoueurs ; i++)
 							{
-								Runtime runtime = Runtime.getRuntime();
+                                try{Thread.sleep(1000); } catch   (InterruptedException re) { System.out.println(re) ; }
+                                if(tabJoueurs.get(i)=="humain")
+                                {
+									Fenetre2 f2 = new Fenetre2(i,MC);
+									f2.setVisible(true);
+                                    continue;
+								}
+                                Runtime runtime = Runtime.getRuntime();
 								String titre_terminal = "\"Joueur n°"+i+"\"";
 								int port_joueur = 5001+i;
                                 System.out.println(tabJoueurs.get(i));
 								String commande_lancement_joueur = "java JoueurImpl localhost 5000 localhost "+port_joueur+" "+tabJoueurs.get(i)+"; $SHELL"; 
 								runtime.exec(new String[] { "xterm", "-T", titre_terminal,"-e",commande_lancement_joueur} );
-								
-								if(tabJoueurs.get(i)=="humain")
-								{
-									Fenetre2 f2 = new Fenetre2(i);
-									f2.setVisible(true);
-								
-								}
+
 							}
 						}
 					catch(IOException exc){

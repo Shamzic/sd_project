@@ -24,7 +24,8 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
     public COMPORTEMENT comportement= COMPORTEMENT.COOPERATIF;
     public ETAT etat = ETAT.ATTEND;
     static Object ObjSynchro = new Object();
-
+    boolean played = false;
+    
     /**
 	 *
 	 * Méthode principale qui lance un joueur lié à un producteur
@@ -134,17 +135,24 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                 System.out.println("Comportement du joueur : brute.");
                 break;
             }
+            case "humain":
+            {
+                this.comportement = COMPORTEMENT.HUMAIN;
+                System.out.println("Comportement du joueur : humain.");
+                break;
+            }
             
             default: 
             {
                 this.comportement = COMPORTEMENT.COOPERATIF;
-                System.out.println("Comportement par défaut du joueur : coopératif.");
+                System.out.println("Comportement par défaut du joueur : coopératif." + comportement);
                 break;
             }
         }
 
         // initialise le serveur connexion pour que le controlleur puisse lui envoyer les nouveaux connectés
         C = new ConnexionImpl();
+        System.out.println("je me suis connecté au port" + portSelf);
         try
         {
             Naming.rebind( "rmi://localhost:"+ portSelf + "/Connexion", C);
@@ -245,14 +253,16 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                     {
                         comportement_attack();
                     }
+                    else
+                    {
+                        System.out.println("Je suis un humain !!");
+                    }
                 }
 
 
                 System.out.println("\tTour joueur terminé en état "+etat);
                 M.sendInformation(id, RList);
                 TimeUnit.SECONDS.sleep(1);
-                if(id == 1)
-                    TimeUnit.SECONDS.sleep(1);
                     
                 // test de victoire et passe le jeton
                 victory_test();
@@ -901,6 +911,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                             {
                                 have_token = false;
                                 C.JList.get( i ).receiveToken();
+                        System.out.println("Send token to " + i);
                             }
                         }
                     }
@@ -920,6 +931,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                     {
                         have_token = false;
                         C.JList.get( i ).receiveToken();
+                        System.out.println("Send token to " + i);
                     }
                 }
                 else
@@ -1099,7 +1111,108 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
         {monitor.notify();}
     }
     
+    public void VolRessources(int nb, int id, String Res)
+    {
+        int ressources_prises =0;
+        TYPE choosenType;
+        if( Res == "OR")
+            choosenType = TYPE.OR;
+        else if( Res == "BOIS")
+            choosenType = TYPE.BOIS;
+        else
+            choosenType = TYPE.ARGENT;
+        
+         // cherche la ressource chez le joueur
+        try
+        {
+            ressources_prises = C.JList.get(id).getStock( nb , choosenType) ;
+        }catch (RemoteException re) { System.out.println(re) ; }
+                    
+        if( ressources_prises >= 0) // le joueur a donné ressources
+        {
+            etat = ETAT.VOLE;
+            System.out.println("Je prends "+ressources_prises+" ressources de " + choosenType +" au joueur n°"+id);
+            try
+            {
+                increaseRessourceAmout( choosenType,ressources_prises);
+            } catch (RemoteException re) { System.out.println(re) ; }
+        }
+        else
+        {
+            System.out.println("Je me suis fais avoir :-(");
+            etat=ETAT.PENALITE;
+        }
+        try
+        {
+            System.out.println("\tTour joueur terminé en état "+etat);
+            System.out.println("Mon id " + id);
+            M.sendInformation(id, RList);
+            TimeUnit.SECONDS.sleep(1);
+            
+            // test de victoire et passe le jeton
+            victory_test();
+            if( C.JList.size() == C.FinishedPlayerList.size() ) // Tous on fini 
+            {
+                C.endAllProducteurs();
+                return ;
+            }
+        }
+            catch (InterruptedException re) { System.out.println(re) ; }
+            catch (RemoteException re) { System.out.println(re) ; }
+    }
     
+    
+    public void PrendRessources(int nb, int id, String Res)
+    {
+        int ressources_prises =0;
+        TYPE choosenType;
+        if( Res == "OR")
+            choosenType = TYPE.OR;
+        else if( Res == "BOIS")
+            choosenType = TYPE.BOIS;
+        else
+            choosenType = TYPE.ARGENT;
+        
+        
+        // cherche la ressource chez le producteur
+        try
+        {
+            ressources_prises = C.PList.get(id).getStock( nb , choosenType) ;
+        }catch (RemoteException re) { System.out.println(re) ; }
+                    
+        if( ressources_prises > 0) // le producteur a des ressources
+        {
+            etat = ETAT.PREND_RESSOURCES;
+            System.out.println("Je prends "+ressources_prises+" ressources de " + choosenType +" au producteur n°"+id);
+            try
+            {
+                increaseRessourceAmout( choosenType,ressources_prises);
+            } catch (RemoteException re) { System.out.println(re) ; }
+        }
+        else
+        {
+            System.out.println("Pas assez de ressource disponibles");
+            etat=ETAT.ATTEND;
+        }
+        
+        try
+        {
+            System.out.println("\tTour joueur terminé en état "+etat);
+            System.out.println("Mon id " + id);
+            M.sendInformation(id, RList);
+            TimeUnit.SECONDS.sleep(1);
+            
+            // test de victoire et passe le jeton
+            victory_test();
+            if( C.JList.size() == C.FinishedPlayerList.size() ) // Tous on fini 
+            {
+                C.endAllProducteurs();
+                return ;
+            }
+        }
+            catch (InterruptedException re) { System.out.println(re) ; }
+            catch (RemoteException re) { System.out.println(re) ; }
+    }
     
     /**
      * Termine le programme
@@ -1121,6 +1234,28 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
         throws RemoteException
     {
         C.deletePlayer(id);
+    }
+    
+    public void Observer()
+    {
+        etat = ETAT.OBSERVE;
+        
+        try
+        {
+            System.out.println("\tTour joueur terminé en état "+etat);
+            M.sendInformation(id, RList);
+            TimeUnit.SECONDS.sleep(1);
+            
+            // test de victoire et passe le jeton
+            victory_test();
+            if( C.JList.size() == C.FinishedPlayerList.size() ) // Tous on fini 
+            {
+                C.endAllProducteurs();
+                return ;
+            }
+        }
+            catch (InterruptedException re) { System.out.println(re) ; }
+            catch (RemoteException re) { System.out.println(re) ; }
     }
     
 }

@@ -288,9 +288,8 @@ public class Fenetre extends JFrame{
 							//System.out.println("Mode de jeu activé : "+ModeDeJeu);
 							//System.out.println("OR VICTOIRE : "+orWin);
 							  
-							
-							MC = new MessageControleImpl(5,3,nbProducteurs,nbJoueurs,"localhost",5000,0,L,ModeDeJeu,1); // Boouchon sur le temps 
-																																		    // pas encore implémenté
+							Tps_max =(Integer) FormatterTempsMax.getValue();
+							MC = new MessageControleImpl(5,3,nbProducteurs,nbJoueurs,"localhost",5000,0,L,ModeDeJeu, Tps_max ); 
 							Naming.rebind( "rmi://localhost:"+5000 +"/MessageControleGlobal", MC); 
 						}
 						catch (RemoteException re) { System.out.println(re) ; }

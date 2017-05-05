@@ -54,14 +54,14 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
             M = (MessageControle) Naming.lookup("rmi://" + args[0] + ":" + args[1] + "/MessageControleGlobal");
             
             InitialInfoImpl I =M.getPlayerInitialInfo();
-           // System.out.println("Le joueur reçoit l'id : " + I.IdJoueur + ", RI : " + I.nbRessourcesInitiales + ", RD : " + I.nbRessourcesDifferentes);
+
             id = I.IdJoueur;
             // initialise le serveur joueur
             J = new JoueurImpl (I,args[3],args[4]);
             Naming.rebind( "rmi://localhost:"+args[3] + "/Joueur", J);
             
             // Maintenant envoie ses "coordonnées" au Coordinateur
-        //    System.out.println("je vais ajouter " + args[2] + "    "  + Integer.parseInt(args[3]));
+
             M.addMachine( args[2], Integer.parseInt(args[3]) );
             J.start();
         }
@@ -401,7 +401,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
         }
         Random r = new Random();
         index = r.nextInt( Math.min(2,PriorityList.size()) ); // choisit soit la première ressource, soit la deuxième, s'il reste une deuxième ressource à chercher
-        //System.out.println("J'ai choisi l'index " + index);
+
         // On a choisi la ressource à la position i de la liste TypeNb
         max = -1;
         // Maintenant il faut choisir le producteur chez qui on prend les ressources -> celui qui en a le plus
@@ -950,7 +950,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                     i = (id +1) % C.JList.size();
                     while( C.FinishedPlayerList.contains( C.JList.get(i) ) ) // parcours tous les joueurs et regarde s'ils ont déjà finis
                         i = (i+1) % C.JList.size();
-                  //  System.out.println("Envoie token a " + i);
+
                     if(I.playMode == 0)
                     {
                         have_token = false;
@@ -1368,49 +1368,7 @@ class JoueurImpl extends UnicastRemoteObject implements Joueur
                 catch (RemoteException re) { System.out.println(re) ; }
         }
     }
-    /*
-    public void PlayerOrder(String order, int nb, int id, String Res)
-    {
-        if( etat == ETAT.PENALITE3) // c'est fait prendre en volant au tour d'avant
-        {
-            System.out.println("Je dois attendre ce tour");
-            etat = ETAT.PENALITE2;
-            if( I.playMode == 1 ) 
-                try {Thread.sleep( 50 );}
-                    catch (InterruptedException re) { System.out.println(re) ; }                
-        
-        }
-        if( etat == ETAT.PENALITE2) // c'est fait prendre en volant au tour d'avant
-        {
-            System.out.println("Je dois attendre ce tour");
-            etat = ETAT.PENALITE;
-            if( I.playMode == 1 ) 
-                try {Thread.sleep( 50 );}
-                    catch (InterruptedException re) { System.out.println(re) ; }                
-        }
-        else if( etat == ETAT.PENALITE) // c'est fait prendre en volant au tour d'avant
-        {
-            System.out.println("Je dois attendre ce tour");
-            etat = ETAT.ATTEND;
-            if( I.playMode == 1 ) 
-                try {Thread.sleep( 50 );}
-                    catch (InterruptedException re) { System.out.println(re) ; }                
-        }
-        else
-        {
-            if( order == "observer")
-                Observer();
-            else if (order == "PrendRessource")
-                PrendRessources( nb,id,Res);
-            else if (order == "VolRessources")
-                VolRessources(nb,id,Res);
-            else
-                System.out.println("Action non disponible");
-            
-            
-        }
-    }
-    */
+
     
 }
 

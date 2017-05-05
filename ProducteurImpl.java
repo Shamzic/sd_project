@@ -116,15 +116,17 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
         return RepL;
     }
 
+    
     public synchronized void decreaseRessourceAmount(int ressource, int x)
         throws RemoteException 
     {
         RList.get(ressource).decreaseRessource(x);
     }
     
+    // Fonction qui permet de faire un thread qui augmente les ressources du producteur toutes les x ms jusqu'à
+    // ce qu'on lui envoie un interrupt
     public void fonctionThread ( int ms)
     {
-        System.out.println("entre dans fonctoinThread avec un temps de " + ms);
         final int time = ms;
         t = new Thread()
         {
@@ -142,6 +144,7 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
         t.start();
     }
     
+    // Fonction qui sert à ajouter des ressources à chaque tour (mode tour / tour et mode temps réel)
     public void addStockTurn()
         throws RemoteException 
     {
@@ -168,7 +171,10 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
         }
     }
     
-    
+    // Fonction utilisée pour prendre quantitee ressource du type T chez le producteur
+    // Lorsqu'un producteur produit plusieurs ressources de même type et qu'on demande cette ressource,
+    // le producteur prélève ce montant équitablement sur chaque ressource
+    // On peut prendre au maximum une quantité de 10 ressources
     public int getStock(int quantity, TYPE T)
         throws RemoteException 
     {
@@ -177,7 +183,6 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
         
         // Commence par compter le nombre de ressources de ce type chez ce producteur 
         int nType = 0, total = 0, takenRessources = 0 , i;
-       // int RNonDivisibles; // non utilisé
         ArrayList<Ressource> RL = new ArrayList<Ressource>(); // y met les ressources de ce type
         
         synchronized (ObjSynchro) // synchronized sert à faire des sections critiques ( section exécutée de façon atomique )
@@ -233,10 +238,11 @@ class ProducteurImpl extends UnicastRemoteObject implements Producteur
                 }
             }
         }
-//        System.out.println( "\t A pris " + takenRessources + ".");
+
         return takenRessources;
     }
     
+    // Renvoie la quantité de la ressource T qu'à le producteur
     public int getStockQuantity(TYPE T)
     {
         int i;

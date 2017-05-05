@@ -95,7 +95,7 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
         try
         {
             Connexion CNew = (Connexion) Naming.lookup("rmi://" + MachineName + ":" + port + "/Connexion");
-            ///////////////// j'ai changé ça de place après le for pour que les joueurs senregistres aussi :::::::::::::::::::::::::::::::::::::
+
             CList.add(CNew); // l'ajoute à la list de connexions
             SList.add(new Tuple<String,Integer>(MachineName,port)); // l'ajoute à la liste de tuples (MachineName,port) servant à l'interconnexion des différents hôtes
             
@@ -239,9 +239,7 @@ public class MessageControleImpl extends UnicastRemoteObject implements MessageC
         
         for(i = 0 ; i < TYPE.values().length ; i++ )
         {
-	    //writer.print(turn);
             S +=" " + Ressources.get(i).getStock();
-            //System.out.println( " val du type " + Ressources.get(i).getStockType() + " a une valeur de "  + Ressources.get(i).getStock());
         }
         System.out.println(S);
         

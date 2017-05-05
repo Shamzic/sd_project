@@ -12,6 +12,5 @@ public class Test {
 	 	/*Runtime runtime = Runtime.getRuntime();
 runtime.exec(new String[] { "xterm", "-T", "\"yolo\"","-e", "java Mainexemple" } );*/
 
-	 		
 	}
 }

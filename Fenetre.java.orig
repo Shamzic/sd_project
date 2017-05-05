@@ -66,7 +66,11 @@ public class Fenetre extends JFrame{
 		final JFormattedTextField FormatterProducteurs = new JFormattedTextField(formatter);
 		FormatterProducteurs.setValue(1);
 
+<<<<<<< HEAD
+		String[] comportements = {"coopératif", "individualiste", "voleur", "humain"};
+=======
 		String[] comportements = {"cooperatif", "individualiste", "voleur", "humain"};
+>>>>>>> 78d738d3b46f762fe480fabcd0d0d10ec9bc3e09
 		final JComboBox<String> comboxJoueur= new JComboBox<>(comportements);
 
 		NumberFormatter formatterRessources = new NumberFormatter(format);

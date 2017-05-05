@@ -3,7 +3,7 @@ set output "Graphique_fin.jpg"
 set title ' Evolution des ressources des joueurs en fonction des tours : '
 set xlabel ' Tour '
 set ylabel ' Nombre de ressources '
-set key on outside left bmargin box title 'Légende'
+set key on outside left bmargin box title 'Legende'
 plot "actionLog.dat" using 1:3 every $0::2 with line lc rgb"green" title "Ressource 1 joueur 2",\
      "actionLog.dat" using 1:4 every $0::2 with line lc rgb"blue" title "Ressource 2 joueur 2",\
      "actionLog.dat" using 1:5 every $0::2 with line lc rgb"red" title "Ressource 3 joueur 2"

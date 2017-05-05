@@ -27,9 +27,11 @@ public class Graphs {
 
 	ressource1.set("xlabel","'Tour ou millisecondes selon votre mode de jeu'");
 	ressource1.set("ylabel","'Nombre de ressources'");
-	ressource1.set("key","on outside left bmargin box title 'Légende'");// title \'Légende\'
+	ressource1.set("key","on outside left bmargin box title 'Légende'");
 	
-    ressource1.addPlot("sin(x)");
+	//cmd_plot1="actionLog.dat" using 1:3 every $0::2 with line lc rgb"green" title "Ressource 1 joueur 2",\ "actionLog.dat" using 1:4 every $0::2 with line lc rgb"blue" title "Ressource 2 joueur 2",\ "actionLog.dat" using 1:5 every $0::2 with line lc rgb"red" title "Ressource 3 joueur 2";
+	
+    ressource1.addPlot(cmd_plot1);
     ressource2.addPlot("");
     ressource3.addPlot("");
     ressource1.plot();
